@@ -1,0 +1,489 @@
+/**
+ * Canonical site content + types.
+ * Imported by the Vue app (via `~~/shared/site`) and the Nitro
+ * server API routes (via relative path), so the data stays in one place.
+ */
+
+export type ProjectCategory =
+  | "SaaS"
+  | "E-commerce"
+  | "Agency"
+  | "Portfolio"
+  | "Web App"
+  | "Landing";
+
+export type ProjectStatus = "Available" | "Sold" | "Featured";
+
+export interface Project {
+  id: string;
+  name: string;
+  category: ProjectCategory;
+  blurb: string;
+  /** Headline proof metric, e.g. "+212% signups". */
+  metric: string;
+  metricLabel: string;
+  price: number;
+  status: ProjectStatus;
+  year: number;
+  tags: string[];
+  /** Tailwind-friendly gradient stops for the generated cover. */
+  gradient: [string, string];
+}
+
+export interface PricingTier {
+  id: string;
+  name: string;
+  tagline: string;
+  price: number;
+  /** false when it's a custom/quote tier. */
+  fixed: boolean;
+  period: string;
+  features: string[];
+  highlighted?: boolean;
+  cta: string;
+}
+
+export interface Testimonial {
+  quote: string;
+  author: string;
+  role: string;
+  company: string;
+  initials: string;
+}
+
+export interface ProcessStep {
+  step: string;
+  title: string;
+  description: string;
+}
+
+export interface Faq {
+  q: string;
+  a: string;
+}
+
+export interface Stat {
+  value: string;
+  label: string;
+}
+
+/* ---------------------------------------------------------------- */
+
+export const projects: Project[] = [
+  {
+    id: "nimbus-analytics",
+    name: "Nimbus Analytics",
+    category: "SaaS",
+    blurb:
+      "A real-time product analytics dashboard with live charts, cohort retention, and a self-serve onboarding flow.",
+    metric: "+212%",
+    metricLabel: "trial signups",
+    price: 7400,
+    status: "Featured",
+    year: 2025,
+    tags: ["Dashboard", "Charts", "Auth", "Billing"],
+    gradient: ["#34d8a6", "#1f9bf0"],
+  },
+  {
+    id: "verdant-market",
+    name: "Verdant Market",
+    category: "E-commerce",
+    blurb:
+      "A headless storefront for an organic grocer — instant search, one-tap checkout, and a subscription box flow.",
+    metric: "+38%",
+    metricLabel: "conversion rate",
+    price: 9200,
+    status: "Sold",
+    year: 2025,
+    tags: ["Headless", "Stripe", "Search", "PWA"],
+    gradient: ["#6ce9bf", "#0a9472"],
+  },
+  {
+    id: "harbor-legal",
+    name: "Harbor Legal",
+    category: "Agency",
+    blurb:
+      "A trust-forward marketing site for a boutique law firm, with case studies, intake forms, and CMS-driven articles.",
+    metric: "4.2×",
+    metricLabel: "qualified leads",
+    price: 5600,
+    status: "Sold",
+    year: 2024,
+    tags: ["CMS", "Forms", "SEO", "Blog"],
+    gradient: ["#38bdf8", "#2563eb"],
+  },
+  {
+    id: "atlas-portfolio",
+    name: "Atlas Folio",
+    category: "Portfolio",
+    blurb:
+      "An award-style portfolio for a 3D artist with cinematic scroll, WebGL hero, and a password-gated client area.",
+    metric: "92",
+    metricLabel: "Awwwards score",
+    price: 4300,
+    status: "Available",
+    year: 2025,
+    tags: ["WebGL", "Motion", "Gallery"],
+    gradient: ["#7dd3fc", "#14b88a"],
+  },
+  {
+    id: "pulse-fit",
+    name: "Pulse Fit",
+    category: "Web App",
+    blurb:
+      "A workout-tracking PWA with offline support, streaks, and a social leaderboard powered by edge functions.",
+    metric: "61k",
+    metricLabel: "monthly actives",
+    price: 11800,
+    status: "Available",
+    year: 2025,
+    tags: ["PWA", "Offline", "Realtime", "Edge"],
+    gradient: ["#34d8a6", "#38bdf8"],
+  },
+  {
+    id: "lumen-launch",
+    name: "Lumen Launch",
+    category: "Landing",
+    blurb:
+      "A high-velocity product launch page with a waitlist, animated feature reveals, and A/B-tested hero variants.",
+    metric: "27%",
+    metricLabel: "waitlist opt-in",
+    price: 2900,
+    status: "Available",
+    year: 2026,
+    tags: ["Waitlist", "A/B", "Analytics"],
+    gradient: ["#a4f4d6", "#1f9bf0"],
+  },
+  {
+    id: "meridian-bank",
+    name: "Meridian Neo",
+    category: "SaaS",
+    blurb:
+      "A fintech onboarding experience with KYC steps, animated balance cards, and a fully themeable design system.",
+    metric: "−43%",
+    metricLabel: "drop-off rate",
+    price: 13500,
+    status: "Sold",
+    year: 2024,
+    tags: ["Fintech", "Design System", "KYC"],
+    gradient: ["#14b88a", "#2563eb"],
+  },
+  {
+    id: "evergreen-stay",
+    name: "Evergreen Stay",
+    category: "E-commerce",
+    blurb:
+      "A boutique-hotel booking site with availability calendar, map search, and a buttery multi-step reservation flow.",
+    metric: "+54%",
+    metricLabel: "direct bookings",
+    price: 8100,
+    status: "Available",
+    year: 2025,
+    tags: ["Booking", "Calendar", "Maps"],
+    gradient: ["#6ce9bf", "#38bdf8"],
+  },
+  {
+    id: "cobalt-crm",
+    name: "Cobalt CRM",
+    category: "SaaS",
+    blurb:
+      "A pipeline CRM with drag-and-drop deals, an activity timeline, and a command palette that power users love.",
+    metric: "+176%",
+    metricLabel: "seat activation",
+    price: 10200,
+    status: "Sold",
+    year: 2025,
+    tags: ["CRM", "Drag & Drop", "Command-K"],
+    gradient: ["#34d8a6", "#2563eb"],
+  },
+  {
+    id: "northwind-freight",
+    name: "Northwind Freight",
+    category: "Web App",
+    blurb:
+      "A logistics tracking portal with live shipment maps, role-based access, and exportable customs paperwork.",
+    metric: "−31%",
+    metricLabel: "support tickets",
+    price: 12400,
+    status: "Available",
+    year: 2024,
+    tags: ["Maps", "RBAC", "Exports", "Realtime"],
+    gradient: ["#1f9bf0", "#0a765e"],
+  },
+  {
+    id: "saffron-table",
+    name: "Saffron Table",
+    category: "E-commerce",
+    blurb:
+      "A restaurant-group ordering platform with menu builder, table QR ordering, and Stripe-powered payouts.",
+    metric: "+63%",
+    metricLabel: "online orders",
+    price: 6800,
+    status: "Sold",
+    year: 2025,
+    tags: ["Ordering", "QR", "Stripe", "Menu CMS"],
+    gradient: ["#a4f4d6", "#0a9472"],
+  },
+  {
+    id: "orbit-docs",
+    name: "Orbit Docs",
+    category: "SaaS",
+    blurb:
+      "A developer docs + knowledge base with instant search, versioned content, and interactive API playgrounds.",
+    metric: "2.8×",
+    metricLabel: "trial signups",
+    price: 5900,
+    status: "Available",
+    year: 2026,
+    tags: ["Docs", "Search", "Versioning", "MDX"],
+    gradient: ["#7dd3fc", "#2563eb"],
+  },
+  {
+    id: "bloom-studio",
+    name: "Bloom Studio",
+    category: "Agency",
+    blurb:
+      "An award-style site for a creative studio — WebGL hero, case-study scrollytelling, and a CMS-driven journal.",
+    metric: "88",
+    metricLabel: "Awwwards score",
+    price: 4800,
+    status: "Featured",
+    year: 2025,
+    tags: ["WebGL", "Scrollytelling", "CMS"],
+    gradient: ["#6ce9bf", "#1f9bf0"],
+  },
+  {
+    id: "vanta-wear",
+    name: "Vanta Wear",
+    category: "E-commerce",
+    blurb:
+      "A fashion storefront with 3D product spins, size-recommendation quiz, and an editorial lookbook builder.",
+    metric: "+41%",
+    metricLabel: "average order value",
+    price: 9800,
+    status: "Available",
+    year: 2025,
+    tags: ["3D", "Quiz", "Lookbook", "Headless"],
+    gradient: ["#38bdf8", "#14b88a"],
+  },
+  {
+    id: "pinnacle-capital",
+    name: "Pinnacle Capital",
+    category: "Landing",
+    blurb:
+      "A venture fund site with an animated thesis section, portfolio grid, and a gated LP data room.",
+    metric: "+120%",
+    metricLabel: "demo requests",
+    price: 3600,
+    status: "Sold",
+    year: 2026,
+    tags: ["Finance", "Gated", "Animation"],
+    gradient: ["#7dd3fc", "#2563eb"],
+  },
+];
+
+export const pricingTiers: PricingTier[] = [
+  {
+    id: "launch",
+    name: "Starter Site",
+    tagline: "A clean one-page website for a new brand, offer, or service.",
+    price: 650,
+    fixed: true,
+    period: "project",
+    features: [
+      "1 polished landing page",
+      "Mobile-friendly responsive build",
+      "Custom colors, fonts, and layout",
+      "Contact form setup",
+      "Basic SEO and speed pass",
+      "1 revision round",
+    ],
+    cta: "Start a starter site",
+  },
+  {
+    id: "studio",
+    name: "Business Site",
+    tagline: "A complete multi-page website for a growing business.",
+    price: 1850,
+    fixed: true,
+    period: "project",
+    highlighted: true,
+    features: [
+      "Up to 6 core pages",
+      "Services, about, contact, and portfolio sections",
+      "Stronger visuals and page transitions",
+      "Forms, analytics, and basic integrations",
+      "SEO metadata, sitemap, and launch setup",
+      "3 revision rounds + handover",
+    ],
+    cta: "Build a business site",
+  },
+  {
+    id: "scale",
+    name: "Custom Build",
+    tagline: "For web apps, ecommerce, portals, dashboards, and larger ideas.",
+    price: 0,
+    fixed: false,
+    period: "scoped",
+    features: [
+      "Dashboards, bookings, stores, or client portals",
+      "Auth, payments, database, or API work",
+      "CMS/admin tools where needed",
+      "Third-party integrations and automation",
+      "Performance and security setup",
+      "Optional support or monthly retainer",
+    ],
+    cta: "Plan a custom build",
+  },
+];
+
+export const testimonials: Testimonial[] = [
+  {
+    quote:
+      "Lumina shipped our SaaS marketing site in under two weeks and trial signups more than tripled. The motion work is unreal.",
+    author: "Dana Reyes",
+    role: "Head of Growth",
+    company: "Nimbus",
+    initials: "DR",
+  },
+  {
+    quote:
+      "We bought one of their available builds and relaunched in days. Conversion jumped 38% and the codebase is genuinely clean.",
+    author: "Marcus Bell",
+    role: "Founder",
+    company: "Verdant Market",
+    initials: "MB",
+  },
+  {
+    quote:
+      "The team treated our brand like their own. Qualified leads went up 4×, and clients keep complimenting the site.",
+    author: "Priya Nair",
+    role: "Managing Partner",
+    company: "Harbor Legal",
+    initials: "PN",
+  },
+  {
+    quote:
+      "Fast, communicative, and obsessive about detail. Our drop-off rate fell 43% after they reworked onboarding.",
+    author: "Tomás Lind",
+    role: "Product Lead",
+    company: "Meridian",
+    initials: "TL",
+  },
+  {
+    quote:
+      "Seat activation jumped 176% after launch. They turned a clunky internal tool into something our reps actually open.",
+    author: "Sofia Alvarez",
+    role: "VP Sales",
+    company: "Cobalt",
+    initials: "SA",
+  },
+  {
+    quote:
+      "Our customs portal used to generate a flood of tickets. Lumina cut them by a third and ops finally went quiet.",
+    author: "Jonas Weber",
+    role: "Head of Operations",
+    company: "Northwind",
+    initials: "JW",
+  },
+  {
+    quote:
+      "The 3D product spins and size quiz lifted our average order value 41%. The site sells better than our store associates.",
+    author: "Ivy Chen",
+    role: "Ecommerce Director",
+    company: "Vanta Wear",
+    initials: "IC",
+  },
+  {
+    quote:
+      "We bought a ready-made build, rebranded it in a weekend, and demo requests doubled. Best money we've spent all year.",
+    author: "Daniel Osei",
+    role: "CEO",
+    company: "Pinnacle",
+    initials: "DO",
+  },
+];
+
+export const processSteps: ProcessStep[] = [
+  {
+    step: "01",
+    title: "Discover",
+    description:
+      "We dig into your goals, audience, and metrics, then map the fastest path to a site that performs.",
+  },
+  {
+    step: "02",
+    title: "Design",
+    description:
+      "Interactive prototypes with real motion — you approve the feel before a single production line ships.",
+  },
+  {
+    step: "03",
+    title: "Build",
+    description:
+      "Production code with a backend, CMS, and analytics. Accessible, fast, and ready to scale.",
+  },
+  {
+    step: "04",
+    title: "Launch & sell",
+    description:
+      "We deploy, hand over the keys, and — if you'd like — list the build for sale in our showcase.",
+  },
+];
+
+export const faqs: Faq[] = [
+  {
+    q: "Do you build custom sites or sell pre-made ones?",
+    a: "Both. We craft bespoke sites for clients, and we also sell production-ready builds you can buy outright and relaunch under your brand.",
+  },
+  {
+    q: "What's your typical turnaround?",
+    a: "A Launch one-pager goes live in about 7 days. Studio multi-page sites take 2–4 weeks. Scale projects are scoped per sprint.",
+  },
+  {
+    q: "What tech stack do you use?",
+    a: "Modern, fast, and maintainable: Nuxt 4, Vue 3, Tailwind v4, edge-ready backends, and a CMS where it helps. Everything is yours after handover.",
+  },
+  {
+    q: "Do I own the code?",
+    a: "Yes. On final payment you receive the full repository, assets, and deployment — no lock-in, no licensing strings.",
+  },
+  {
+    q: "Can you maintain the site after launch?",
+    a: "Absolutely. Studio includes 30 days of support, and Scale plans come with an optional ongoing retainer and SLA.",
+  },
+];
+
+export const stats: Stat[] = [
+  { value: "120+", label: "websites shipped" },
+  { value: "98", label: "avg. Lighthouse score" },
+  { value: "$24M+", label: "client revenue influenced" },
+  { value: "14", label: "countries served" },
+];
+
+export const clientLogos: string[] = [
+  "Nimbus",
+  "Verdant",
+  "Harbor",
+  "Atlas",
+  "Pulse",
+  "Lumen",
+  "Meridian",
+  "Evergreen",
+  "Northwind",
+  "Cobalt",
+  "Saffron",
+  "Orbit",
+  "Bloom",
+  "Vanta",
+  "Pinnacle",
+];
+
+export const projectCategories: ProjectCategory[] = [
+  "SaaS",
+  "E-commerce",
+  "Agency",
+  "Portfolio",
+  "Web App",
+  "Landing",
+];
