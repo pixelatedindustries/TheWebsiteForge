@@ -1,17 +1,5 @@
 <script setup lang="ts">
-/**
- * BuildShip — a looping narrative SVG of a website's lifecycle:
- *   1. Reach out: two people figures appear and chat bubbles pop between them
- *   2. Design:   the people fade away and the chat converges into a frame
- *   3. Build:    a blank frame appears with just a hero (one thing), then a
- *                header arrives, then a feature card, then more cards + footer
- *                — the site visibly grows
- *   4. Live:     a refresh highlight rotates through the blocks (a deploy beat)
- *   5. Fade:     everything fades back to nothing — loop restarts from step 1
- *
- * The loop is perfect because every entrance uses `fromTo`, which re-applies
- * its from-state at the start of each iteration.
- */
+
 type Stage = "reaching" | "designing" | "building" | "live" | "optimising";
 const stage = ref<Stage>("reaching");
 const stageLabel = computed(

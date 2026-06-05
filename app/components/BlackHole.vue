@@ -1,13 +1,5 @@
 <script setup lang="ts">
-/**
- * Black-hole lens — a self-contained WebGL scene: a deep three-layer starfield +
- * icy nebula gravitationally lensed HARD around a black event horizon (soft halo,
- * no accretion ring). Living detail: an orbiting photon, periodic stars that are
- * captured + spaghettified, spacetime ripples on fast cursor moves, an Einstein-
- * ring magnification, a scroll z-dolly, and a "scene birth" on first load. On
- * Enter it forms a VORTEX that swirls the field down and drains to black (the
- * hole never grows). Normal `.vue` (empty div on SSR; Three.js via dynamic import).
- */
+
 const host = ref<HTMLDivElement | null>(null);
 // drives the "vortex" swallow on Enter (set from the intro page)
 const swallow = useState<{
@@ -61,6 +53,7 @@ onMounted(async () => {
     uRippleAmp: { value: 1 },
     uStarStart: { value: new THREE.Vector2(0, 0) },
     uStarProg: { value: 0 },
+    uswallowCover: { value: 0 },
   };
 
   const material = new THREE.ShaderMaterial({
