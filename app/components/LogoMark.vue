@@ -11,7 +11,7 @@ withDefaults(defineProps<{ size?: number }>(), { size: 34 });
     xmlns="http://www.w3.org/2000/svg"
     class="shrink-0"
     role="img"
-    aria-label="YourWebsiteSource logo"
+    aria-label="TheWebsiteForge logo"
   >
     <defs>
       <linearGradient id="lumina-grad" x1="6" y1="6" x2="42" y2="42">

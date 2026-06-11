@@ -21,11 +21,7 @@ withDefaults(
       <!-- internal glow (breathing) -->
       <div
         class="animate-pulse-glow absolute inset-0 -z-10"
-        style="
-          background:
-            radial-gradient(60% 60% at 30% 20%, rgba(20, 184, 138, 0.25), transparent 70%),
-            radial-gradient(60% 60% at 75% 80%, rgba(31, 155, 240, 0.28), transparent 70%);
-        "
+        style="background: radial-gradient(60% 60% at 30% 20%, rgba(20, 184, 138, 0.25), transparent 70%), radial-gradient(60% 60% at 75% 80%, rgba(31, 155, 240, 0.28), transparent 70%);"
       />
       <div class="absolute inset-0 -z-10 glass-strong" />
 

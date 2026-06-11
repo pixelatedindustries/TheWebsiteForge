@@ -258,11 +258,12 @@ onMounted(async () => {
   let starTimer = 5 + Math.random() * 5;
   let idleRippleTimer = 4.5;
 
-  const clock = new THREE.Clock();
+  const timer = new THREE.Timer();
   let elapsed = 0;
   let raf = 0;
   const render = () => {
-    const dt = Math.min(0.05, clock.getDelta());
+    timer.update();
+    const dt = Math.min(0.05, timer.getDelta());
     elapsed += dt;
     uniforms.uTime.value = elapsed;
     uniforms.uMouse.value.x += (mTarget.x - uniforms.uMouse.value.x) * 0.04;

@@ -69,7 +69,7 @@ const priceLabel = computed(() =>
 
     <NuxtLink
       v-magnetic="0.4"
-      to="/contact"
+      :to="tier.planKey ? `/checkout/start?plan=${tier.planKey}` : '/contact'"
       class="mt-8 inline-flex items-center justify-center rounded-lg px-4 py-3 text-sm font-semibold transition"
       :class="
         tier.highlighted

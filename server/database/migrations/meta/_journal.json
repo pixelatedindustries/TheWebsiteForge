@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1780846495730,
+      "tag": "0000_amazing_lethal_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781178934563,
+      "tag": "0001_tense_makkari",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781183242353,
+      "tag": "0002_futuristic_luke_cage",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1781206960552,
+      "tag": "0003_freezing_hydra",
+      "breakpoints": true
+    }
+  ]
+}

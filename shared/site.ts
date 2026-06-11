@@ -41,6 +41,31 @@ export interface PricingTier {
   features: string[];
   highlighted?: boolean;
   cta: string;
+  /** Billing catalogue key (shared/billing.ts) so the card can start checkout. */
+  planKey?: string;
+}
+
+/** A recurring hosting or care plan (monthly price, USD). */
+export interface RecurringPlan {
+  id: string;
+  name: string;
+  tagline: string;
+  /** Monthly price in USD. `from` true when it's a starting price. */
+  price: number;
+  from?: boolean;
+  features: string[];
+  highlighted?: boolean;
+}
+
+/** A simple priced add-on tier (e.g. database sizing). */
+export interface AddOnTier {
+  id: string;
+  name: string;
+  price: number;
+  period: string;
+  detail: string;
+  /** Managed-cloud monthly price (self-hosted + handling), when offered. */
+  managedPrice?: number;
 }
 
 export interface Testimonial {
@@ -284,30 +309,32 @@ export const projects: Project[] = [
 
 export const pricingTiers: PricingTier[] = [
   {
-    id: "launch",
-    name: "Starter Site",
-    tagline: "A clean one-page website for a new brand, offer, or service.",
-    price: 650,
+    id: "starter",
+    name: "Starter",
+    tagline: "A clean, fast site to launch a new brand, offer, or service.",
+    price: 249,
     fixed: true,
     period: "project",
+    planKey: "build_starter",
     features: [
-      "1 polished landing page",
+      "1–3 polished pages",
       "Mobile-friendly responsive build",
       "Custom colors, fonts, and layout",
       "Contact form setup",
       "Basic SEO and speed pass",
       "1 revision round",
     ],
-    cta: "Start a starter site",
+    cta: "Get started",
   },
   {
-    id: "studio",
-    name: "Business Site",
-    tagline: "A complete multi-page website for a growing business.",
-    price: 1850,
+    id: "professional",
+    name: "Professional",
+    tagline: "A polished multi-page website for a growing business.",
+    price: 399,
     fixed: true,
     period: "project",
     highlighted: true,
+    planKey: "build_professional",
     features: [
       "Up to 6 core pages",
       "Services, about, contact, and portfolio sections",
@@ -316,26 +343,161 @@ export const pricingTiers: PricingTier[] = [
       "SEO metadata, sitemap, and launch setup",
       "3 revision rounds + handover",
     ],
-    cta: "Build a business site",
+    cta: "Get started",
   },
   {
-    id: "scale",
-    name: "Custom Build",
-    tagline: "For web apps, ecommerce, portals, dashboards, and larger ideas.",
-    price: 0,
-    fixed: false,
-    period: "scoped",
+    id: "business",
+    name: "Business",
+    tagline: "A complete business website with deeper content and integrations.",
+    price: 699,
+    fixed: true,
+    period: "project",
+    planKey: "build_business",
     features: [
-      "Dashboards, bookings, stores, or client portals",
-      "Auth, payments, database, or API work",
-      "CMS/admin tools where needed",
-      "Third-party integrations and automation",
-      "Performance and security setup",
-      "Optional support or monthly retainer",
+      "Up to 12 pages or a small CMS",
+      "Editable content / blog where needed",
+      "Advanced animations and interactions",
+      "Third-party + marketing integrations",
+      "Technical SEO and performance tuning",
+      "4 revision rounds + handover",
     ],
-    cta: "Plan a custom build",
+    cta: "Get started",
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise",
+    tagline: "A larger custom build with advanced features and systems.",
+    price: 999,
+    fixed: true,
+    period: "project",
+    planKey: "build_enterprise",
+    features: [
+      "Web apps, dashboards, stores, or portals",
+      "Auth, payments, database, or API work",
+      "CMS / admin tooling where needed",
+      "Deeper integrations and automation",
+      "Performance and security hardening",
+      "Priority delivery + handover",
+    ],
+    cta: "Get started",
   },
 ];
+
+/* ---------------------------------------------------------------- */
+/* Recurring revenue: hosting, databases, care, and domains.        */
+/* ---------------------------------------------------------------- */
+
+export const hostingPlans: RecurringPlan[] = [
+  {
+    id: "static",
+    name: "Static Hosting",
+    tagline: "Landing pages and brochure sites that just need to be fast.",
+    price: 15,
+    from: true,
+    features: [
+      "Fast global edge delivery",
+      "SSL certificate + domain connection",
+      "Daily backups & uptime monitoring",
+      "Small text & image changes included",
+      "Email support",
+    ],
+  },
+  {
+    id: "dynamic",
+    name: "Dynamic Hosting",
+    tagline: "Business sites with a CMS, forms, logins, or a small database.",
+    price: 45,
+    from: true,
+    highlighted: true,
+    features: [
+      "Everything in Static",
+      "CMS / admin hosting",
+      "Form handling with spam protection",
+      "Staging environment for changes",
+      "Priority on small content changes",
+    ],
+  },
+  {
+    id: "app",
+    name: "App Hosting",
+    tagline: "Web apps, dashboards, and stores with real workloads.",
+    price: 120,
+    from: true,
+    features: [
+      "Everything in Dynamic",
+      "Dedicated app server resources",
+      "Background jobs & API hosting",
+      "Scaling headroom for traffic spikes",
+      "Advanced monitoring & alerts",
+    ],
+  },
+];
+
+export const databaseTiers: AddOnTier[] = [
+  {
+    id: "db-small",
+    name: "Small",
+    price: 10,
+    managedPrice: 15,
+    period: "month",
+    detail: "Up to ~1 GB. Forms, a small CMS, or a light member area.",
+  },
+  {
+    id: "db-medium",
+    name: "Medium",
+    price: 25,
+    managedPrice: 37.5,
+    period: "month",
+    detail: "Up to ~10 GB. Growing stores and membership sites.",
+  },
+  {
+    id: "db-large",
+    name: "Large",
+    price: 60,
+    managedPrice: 90,
+    period: "month",
+    detail: "Up to ~50 GB. High-traffic apps and large catalogues.",
+  },
+];
+
+export const carePlans: RecurringPlan[] = [
+  {
+    id: "care-basic",
+    name: "Basic Care",
+    tagline: "Keep your site current, secure, and online.",
+    price: 20,
+    features: [
+      "Monthly dependency & security updates",
+      "Uptime & broken-link checks",
+      "Monthly backup verification",
+      "Email support",
+    ],
+  },
+  {
+    id: "care-plus",
+    name: "Plus Care",
+    tagline: "A hands-on partner for an evolving website.",
+    price: 60,
+    highlighted: true,
+    features: [
+      "Everything in Basic Care",
+      "Priority support response",
+      "Content updates each month",
+      "Performance & SEO health check",
+      "Quarterly improvement call",
+    ],
+  },
+];
+
+export const domainInfo = {
+  tagline: "Domains at cost plus a small handling fee — no markup games.",
+  points: [
+    "We register and renew the domain on your behalf.",
+    "You are the legal owner and registrant from day one.",
+    "Transparent annual pricing, billed at cost + a small fee.",
+    "Auto-renew keeps your domain from ever lapsing.",
+  ],
+};
 
 export const testimonials: Testimonial[] = [
   {

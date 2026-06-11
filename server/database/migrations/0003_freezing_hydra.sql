@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "wallet_txn_reference_uq" ON "wallet_transactions" USING btree ("reference") WHERE "wallet_transactions"."reference" is not null;

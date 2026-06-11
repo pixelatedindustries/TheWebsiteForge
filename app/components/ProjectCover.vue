@@ -16,13 +16,7 @@ const style = computed(() => ({
     <!-- sheen -->
     <div
       class="absolute inset-0 opacity-60"
-      style="
-        background: radial-gradient(
-          120% 80% at 20% 0%,
-          rgba(255, 255, 255, 0.35),
-          transparent 55%
-        );
-      "
+      style="background: radial-gradient(120% 80% at 20% 0%, rgba(255, 255, 255, 0.35), transparent 55%);"
     />
 
     <!-- faux browser window -->

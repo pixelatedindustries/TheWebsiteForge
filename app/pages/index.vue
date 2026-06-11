@@ -1,6 +1,6 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: "YourWebsiteSource — Premium Websites With Motion, Speed & Bite",
+  title: "TheWebsiteForge — Premium Websites With Motion, Speed & Bite",
   description:
     "We design, build, and sell premium, beautifully animated websites. Enter to explore the showcase, the proof, and transparent pricing.",
 });
@@ -14,9 +14,16 @@ const swallow = useState<{
 
 // ambient cinematic audio (synthesised; muted by default)
 const hum = useAmbientHum();
-onBeforeUnmount(() => hum.disable());
+// Cleanup fns collected from inside the async onMounted. Vue lifecycle hooks
+// can't be registered after an `await`, so we register ONE onBeforeUnmount here
+// (synchronously) and run everything pushed to this array.
+const cleanups: Array<() => void> = [];
+onBeforeUnmount(() => {
+  hum.disable();
+  for (const fn of cleanups) fn();
+});
 
-const line1 = "YourWebsite".split(""); // headline rendered per-letter for the lens
+const line1 = "TheWebsite".split(""); // headline rendered per-letter for the lens
 
 // things the black hole's gravity acts on. `lens` = headline letters that bend
 // toward the hole by their own geometry (a standing gravitational lens); `tug` =
@@ -72,6 +79,12 @@ function applyLens(hole: { x: number; y: number }) {
 }
 
 onMounted(async () => {
+  // Returning visitors skip the intro and go straight to /home. The flag is set
+  // the first time they click "Enter the site" (see enter()).
+  if (localStorage.getItem("twf_entered") === "1") {
+    await navigateTo("/home", { replace: true });
+    return;
+  }
   if (!content.value) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const { default: gsap } = await import("gsap");
@@ -140,7 +153,7 @@ onMounted(async () => {
     measure();
   };
   window.addEventListener("resize", remeasure);
-  onBeforeUnmount(() => window.removeEventListener("resize", remeasure));
+  cleanups.push(() => window.removeEventListener("resize", remeasure));
 
   // let the entrance reveals settle, then measure rest positions + start effects
   const readyT = setTimeout(() => {
@@ -148,7 +161,7 @@ onMounted(async () => {
     ambientReady = true;
     applyLens(holeScreen());
   }, 1900);
-  onBeforeUnmount(() => clearTimeout(readyT));
+  cleanups.push(() => clearTimeout(readyT));
 
   // ambient pull only for fine pointers
   if (!window.matchMedia("(pointer: fine)").matches) return;
@@ -182,13 +195,15 @@ onMounted(async () => {
     }
   };
   window.addEventListener("pointermove", onMove, { passive: true });
-  onBeforeUnmount(() => window.removeEventListener("pointermove", onMove));
+  cleanups.push(() => window.removeEventListener("pointermove", onMove));
 });
 
 // Vortex swallow: the black hole sucks the copy in, swirls the whole field down
 // into itself and drains the screen to black, then /home is revealed from the dark.
 async function enter() {
   if (entering) return;
+  // Remember that the visitor has entered, so future visits skip the intro.
+  if (import.meta.client) localStorage.setItem("twf_entered", "1");
   const reduced =
     import.meta.client &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -287,7 +302,7 @@ async function enter() {
         </p>
 
         <h1 class="intro-word font-display font-bold leading-[0.9] tracking-tight text-white">
-          <span class="sr-only">YourWebsite Source</span>
+          <span class="sr-only">TheWebsite Forge</span>
           <span aria-hidden="true" class="block whitespace-nowrap">
             <span
               v-for="(ch, i) in line1"
@@ -297,7 +312,7 @@ async function enter() {
               >{{ ch }}</span
             >
           </span>
-          <span aria-hidden="true" data-letter class="source-word block">Source</span>
+          <span aria-hidden="true" data-letter class="source-word block">Forge</span>
         </h1>
 
         <p

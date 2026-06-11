@@ -1,6 +1,6 @@
 <script setup lang="ts">
 useSeoMeta({
-  title: "YourWebsiteSource — Websites We Build, Sell, and Stand Behind",
+  title: "TheWebsiteForge — Websites We Build, Sell, and Stand Behind",
   description:
     "Premium, fast, beautifully animated websites we build and sell. Browse the showcase, see the proof, and pick a plan.",
 });
@@ -28,7 +28,7 @@ useSeoMeta({
           v-reveal="{ delay: 0.55 }"
           class="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300"
         >
-          YourWebsiteSource crafts blisteringly fast, beautifully animated websites
+          TheWebsiteForge crafts blisteringly fast, beautifully animated websites
           — then offers them for sale. Browse the showcase, see the proof, and
           launch something you're proud of.
         </p>

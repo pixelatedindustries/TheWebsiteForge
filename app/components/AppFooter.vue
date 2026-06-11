@@ -30,7 +30,7 @@ const columns = [
           <NuxtLink to="/home" class="flex items-center gap-2.5">
             <LogoMark :size="30" />
             <span class="text-lg font-semibold tracking-tight text-white">
-              YourWebsite<span class="text-gradient">Source</span>
+              TheWebsite<span class="text-gradient">Forge</span>
             </span>
           </NuxtLink>
           <p class="mt-4 max-w-xs text-sm leading-relaxed text-slate-400">
@@ -70,7 +70,16 @@ const columns = [
       <div
         class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-sm text-slate-500 sm:flex-row"
       >
-        <p>© {{ year }} YourWebsiteSource. All rights reserved.</p>
+        <p>© {{ year }} TheWebsiteForge. All rights reserved.</p>
+        <nav class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+          <NuxtLink to="/terms" class="transition hover:text-brand-300">Terms</NuxtLink>
+          <NuxtLink to="/hosting-agreement" class="transition hover:text-brand-300">
+            Hosting Agreement
+          </NuxtLink>
+          <NuxtLink to="/refund-policy" class="transition hover:text-brand-300">
+            Refund Policy
+          </NuxtLink>
+        </nav>
         <p class="flex items-center gap-2">
           <span class="inline-block h-2 w-2 animate-pulse-glow rounded-full bg-brand-400" />
           Built with Nuxt 4 · Tailwind v4

@@ -19,7 +19,7 @@ withDefaults(
 
       <div
         v-reveal:stagger="{ selector: '.tier', stagger: 0.13, y: 52 }"
-        class="mt-14 grid gap-6 lg:grid-cols-3 lg:items-center"
+        class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:items-stretch"
       >
         <div v-for="tier in pricingTiers" :key="tier.id" class="tier">
           <PricingCard :tier="tier" />
@@ -27,7 +27,7 @@ withDefaults(
       </div>
 
       <p class="mt-8 text-center text-sm text-slate-500">
-        Starting prices in USD. Need something in between?
+        Prices in USD; you'll be charged the ZAR equivalent at checkout. Need something custom?
         <NuxtLink to="/contact" class="text-brand-300 underline-offset-4 hover:underline">
           Tell us about your project
         </NuxtLink>

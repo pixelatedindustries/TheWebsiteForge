@@ -55,15 +55,7 @@ const row = [...techStack, ...techStack];
     </p>
     <div
       class="tech-marquee relative"
-      style="
-        mask-image: linear-gradient(
-          to right,
-          transparent,
-          #000 12%,
-          #000 88%,
-          transparent
-        );
-      "
+      style="mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);"
     >
       <div class="flex w-max animate-marquee items-center gap-4 py-2 pr-4">
         <span
