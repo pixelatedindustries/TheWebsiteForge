@@ -25,7 +25,9 @@ export interface FinalizeResult {
   balanceAfterCents?: number;
 }
 
-export async function finalizeByReference(reference: string): Promise<FinalizeResult> {
+export async function finalizeByReference(
+  reference: string,
+): Promise<FinalizeResult> {
   let verified;
   try {
     verified = await verifyTransaction(reference);
@@ -51,7 +53,10 @@ export async function finalizeByReference(reference: string): Promise<FinalizeRe
 
 async function finalizeTopup(
   reference: string,
-  verified: { amount: number; customer?: { email?: string; customer_code?: string } },
+  verified: {
+    amount: number;
+    customer?: { email?: string; customer_code?: string };
+  },
   meta: Record<string, unknown>,
 ): Promise<FinalizeResult> {
   // Idempotency pre-check (the unique index is the hard guarantee).
@@ -59,10 +64,13 @@ async function finalizeTopup(
     return { ok: true, status: "success", kind: "topup" };
   }
 
-  const customerId = typeof meta.customerId === "string" ? meta.customerId : undefined;
+  const customerId =
+    typeof meta.customerId === "string" ? meta.customerId : undefined;
   const usdCents = Number(meta.usdCents ?? 0);
   if (!customerId || !Number.isFinite(usdCents) || usdCents <= 0) {
-    console.warn(`[fulfillment] topup ${reference} missing customerId/usdCents metadata.`);
+    console.warn(
+      `[fulfillment] topup ${reference} missing customerId/usdCents metadata.`,
+    );
     return { ok: false, status: "missing_metadata" };
   }
 
@@ -73,7 +81,9 @@ async function finalizeTopup(
     .where(eq(schema.customers.id, customerId))
     .limit(1);
   if (!customer) {
-    console.warn(`[fulfillment] topup ${reference} for unknown customer ${customerId}.`);
+    console.warn(
+      `[fulfillment] topup ${reference} for unknown customer ${customerId}.`,
+    );
     return { ok: false, status: "unknown_customer" };
   }
 

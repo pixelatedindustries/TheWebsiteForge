@@ -22,7 +22,9 @@ defineProps<{ testimonial: Testimonial }>();
     <blockquote class="flex-1 text-sm leading-relaxed text-slate-200">
       "{{ testimonial.quote }}"
     </blockquote>
-    <figcaption class="mt-5 flex items-center gap-3 border-t border-white/10 pt-4">
+    <figcaption
+      class="mt-5 flex items-center gap-3 border-t border-white/10 pt-4"
+    >
       <span
         class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent-600 text-sm font-bold text-white"
       >

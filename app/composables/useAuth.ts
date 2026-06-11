@@ -1,26 +1,21 @@
 import type { FetchOptions } from "ofetch";
-
-export interface AuthUser {
-  email: string | null;
-  uid: string;
-  displayName: string | null;
-  photoURL: string | null;
-}
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "~/stores/auth";
 
 /**
  * Client-side auth helper around Firebase (Google sign-in). The Firebase app
  * and the auth-state listener are set up in `plugins/firebase.client.ts`,
- * which populates the shared `auth-user` / `auth-ready` states this reads.
+ * which populates the Pinia auth store this reads.
  */
 export function useAuth() {
-  const user = useState<AuthUser | null>("auth-user", () => null);
-  const ready = useState<boolean>("auth-ready", () => false);
-  const configured = useState<boolean>("auth-configured", () => false);
+  const authStore = useAuthStore();
+  const { user, ready, configured } = storeToRefs(authStore);
 
   async function signInWithGoogle(): Promise<void> {
     const { $firebaseAuth } = useNuxtApp();
     if (!$firebaseAuth) throw new Error("Firebase is not configured.");
-    const { GoogleAuthProvider, signInWithPopup } = await import("firebase/auth");
+    const { GoogleAuthProvider, signInWithPopup } =
+      await import("firebase/auth");
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
     await signInWithPopup($firebaseAuth, provider);
@@ -32,7 +27,7 @@ export function useAuth() {
       const { signOut: fbSignOut } = await import("firebase/auth");
       await fbSignOut($firebaseAuth);
     }
-    user.value = null;
+    authStore.clearUser();
   }
 
   async function getToken(forceRefresh = false): Promise<string | null> {
@@ -43,7 +38,10 @@ export function useAuth() {
   }
 
   /** $fetch wrapper that attaches the Firebase ID token as a Bearer header. */
-  async function adminFetch<T>(url: string, opts: FetchOptions = {}): Promise<T> {
+  async function adminFetch<T>(
+    url: string,
+    opts: FetchOptions = {},
+  ): Promise<T> {
     const token = await getToken();
     return $fetch<T>(url, {
       ...(opts as Record<string, unknown>),

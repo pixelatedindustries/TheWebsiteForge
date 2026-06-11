@@ -34,7 +34,10 @@ async function load() {
     const res = await adminFetch<{ sites: Site[] }>("/api/admin/sites");
     sites.value = res.sites;
   } catch (e) {
-    const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
     error.value =
       err?.data?.statusMessage || err?.statusMessage || "Failed to load sites.";
   } finally {
@@ -64,9 +67,7 @@ onMounted(load);
 <template>
   <div>
     <h1 class="font-display text-2xl font-semibold text-white">Sites</h1>
-    <p class="mt-1 text-sm text-slate-400">
-      Every site you build and host.
-    </p>
+    <p class="mt-1 text-sm text-slate-400">Every site you build and host.</p>
 
     <p v-if="pending" class="mt-8 text-sm text-slate-500">Loading…</p>
     <p v-else-if="error" class="mt-8 text-sm text-rose-400">{{ error }}</p>
@@ -74,13 +75,12 @@ onMounted(load);
       No sites yet.
     </p>
 
-    <div
-      v-else
-      class="glass gradient-border mt-8 overflow-hidden rounded-2xl"
-    >
+    <div v-else class="glass gradient-border mt-8 overflow-hidden rounded-2xl">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
-          <thead class="border-b border-white/10 text-xs uppercase text-slate-500">
+          <thead
+            class="border-b border-white/10 text-xs uppercase text-slate-500"
+          >
             <tr>
               <th class="px-4 py-3 font-medium">Site</th>
               <th class="px-4 py-3 font-medium">Customer</th>
@@ -112,7 +112,9 @@ onMounted(load);
               <td class="px-4 py-3">
                 <span
                   class="rounded-full px-2 py-0.5 text-xs font-medium"
-                  :class="statusStyles[s.status] || 'bg-slate-500/15 text-slate-400'"
+                  :class="
+                    statusStyles[s.status] || 'bg-slate-500/15 text-slate-400'
+                  "
                 >
                   {{ titleCase(s.status) }}
                 </span>

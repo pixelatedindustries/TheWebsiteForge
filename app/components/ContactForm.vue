@@ -32,12 +32,14 @@ const steps: Step[] = [
   {
     eyebrow: "Step 02",
     title: "Business & Site Type",
-    description: "Tell us what kind of business this is and what needs building.",
+    description:
+      "Tell us what kind of business this is and what needs building.",
   },
   {
     eyebrow: "Step 03",
     title: "Budget & Deadline",
-    description: "Give us the range and timing so we can suggest the right path.",
+    description:
+      "Give us the range and timing so we can suggest the right path.",
   },
   {
     eyebrow: "Step 04",
@@ -134,11 +136,13 @@ function validateStep(step = currentStep.value) {
 
   if (step === 0) {
     if (form.name.trim().length < 2) errors.name = "Please enter your name.";
-    if (!isEmail(form.email.trim())) errors.email = "Please enter a valid email.";
+    if (!isEmail(form.email.trim()))
+      errors.email = "Please enter a valid email.";
   }
 
   if (step === 1) {
-    if (!form.businessType) errors.businessType = "Choose the closest business type.";
+    if (!form.businessType)
+      errors.businessType = "Choose the closest business type.";
     if (!form.siteType) errors.siteType = "Choose the kind of site you need.";
   }
 
@@ -253,7 +257,10 @@ function reset() {
 
 <template>
   <div class="glass-strong gradient-border rounded-3xl p-6 sm:p-8">
-    <div v-if="status === 'success'" class="flex flex-col items-center py-10 text-center">
+    <div
+      v-if="status === 'success'"
+      class="flex flex-col items-center py-10 text-center"
+    >
       <div
         class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent-600"
       >
@@ -270,7 +277,9 @@ function reset() {
           <path d="M20 6 9 17l-5-5" />
         </svg>
       </div>
-      <h3 class="mt-5 font-display text-xl font-semibold text-white">Quote request sent</h3>
+      <h3 class="mt-5 font-display text-xl font-semibold text-white">
+        Quote request sent
+      </h3>
       <p class="mt-2 max-w-sm text-sm text-slate-400">{{ serverMessage }}</p>
       <button
         type="button"
@@ -283,13 +292,20 @@ function reset() {
 
     <form v-else class="space-y-6" novalidate @submit.prevent="submit">
       <div class="absolute -left-[9999px]" aria-hidden="true">
-        <label>Leave this empty<input v-model="form.website" tabindex="-1" autocomplete="off" /></label>
+        <label
+          >Leave this empty<input
+            v-model="form.website"
+            tabindex="-1"
+            autocomplete="off"
+        /></label>
       </div>
 
       <div>
         <div class="flex items-center justify-between gap-4">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-brand-300">
+            <p
+              class="text-xs font-semibold uppercase tracking-[0.24em] text-brand-300"
+            >
               {{ current.eyebrow }}
             </p>
             <h3 class="mt-2 font-display text-2xl font-bold text-white">
@@ -329,19 +345,32 @@ function reset() {
           <template v-if="currentStep === 0">
             <div class="grid gap-4 sm:grid-cols-2">
               <div>
-                <label class="mb-1.5 block text-xs font-medium text-slate-300">Name</label>
-                <input v-model="form.name" type="text" placeholder="Jane Doe" :class="inputClass" />
-                <p v-if="fieldErrors.name" class="mt-1 text-xs text-rose-400">{{ fieldErrors.name }}</p>
+                <label class="mb-1.5 block text-xs font-medium text-slate-300"
+                  >Name</label
+                >
+                <input
+                  v-model="form.name"
+                  type="text"
+                  placeholder="Jane Doe"
+                  :class="inputClass"
+                />
+                <p v-if="fieldErrors.name" class="mt-1 text-xs text-rose-400">
+                  {{ fieldErrors.name }}
+                </p>
               </div>
               <div>
-                <label class="mb-1.5 block text-xs font-medium text-slate-300">Email</label>
+                <label class="mb-1.5 block text-xs font-medium text-slate-300"
+                  >Email</label
+                >
                 <input
                   v-model="form.email"
                   type="email"
                   placeholder="jane@company.com"
                   :class="inputClass"
                 />
-                <p v-if="fieldErrors.email" class="mt-1 text-xs text-rose-400">{{ fieldErrors.email }}</p>
+                <p v-if="fieldErrors.email" class="mt-1 text-xs text-rose-400">
+                  {{ fieldErrors.email }}
+                </p>
               </div>
             </div>
             <div class="grid gap-4 sm:grid-cols-2">
@@ -349,20 +378,32 @@ function reset() {
                 <label class="mb-1.5 block text-xs font-medium text-slate-300">
                   Company <span class="text-slate-600">(optional)</span>
                 </label>
-                <input v-model="form.company" type="text" placeholder="Acme Inc." :class="inputClass" />
+                <input
+                  v-model="form.company"
+                  type="text"
+                  placeholder="Acme Inc."
+                  :class="inputClass"
+                />
               </div>
               <div>
                 <label class="mb-1.5 block text-xs font-medium text-slate-300">
                   Phone <span class="text-slate-600">(optional)</span>
                 </label>
-                <input v-model="form.phone" type="tel" placeholder="+1 555 000 0000" :class="inputClass" />
+                <input
+                  v-model="form.phone"
+                  type="tel"
+                  placeholder="+1 555 000 0000"
+                  :class="inputClass"
+                />
               </div>
             </div>
           </template>
 
           <template v-else-if="currentStep === 1">
             <div>
-              <label class="mb-2 block text-xs font-medium text-slate-300">Type of business</label>
+              <label class="mb-2 block text-xs font-medium text-slate-300"
+                >Type of business</label
+              >
               <div class="grid gap-2 sm:grid-cols-2">
                 <button
                   v-for="type in businessTypes"
@@ -379,13 +420,18 @@ function reset() {
                   {{ type }}
                 </button>
               </div>
-              <p v-if="fieldErrors.businessType" class="mt-1 text-xs text-rose-400">
+              <p
+                v-if="fieldErrors.businessType"
+                class="mt-1 text-xs text-rose-400"
+              >
                 {{ fieldErrors.businessType }}
               </p>
             </div>
 
             <div>
-              <label class="mb-2 block text-xs font-medium text-slate-300">Type of site</label>
+              <label class="mb-2 block text-xs font-medium text-slate-300"
+                >Type of site</label
+              >
               <div class="grid gap-2 sm:grid-cols-2">
                 <button
                   v-for="type in siteTypes"
@@ -422,7 +468,9 @@ function reset() {
 
           <template v-else-if="currentStep === 2">
             <div>
-              <label class="mb-2 block text-xs font-medium text-slate-300">Budget range</label>
+              <label class="mb-2 block text-xs font-medium text-slate-300"
+                >Budget range</label
+              >
               <div class="grid gap-2 sm:grid-cols-2">
                 <button
                   v-for="budget in budgets"
@@ -439,11 +487,15 @@ function reset() {
                   {{ budget }}
                 </button>
               </div>
-              <p v-if="fieldErrors.budget" class="mt-1 text-xs text-rose-400">{{ fieldErrors.budget }}</p>
+              <p v-if="fieldErrors.budget" class="mt-1 text-xs text-rose-400">
+                {{ fieldErrors.budget }}
+              </p>
             </div>
 
             <div>
-              <label class="mb-2 block text-xs font-medium text-slate-300">Deadline</label>
+              <label class="mb-2 block text-xs font-medium text-slate-300"
+                >Deadline</label
+              >
               <div class="grid gap-2 sm:grid-cols-2">
                 <button
                   v-for="deadline in deadlines"
@@ -460,35 +512,47 @@ function reset() {
                   {{ deadline }}
                 </button>
               </div>
-              <p v-if="fieldErrors.deadline" class="mt-1 text-xs text-rose-400">{{ fieldErrors.deadline }}</p>
+              <p v-if="fieldErrors.deadline" class="mt-1 text-xs text-rose-400">
+                {{ fieldErrors.deadline }}
+              </p>
             </div>
           </template>
 
           <template v-else>
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-300">Main goal</label>
+              <label class="mb-1.5 block text-xs font-medium text-slate-300"
+                >Main goal</label
+              >
               <textarea
                 v-model="form.goals"
                 rows="3"
                 placeholder="What should this site help you do?"
                 :class="inputClass"
               />
-              <p v-if="fieldErrors.goals" class="mt-1 text-xs text-rose-400">{{ fieldErrors.goals }}</p>
+              <p v-if="fieldErrors.goals" class="mt-1 text-xs text-rose-400">
+                {{ fieldErrors.goals }}
+              </p>
             </div>
 
             <div>
-              <label class="mb-1.5 block text-xs font-medium text-slate-300">Expected pages or sections</label>
+              <label class="mb-1.5 block text-xs font-medium text-slate-300"
+                >Expected pages or sections</label
+              >
               <textarea
                 v-model="form.pages"
                 rows="3"
                 placeholder="Home, about, services, contact, dashboard, product pages..."
                 :class="inputClass"
               />
-              <p v-if="fieldErrors.pages" class="mt-1 text-xs text-rose-400">{{ fieldErrors.pages }}</p>
+              <p v-if="fieldErrors.pages" class="mt-1 text-xs text-rose-400">
+                {{ fieldErrors.pages }}
+              </p>
             </div>
 
             <div>
-              <label class="mb-2 block text-xs font-medium text-slate-300">Needed features</label>
+              <label class="mb-2 block text-xs font-medium text-slate-300"
+                >Needed features</label
+              >
               <div class="flex flex-wrap gap-2">
                 <button
                   v-for="feature in featureOptions"
@@ -505,7 +569,9 @@ function reset() {
                   {{ feature }}
                 </button>
               </div>
-              <p v-if="fieldErrors.features" class="mt-1 text-xs text-rose-400">{{ fieldErrors.features }}</p>
+              <p v-if="fieldErrors.features" class="mt-1 text-xs text-rose-400">
+                {{ fieldErrors.features }}
+              </p>
             </div>
 
             <div class="grid gap-4 sm:grid-cols-2">
@@ -578,16 +644,33 @@ function reset() {
           :disabled="status === 'loading'"
           class="btn-gradient inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"
         >
-          <svg v-if="status === 'loading'" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-            <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+          <svg
+            v-if="status === 'loading'"
+            class="h-4 w-4 animate-spin"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            />
+            <path
+              class="opacity-90"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            />
           </svg>
           {{ status === "loading" ? "Sending..." : "Send quote request" }}
         </button>
       </div>
 
       <p class="text-center text-xs text-slate-500">
-        Each section must be completed before moving on. We reply within one business day.
+        Each section must be completed before moving on. We reply within one
+        business day.
       </p>
     </form>
   </div>
@@ -596,7 +679,9 @@ function reset() {
 <style scoped>
 .quote-step-enter-active,
 .quote-step-leave-active {
-  transition: opacity 0.22s ease, transform 0.22s ease;
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
 }
 
 .quote-step-enter-from {

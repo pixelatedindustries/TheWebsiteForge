@@ -2,7 +2,8 @@
 import { faqs } from "~~/shared/site";
 
 const openIndex = ref<number | null>(0);
-const toggle = (i: number) => (openIndex.value = openIndex.value === i ? null : i);
+const toggle = (i: number) =>
+  (openIndex.value = openIndex.value === i ? null : i);
 </script>
 
 <template>

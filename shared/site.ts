@@ -348,7 +348,8 @@ export const pricingTiers: PricingTier[] = [
   {
     id: "business",
     name: "Business",
-    tagline: "A complete business website with deeper content and integrations.",
+    tagline:
+      "A complete business website with deeper content and integrations.",
     price: 699,
     fixed: true,
     period: "project",

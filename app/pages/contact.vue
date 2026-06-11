@@ -54,7 +54,18 @@ const highlights = [
               <span
                 class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-accent-600"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
               </span>
               <div>
                 <p class="font-semibold text-white">{{ item.title }}</p>
@@ -63,10 +74,27 @@ const highlights = [
             </li>
           </ul>
 
-          <div class="glass mt-10 flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-300">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>
+          <div
+            class="glass mt-10 flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-slate-300"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="m3 7 9 6 9-6" />
+            </svg>
             Prefer email?
-            <a href="mailto:dummy@mail.com" class="font-medium text-brand-300 underline-offset-4 hover:underline">
+            <a
+              href="mailto:dummy@mail.com"
+              class="font-medium text-brand-300 underline-offset-4 hover:underline"
+            >
               dummy@mail.com
             </a>
           </div>

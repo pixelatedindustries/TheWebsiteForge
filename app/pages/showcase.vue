@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { projectCategories, type Project, type ProjectCategory } from "~~/shared/site";
+import {
+  projectCategories,
+  type Project,
+  type ProjectCategory,
+} from "~~/shared/site";
 
 useSeoMeta({
   title: "Showcase — Lumina Studio",

@@ -40,11 +40,15 @@ export default defineEventHandler(async (event) => {
   if (!customerId || (direction !== "credit" && direction !== "debit")) {
     throw createError({
       statusCode: 422,
-      statusMessage: "`customerId` and a `direction` of credit/debit are required.",
+      statusMessage:
+        "`customerId` and a `direction` of credit/debit are required.",
     });
   }
   if (!Number.isFinite(amount) || amount <= 0) {
-    throw createError({ statusCode: 422, statusMessage: "A positive amount is required." });
+    throw createError({
+      statusCode: 422,
+      statusMessage: "A positive amount is required.",
+    });
   }
   const allowed = direction === "credit" ? CREDIT_TYPES : DEBIT_TYPES;
   if (!allowed.has(type)) {

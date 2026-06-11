@@ -53,7 +53,9 @@ export function smoothScrollTo(
     const y =
       typeof target === "number"
         ? target
-        : target.getBoundingClientRect().top + window.scrollY + (opts.offset ?? 0);
+        : target.getBoundingClientRect().top +
+          window.scrollY +
+          (opts.offset ?? 0);
     window.scrollTo({ top: y, behavior: "smooth" });
   }
 }
@@ -68,7 +70,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   /** Register a scroll-driven tween and remember it for teardown. */
-  function tracked(el: HTMLElement, vars: gsap.TweenVars, fromTo: "from" | "to") {
+  function tracked(
+    el: HTMLElement,
+    vars: gsap.TweenVars,
+    fromTo: "from" | "to",
+  ) {
     const tween = fromTo === "from" ? gsap.from(el, vars) : gsap.to(el, vars);
     onCleanup(el, () => {
       tween.scrollTrigger?.kill();
@@ -187,9 +193,18 @@ export default defineNuxtPlugin((nuxtApp) => {
     mounted(el, binding) {
       if (reduced || !window.matchMedia("(pointer: fine)").matches) return;
       const max = binding.value?.max ?? 9;
-      gsap.set(el, { transformPerspective: 900, transformStyle: "preserve-3d" });
-      const rx = gsap.quickTo(el, "rotationX", { duration: 0.5, ease: "power2" });
-      const ry = gsap.quickTo(el, "rotationY", { duration: 0.5, ease: "power2" });
+      gsap.set(el, {
+        transformPerspective: 900,
+        transformStyle: "preserve-3d",
+      });
+      const rx = gsap.quickTo(el, "rotationX", {
+        duration: 0.5,
+        ease: "power2",
+      });
+      const ry = gsap.quickTo(el, "rotationY", {
+        duration: 0.5,
+        ease: "power2",
+      });
       const move = (e: PointerEvent) => {
         const r = el.getBoundingClientRect();
         const px = (e.clientX - r.left) / r.width - 0.5;
@@ -323,7 +338,8 @@ export default defineNuxtPlugin((nuxtApp) => {
       overlay.style.cssText =
         "position:absolute;inset:0;border-radius:inherit;pointer-events:none;" +
         "opacity:0;transition:opacity .35s ease;mix-blend-mode:screen;z-index:3;";
-      if (getComputedStyle(el).position === "static") el.style.position = "relative";
+      if (getComputedStyle(el).position === "static")
+        el.style.position = "relative";
       el.appendChild(overlay);
       const move = (e: PointerEvent) => {
         const r = el.getBoundingClientRect();
@@ -349,8 +365,12 @@ export default defineNuxtPlugin((nuxtApp) => {
     mounted(el, binding) {
       if (reduced) return;
       const factor = binding.value ?? 0.18;
-      const skewTo = gsap.quickTo(el, "skewY", { duration: 0.5, ease: "power3" });
-      const tick = () => skewTo(gsap.utils.clamp(-6, 6, velocity.value * factor));
+      const skewTo = gsap.quickTo(el, "skewY", {
+        duration: 0.5,
+        ease: "power3",
+      });
+      const tick = () =>
+        skewTo(gsap.utils.clamp(-6, 6, velocity.value * factor));
       gsap.ticker.add(tick);
       onCleanup(el, () => {
         gsap.ticker.remove(tick);
@@ -376,7 +396,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.hook("app:mounted", () =>
       requestAnimationFrame(() => ScrollTrigger.refresh()),
     );
-    window.addEventListener("load", () => ScrollTrigger.refresh(), { once: true });
+    window.addEventListener("load", () => ScrollTrigger.refresh(), {
+      once: true,
+    });
   }
 
   // ── Lenis smooth scroll (client, motion-safe) ───────────────────────────────

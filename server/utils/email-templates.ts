@@ -64,9 +64,7 @@ function button(href: string, label: string): string {
 /* ------------------------------ leads ------------------------------ */
 
 /** Confirmation sent to a lead after they submit the contact form. */
-export function leadConfirmationEmail(input: {
-  name: string;
-}): EmailContent {
+export function leadConfirmationEmail(input: { name: string }): EmailContent {
   const first = input.name.split(" ")[0] || "there";
   const subject = `Thanks for reaching out to ${BRAND}`;
   const html = layout(`

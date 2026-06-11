@@ -5,22 +5,7 @@ import {
   WALLET_CURRENCY,
   CHARGE_CURRENCY,
 } from "../../../shared/billing";
-
-interface CheckoutPayload {
-  /** "build" = one-off website package; "topup" = add wallet credit. */
-  purpose?: "build" | "topup";
-  /** Required for purpose="build" — a key from buildPackages. */
-  planKey?: string;
-  /** Required for purpose="topup" — USD cents the customer wants to add. */
-  amountUsdCents?: number;
-  /** Required when not signed in; ignored if a valid token is present. */
-  email?: string;
-  name?: string;
-  /** Optional: link a build to an existing site. */
-  siteId?: string;
-  /** Build checkout only: apply wallet funds before charging Paystack. */
-  useWalletFirst?: boolean;
-}
+import type { CheckoutPayload } from "../../../shared/checkout";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -73,7 +58,10 @@ export default defineEventHandler(async (event) => {
   } else {
     const pkg = getBuildPackage(body?.planKey ?? "");
     if (!pkg) {
-      throw createError({ statusCode: 422, statusMessage: "Unknown build package." });
+      throw createError({
+        statusCode: 422,
+        statusMessage: "Unknown build package.",
+      });
     }
     usdCents = pkg.amountUsdCents;
     label = `${pkg.label} website build`;
@@ -102,7 +90,10 @@ export default defineEventHandler(async (event) => {
       .where(eq(schema.customers.id, customer.id));
   }
   if (!customer) {
-    throw createError({ statusCode: 500, statusMessage: "Could not resolve customer." });
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Could not resolve customer.",
+    });
   }
 
   // Build checkout can apply prepaid wallet funds first for signed-in customers.
@@ -119,7 +110,9 @@ export default defineEventHandler(async (event) => {
   const zarCents = usdCentsToZarCents(chargeUsdCents);
   const fxRate = String(getUsdToZarRate());
 
-  const reference = generateReference(purpose === "topup" ? "twf_topup" : "twf_build");
+  const reference = generateReference(
+    purpose === "topup" ? "twf_topup" : "twf_build",
+  );
   const config = useRuntimeConfig(event);
   const siteUrl =
     (config.public?.siteUrl as string) ||
@@ -149,7 +142,8 @@ export default defineEventHandler(async (event) => {
       if (!debit.ok) {
         throw createError({
           statusCode: 409,
-          statusMessage: "Wallet balance changed. Please refresh and try again.",
+          statusMessage:
+            "Wallet balance changed. Please refresh and try again.",
         });
       }
     }

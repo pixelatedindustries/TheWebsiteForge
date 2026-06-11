@@ -17,7 +17,8 @@ function getSecretKey(): string {
   if (!key) {
     throw createError({
       statusCode: 500,
-      statusMessage: "PAYSTACK_SECRET_KEY is not set. Add it to .env (see plan §3.1).",
+      statusMessage:
+        "PAYSTACK_SECRET_KEY is not set. Add it to .env (see plan §3.1).",
     });
   }
   return key;
@@ -117,7 +118,9 @@ export interface VerifyTransactionResult {
 }
 
 /** GET /transaction/verify/:reference — confirm status/amount before granting value. */
-export function verifyTransaction(reference: string): Promise<VerifyTransactionResult> {
+export function verifyTransaction(
+  reference: string,
+): Promise<VerifyTransactionResult> {
   return paystackFetch<VerifyTransactionResult>(
     `/transaction/verify/${encodeURIComponent(reference)}`,
   );

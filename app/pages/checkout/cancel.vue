@@ -4,7 +4,10 @@
  * Shown when a customer abandons the Paystack hosted checkout. No charge was
  * made; we just offer a friendly way back.
  */
-useSeoMeta({ title: "Checkout cancelled — TheWebsiteForge", robots: "noindex" });
+useSeoMeta({
+  title: "Checkout cancelled — TheWebsiteForge",
+  robots: "noindex",
+});
 </script>
 
 <template>

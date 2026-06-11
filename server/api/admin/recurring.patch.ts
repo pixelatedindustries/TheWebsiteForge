@@ -19,7 +19,8 @@ export default defineEventHandler(async (event) => {
   if (!body?.id || !body?.status || !STATUSES.includes(body.status)) {
     throw createError({
       statusCode: 422,
-      statusMessage: "A valid `id` and `status` (active/paused/canceled) are required.",
+      statusMessage:
+        "A valid `id` and `status` (active/paused/canceled) are required.",
     });
   }
 
@@ -34,9 +35,16 @@ export default defineEventHandler(async (event) => {
     .returning();
 
   if (!row) {
-    throw createError({ statusCode: 404, statusMessage: "Recurring charge not found." });
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Recurring charge not found.",
+    });
   }
 
-  await writeAudit(admin.email, "recurring.status", `${body.id} → ${body.status}`);
+  await writeAudit(
+    admin.email,
+    "recurring.status",
+    `${body.id} → ${body.status}`,
+  );
   return { ok: true, recurringCharge: row };
 });

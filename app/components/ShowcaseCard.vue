@@ -32,7 +32,10 @@ const priceLabel = computed(() =>
     class="glass gradient-border group relative flex flex-col overflow-hidden rounded-2xl p-3 transition duration-300 hover:-translate-y-1.5 hover:glow-ring"
   >
     <div class="relative overflow-hidden rounded-xl">
-      <ProjectCover :project="project" class="transition duration-500 group-hover:scale-[1.04]" />
+      <ProjectCover
+        :project="project"
+        class="transition duration-500 group-hover:scale-[1.04]"
+      />
       <span
         class="absolute right-3 top-3 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ring-1 backdrop-blur-md"
         :class="statusStyle[project.status]"
@@ -46,10 +49,14 @@ const priceLabel = computed(() =>
         <h3 class="font-display text-lg font-semibold text-white">
           {{ project.name }}
         </h3>
-        <span class="text-xs font-medium text-slate-400">{{ project.category }}</span>
+        <span class="text-xs font-medium text-slate-400">{{
+          project.category
+        }}</span>
       </div>
 
-      <p class="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-400">
+      <p
+        class="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-400"
+      >
         {{ project.blurb }}
       </p>
 
@@ -63,7 +70,9 @@ const priceLabel = computed(() =>
         </span>
       </div>
 
-      <div class="mt-5 flex items-end justify-between border-t border-white/10 pt-4">
+      <div
+        class="mt-5 flex items-end justify-between border-t border-white/10 pt-4"
+      >
         <div>
           <p class="text-2xl font-bold text-gradient">{{ project.metric }}</p>
           <p class="text-xs text-slate-500">{{ project.metricLabel }}</p>

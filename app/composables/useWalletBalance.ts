@@ -1,8 +1,5 @@
-import type { AuthUser } from "~/composables/useAuth";
-
-interface WalletSnapshot {
-  balanceCents: number;
-}
+import type { AuthUser } from "~/types/auth";
+import type { WalletSnapshot } from "~/types/wallet";
 
 /**
  * Shared wallet balance state for signed-in customers.
@@ -12,7 +9,10 @@ interface WalletSnapshot {
  */
 export function useWalletBalance() {
   const { ready, user, authFetch } = useAuth();
-  const balanceCents = useState<number | null>("wallet-balance-cents", () => null);
+  const balanceCents = useState<number | null>(
+    "wallet-balance-cents",
+    () => null,
+  );
   const loading = useState<boolean>("wallet-balance-loading", () => false);
 
   async function refresh(force = false): Promise<void> {

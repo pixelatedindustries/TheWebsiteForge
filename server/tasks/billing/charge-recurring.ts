@@ -103,7 +103,11 @@ export default defineTask({
             graceDays: GRACE_DAYS,
             topupUrl: topupUrl(),
           });
-          void sendEmail({ to: customer.email, replyTo: getSupportEmail(), ...mail });
+          void sendEmail({
+            to: customer.email,
+            replyTo: getSupportEmail(),
+            ...mail,
+          });
         }
         continue;
       }
@@ -139,7 +143,11 @@ export default defineTask({
             siteName,
             topupUrl: topupUrl(),
           });
-          void sendEmail({ to: customer.email, replyTo: getSupportEmail(), ...mail });
+          void sendEmail({
+            to: customer.email,
+            replyTo: getSupportEmail(),
+            ...mail,
+          });
         }
       }
       // else: still within grace — wait for a future run.

@@ -21,17 +21,33 @@ withDefaults(
       <!-- internal glow (breathing) -->
       <div
         class="animate-pulse-glow absolute inset-0 -z-10"
-        style="background: radial-gradient(60% 60% at 30% 20%, rgba(20, 184, 138, 0.25), transparent 70%), radial-gradient(60% 60% at 75% 80%, rgba(31, 155, 240, 0.28), transparent 70%);"
+        style="
+          background:
+            radial-gradient(
+              60% 60% at 30% 20%,
+              rgba(20, 184, 138, 0.25),
+              transparent 70%
+            ),
+            radial-gradient(
+              60% 60% at 75% 80%,
+              rgba(31, 155, 240, 0.28),
+              transparent 70%
+            );
+        "
       />
       <div class="absolute inset-0 -z-10 glass-strong" />
 
-      <h2 class="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
+      <h2
+        class="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl"
+      >
         {{ title }}
       </h2>
       <p class="mx-auto mt-4 max-w-xl text-base text-slate-300 sm:text-lg">
         {{ subtitle }}
       </p>
-      <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <div
+        class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
+      >
         <NuxtLink
           v-magnetic="0.5"
           to="/contact"

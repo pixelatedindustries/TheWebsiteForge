@@ -5,7 +5,12 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
 
-  modules: ["@vueuse/nuxt", "@vueuse/motion/nuxt", "@nuxt/fonts"],
+  modules: [
+    "@pinia/nuxt",
+    "@vueuse/nuxt",
+    "@vueuse/motion/nuxt",
+    "@nuxt/fonts",
+  ],
 
   css: ["~/assets/css/main.css"],
 

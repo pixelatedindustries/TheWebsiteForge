@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 const host = ref<HTMLDivElement | null>(null);
 // drives the "vortex" swallow on Enter (set from the intro page)
 const swallow = useState<{
@@ -272,7 +271,8 @@ onMounted(async () => {
     uniforms.uPulse.value = pulse.value;
 
     // birth ramp 0→1
-    if (uniforms.uBirth.value < 1) uniforms.uBirth.value = Math.min(1, uniforms.uBirth.value + dt / 1.8);
+    if (uniforms.uBirth.value < 1)
+      uniforms.uBirth.value = Math.min(1, uniforms.uBirth.value + dt / 1.8);
 
     // dolly: push in on scroll, spring back to rest
     dollyTarget *= 0.94;
@@ -293,10 +293,17 @@ onMounted(async () => {
 
     // captured star: launch periodically, then advance prog 0→1
     starTimer -= dt;
-    if (starTimer <= 0 && uniforms.uStarProg.value <= 0 && !swallow.value.active) {
+    if (
+      starTimer <= 0 &&
+      uniforms.uStarProg.value <= 0 &&
+      !swallow.value.active
+    ) {
       starTimer = 8 + Math.random() * 6;
       const a = Math.PI * 0.5 + Math.random() * Math.PI; // come from the left half
-      uniforms.uStarStart.value.set(0.34 + Math.cos(a) * 0.95, Math.sin(a) * 0.72);
+      uniforms.uStarStart.value.set(
+        0.34 + Math.cos(a) * 0.95,
+        Math.sin(a) * 0.72,
+      );
       uniforms.uStarProg.value = 0.0001;
     }
     if (uniforms.uStarProg.value > 0) {

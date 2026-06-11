@@ -27,7 +27,8 @@ const websiteTypes: WebsiteType[] = [
     title: "Online Stores",
     description:
       "Fast storefronts with product storytelling, smooth browsing, cart flows, and checkout paths that feel easy to trust.",
-    bestFor: "Retail brands, drops, subscriptions, bookings, and catalog sites.",
+    bestFor:
+      "Retail brands, drops, subscriptions, bookings, and catalog sites.",
     pieces: ["Product pages", "Cart", "Checkout", "Search"],
     icon: "cart",
     accent: "#38bdf8",
@@ -37,7 +38,8 @@ const websiteTypes: WebsiteType[] = [
     title: "Agency Sites",
     description:
       "Credibility-first websites that make services, case studies, and contact paths clear without feeling generic.",
-    bestFor: "Studios, law firms, consultants, teams, and local service brands.",
+    bestFor:
+      "Studios, law firms, consultants, teams, and local service brands.",
     pieces: ["Services", "Case studies", "CMS", "Lead forms"],
     icon: "layers",
     accent: "#7dd3fc",
@@ -47,7 +49,8 @@ const websiteTypes: WebsiteType[] = [
     title: "Portfolio Sites",
     description:
       "Visual showcases with strong motion, project storytelling, and a presentation style built around the work itself.",
-    bestFor: "Designers, artists, photographers, creators, and personal brands.",
+    bestFor:
+      "Designers, artists, photographers, creators, and personal brands.",
     pieces: ["Gallery", "Project pages", "Motion", "Media"],
     icon: "gallery",
     accent: "#6ce9bf",
@@ -77,17 +80,22 @@ const websiteTypes: WebsiteType[] = [
 const activeCategory = ref<ProjectCategory>("SaaS");
 
 const activeType = computed(
-  () => websiteTypes.find((type) => type.category === activeCategory.value) ?? websiteTypes[0],
+  () =>
+    websiteTypes.find((type) => type.category === activeCategory.value) ??
+    websiteTypes[0],
 );
 
 const activeExample = computed(
-  () => projects.find((project) => project.category === activeCategory.value) ?? projects[0],
+  () =>
+    projects.find((project) => project.category === activeCategory.value) ??
+    projects[0],
 );
 
 const categoryCounts = computed(() =>
   websiteTypes.map((type) => ({
     category: type.category,
-    count: projects.filter((project) => project.category === type.category).length,
+    count: projects.filter((project) => project.category === type.category)
+      .length,
   })),
 );
 </script>
@@ -101,7 +109,9 @@ const categoryCounts = computed(() =>
         subtitle="Explore the main kinds of sites we can design, develop, and tailor around your business."
       />
 
-      <div class="mt-12 grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(22rem,0.8fr)] lg:items-stretch">
+      <div
+        class="mt-12 grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(22rem,0.8fr)] lg:items-stretch"
+      >
         <div
           class="glass gradient-border relative min-h-[34rem] overflow-hidden rounded-2xl p-5 sm:p-7"
         >
@@ -222,13 +232,13 @@ const categoryCounts = computed(() =>
                   </svg>
                 </span>
 
-                <span class="node-index">
-                  0{{ index + 1 }}
-                </span>
+                <span class="node-index"> 0{{ index + 1 }} </span>
               </span>
 
               <span class="relative mt-5 block">
-                <span class="block font-display text-2xl font-bold leading-none text-white">
+                <span
+                  class="block font-display text-2xl font-bold leading-none text-white"
+                >
                   {{ type.category }}
                 </span>
                 <span class="mt-3 block text-sm leading-relaxed text-slate-400">
@@ -247,11 +257,17 @@ const categoryCounts = computed(() =>
           v-spotlight
           class="glass gradient-border relative overflow-hidden rounded-2xl p-6 sm:p-7"
         >
-          <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-300/70 to-transparent" />
-          <p class="text-xs font-semibold uppercase tracking-[0.28em] text-brand-200">
+          <div
+            class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-300/70 to-transparent"
+          />
+          <p
+            class="text-xs font-semibold uppercase tracking-[0.28em] text-brand-200"
+          >
             Selected Type
           </p>
-          <h3 class="mt-4 font-display text-4xl font-bold leading-tight text-white">
+          <h3
+            class="mt-4 font-display text-4xl font-bold leading-tight text-white"
+          >
             {{ activeType.title }}
           </h3>
           <p class="mt-4 text-sm leading-7 text-slate-300">
@@ -259,7 +275,9 @@ const categoryCounts = computed(() =>
           </p>
 
           <div class="mt-7 rounded-xl border border-white/10 bg-black/20 p-4">
-            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            <p
+              class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500"
+            >
               Common build pieces
             </p>
             <div class="mt-4 flex flex-wrap gap-2">
@@ -284,7 +302,9 @@ const categoryCounts = computed(() =>
               <p class="text-xs text-slate-500">In showcase</p>
               <p class="mt-1 text-sm font-semibold text-white">
                 {{
-                  categoryCounts.find((item) => item.category === activeCategory)?.count ?? 0
+                  categoryCounts.find(
+                    (item) => item.category === activeCategory,
+                  )?.count ?? 0
                 }}
                 examples
               </p>
@@ -318,19 +338,39 @@ const categoryCounts = computed(() =>
 <style scoped>
 .type-map {
   background:
-    radial-gradient(circle at 18% 22%, rgba(52, 216, 166, 0.18), transparent 22%),
-    radial-gradient(circle at 82% 72%, rgba(56, 189, 248, 0.16), transparent 24%),
+    radial-gradient(
+      circle at 18% 22%,
+      rgba(52, 216, 166, 0.18),
+      transparent 22%
+    ),
+    radial-gradient(
+      circle at 82% 72%,
+      rgba(56, 189, 248, 0.16),
+      transparent 24%
+    ),
     linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
-  background-size: auto, auto, 44px 44px, 44px 44px;
+  background-size:
+    auto,
+    auto,
+    44px 44px,
+    44px 44px;
   mask-image: radial-gradient(circle at center, black, transparent 78%);
   opacity: 0.9;
 }
 
 .type-node::before {
   background:
-    radial-gradient(circle at center, color-mix(in srgb, var(--accent) 40%, transparent), transparent 68%),
-    linear-gradient(135deg, color-mix(in srgb, var(--accent) 28%, transparent), rgba(56, 189, 248, 0.08));
+    radial-gradient(
+      circle at center,
+      color-mix(in srgb, var(--accent) 40%, transparent),
+      transparent 68%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--accent) 28%, transparent),
+      rgba(56, 189, 248, 0.08)
+    );
   content: "";
   filter: blur(1px);
   inset: auto -24% -36% auto;
@@ -338,13 +378,20 @@ const categoryCounts = computed(() =>
   opacity: 0.72;
   position: absolute;
   rotate: calc(var(--node-index) * 12deg);
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
   width: 11rem;
 }
 
 .type-node::after {
   background:
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 80%, white 20%), transparent),
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--accent) 80%, white 20%),
+      transparent
+    ),
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent);
   content: "";
   height: 1px;
@@ -372,12 +419,19 @@ const categoryCounts = computed(() =>
 }
 
 .node-sheen {
-  background: linear-gradient(120deg, transparent 15%, rgba(255, 255, 255, 0.14), transparent 42%);
+  background: linear-gradient(
+    120deg,
+    transparent 15%,
+    rgba(255, 255, 255, 0.14),
+    transparent 42%
+  );
   inset: 0;
   opacity: 0;
   position: absolute;
   transform: translateX(-60%);
-  transition: opacity 0.3s ease, transform 0.55s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.55s ease;
 }
 
 .type-node:hover .node-sheen,
@@ -391,7 +445,9 @@ const categoryCounts = computed(() =>
   height: 1.45rem;
   opacity: 0;
   position: absolute;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
   width: 1.45rem;
 }
 
@@ -419,7 +475,11 @@ const categoryCounts = computed(() =>
 
 .node-icon {
   background:
-    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.24), transparent 42%),
+    radial-gradient(
+      circle at 30% 20%,
+      rgba(255, 255, 255, 0.24),
+      transparent 42%
+    ),
     color-mix(in srgb, var(--accent) 18%, transparent);
   border: 1px solid color-mix(in srgb, var(--accent) 38%, white 10%);
   border-radius: 0.85rem;
@@ -429,7 +489,9 @@ const categoryCounts = computed(() =>
   color: color-mix(in srgb, var(--accent) 78%, white 22%);
   height: 3.25rem;
   position: relative;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
   width: 3.25rem;
 }
 

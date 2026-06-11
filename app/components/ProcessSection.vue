@@ -39,9 +39,7 @@ const visualSteps = computed(() =>
           class="process-rail absolute left-6 right-6 top-24 hidden h-px lg:block"
         />
 
-        <ol
-          class="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
-        >
+        <ol class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <li
             v-for="(step, index) in visualSteps"
             :key="step.step"
@@ -69,7 +67,9 @@ const visualSteps = computed(() =>
               >
                 {{ step.step }}
               </span>
-              <span class="process-pulse relative grid h-4 w-4 place-items-center rounded-full bg-brand-300">
+              <span
+                class="process-pulse relative grid h-4 w-4 place-items-center rounded-full bg-brand-300"
+              >
                 <span class="h-1.5 w-1.5 rounded-full bg-slate-950" />
               </span>
             </div>
@@ -87,9 +87,29 @@ const visualSteps = computed(() =>
                   viewBox="0 0 80 80"
                   fill="none"
                 >
-                  <circle cx="40" cy="40" r="25" stroke="currentColor" stroke-width="3" opacity=".35" />
-                  <circle cx="40" cy="40" r="14" stroke="currentColor" stroke-width="3" opacity=".5" />
-                  <path class="svg-sweep" d="M40 40 60 24" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+                  <circle
+                    cx="40"
+                    cy="40"
+                    r="25"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    opacity=".35"
+                  />
+                  <circle
+                    cx="40"
+                    cy="40"
+                    r="14"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    opacity=".5"
+                  />
+                  <path
+                    class="svg-sweep"
+                    d="M40 40 60 24"
+                    stroke="currentColor"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                  />
                   <circle cx="53" cy="29" r="4" fill="currentColor" />
                   <circle cx="40" cy="40" r="3" fill="currentColor" />
                 </svg>
@@ -99,10 +119,32 @@ const visualSteps = computed(() =>
                   viewBox="0 0 80 80"
                   fill="none"
                 >
-                  <rect x="16" y="18" width="48" height="38" rx="8" stroke="currentColor" stroke-width="3" />
-                  <path d="M16 30h48" stroke="currentColor" stroke-width="3" opacity=".45" />
-                  <path class="svg-draw" d="M27 44h13M27 50h25" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-                  <path d="M49 40l10 10-8 2 2 8-10-10 8-2-2-8Z" fill="currentColor" />
+                  <rect
+                    x="16"
+                    y="18"
+                    width="48"
+                    height="38"
+                    rx="8"
+                    stroke="currentColor"
+                    stroke-width="3"
+                  />
+                  <path
+                    d="M16 30h48"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    opacity=".45"
+                  />
+                  <path
+                    class="svg-draw"
+                    d="M27 44h13M27 50h25"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M49 40l10 10-8 2 2 8-10-10 8-2-2-8Z"
+                    fill="currentColor"
+                  />
                 </svg>
                 <svg
                   v-else-if="step.icon === 'terminal'"
@@ -110,11 +152,43 @@ const visualSteps = computed(() =>
                   viewBox="0 0 80 80"
                   fill="none"
                 >
-                  <rect x="14" y="18" width="52" height="44" rx="8" stroke="currentColor" stroke-width="3" />
-                  <path d="M25 37l8 7-8 7" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-                  <path class="svg-draw" d="M40 51h15" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
-                  <circle cx="26" cy="28" r="2" fill="currentColor" opacity=".65" />
-                  <circle cx="34" cy="28" r="2" fill="currentColor" opacity=".65" />
+                  <rect
+                    x="14"
+                    y="18"
+                    width="52"
+                    height="44"
+                    rx="8"
+                    stroke="currentColor"
+                    stroke-width="3"
+                  />
+                  <path
+                    d="M25 37l8 7-8 7"
+                    stroke="currentColor"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    class="svg-draw"
+                    d="M40 51h15"
+                    stroke="currentColor"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                  />
+                  <circle
+                    cx="26"
+                    cy="28"
+                    r="2"
+                    fill="currentColor"
+                    opacity=".65"
+                  />
+                  <circle
+                    cx="34"
+                    cy="28"
+                    r="2"
+                    fill="currentColor"
+                    opacity=".65"
+                  />
                 </svg>
                 <svg
                   v-else
@@ -122,10 +196,35 @@ const visualSteps = computed(() =>
                   viewBox="0 0 80 80"
                   fill="none"
                 >
-                  <path class="svg-float" d="M42 12c10 7 15 18 13 31l-9 9-18-18 9-9c2-5 3-9 5-13Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
-                  <path d="M28 34l-10 4 8 8M46 52l-4 10-8-8" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".65" />
-                  <circle cx="45" cy="31" r="5" stroke="currentColor" stroke-width="3" />
-                  <path class="svg-flame" d="M30 55c-4 2-7 5-9 10 5-1 9-3 12-7" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+                  <path
+                    class="svg-float"
+                    d="M42 12c10 7 15 18 13 31l-9 9-18-18 9-9c2-5 3-9 5-13Z"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M28 34l-10 4 8 8M46 52l-4 10-8-8"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    opacity=".65"
+                  />
+                  <circle
+                    cx="45"
+                    cy="31"
+                    r="5"
+                    stroke="currentColor"
+                    stroke-width="3"
+                  />
+                  <path
+                    class="svg-flame"
+                    d="M30 55c-4 2-7 5-9 10 5-1 9-3 12-7"
+                    stroke="currentColor"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                  />
                 </svg>
               </div>
             </div>
@@ -161,8 +260,13 @@ const visualSteps = computed(() =>
 }
 
 .process-rail {
-  background:
-    linear-gradient(90deg, transparent, rgba(52, 216, 166, 0.75), rgba(31, 155, 240, 0.75), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(52, 216, 166, 0.75),
+    rgba(31, 155, 240, 0.75),
+    transparent
+  );
 }
 
 .process-rail::after {
@@ -178,7 +282,12 @@ const visualSteps = computed(() =>
 }
 
 .process-card::before {
-  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+  background: linear-gradient(
+    135deg,
+    transparent,
+    rgba(255, 255, 255, 0.18),
+    transparent
+  );
   content: "";
   height: 180%;
   left: -80%;
@@ -186,7 +295,9 @@ const visualSteps = computed(() =>
   position: absolute;
   top: -40%;
   transform: rotate(18deg);
-  transition: left 700ms ease, opacity 300ms ease;
+  transition:
+    left 700ms ease,
+    opacity 300ms ease;
   width: 45%;
 }
 

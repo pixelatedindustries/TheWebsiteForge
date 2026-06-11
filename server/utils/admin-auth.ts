@@ -29,21 +29,33 @@ export async function requireAdmin(event: H3Event): Promise<AdminIdentity> {
   const token = header.startsWith("Bearer ") ? header.slice(7).trim() : "";
 
   if (!token) {
-    throw createError({ statusCode: 401, statusMessage: "Missing bearer token." });
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Missing bearer token.",
+    });
   }
 
   let decoded;
   try {
     decoded = await verifyIdToken(token);
   } catch {
-    throw createError({ statusCode: 401, statusMessage: "Invalid or expired token." });
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Invalid or expired token.",
+    });
   }
 
   if (!decoded.email) {
-    throw createError({ statusCode: 403, statusMessage: "No email on account." });
+    throw createError({
+      statusCode: 403,
+      statusMessage: "No email on account.",
+    });
   }
   if (!isAdminEmail(decoded.email)) {
-    throw createError({ statusCode: 403, statusMessage: "Not authorized for admin." });
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Not authorized for admin.",
+    });
   }
 
   return {

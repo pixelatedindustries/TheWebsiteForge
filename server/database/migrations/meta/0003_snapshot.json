@@ -50,9 +50,7 @@
         "admin_users_email_unique": {
           "name": "admin_users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -167,12 +165,8 @@
           "name": "change_requests_customer_id_customers_id_fk",
           "tableFrom": "change_requests",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -180,12 +174,8 @@
           "name": "change_requests_site_id_sites_id_fk",
           "tableFrom": "change_requests",
           "tableTo": "sites",
-          "columnsFrom": [
-            "site_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["site_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -271,16 +261,12 @@
         "customers_firebase_uid_unique": {
           "name": "customers_firebase_uid_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "firebase_uid"
-          ]
+          "columns": ["firebase_uid"]
         },
         "customers_email_unique": {
           "name": "customers_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -362,12 +348,8 @@
           "name": "domains_customer_id_customers_id_fk",
           "tableFrom": "domains",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -375,12 +357,8 @@
           "name": "domains_site_id_sites_id_fk",
           "tableFrom": "domains",
           "tableTo": "sites",
-          "columnsFrom": [
-            "site_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["site_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -390,9 +368,7 @@
         "domains_fqdn_unique": {
           "name": "domains_fqdn_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "fqdn"
-          ]
+          "columns": ["fqdn"]
         }
       },
       "policies": {},
@@ -502,12 +478,8 @@
           "name": "invoices_customer_id_customers_id_fk",
           "tableFrom": "invoices",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -515,12 +487,8 @@
           "name": "invoices_site_id_sites_id_fk",
           "tableFrom": "invoices",
           "tableTo": "sites",
-          "columnsFrom": [
-            "site_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["site_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -607,12 +575,8 @@
           "name": "leads_customer_id_customers_id_fk",
           "tableFrom": "leads",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -713,12 +677,8 @@
           "name": "recurring_charges_customer_id_customers_id_fk",
           "tableFrom": "recurring_charges",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -726,12 +686,8 @@
           "name": "recurring_charges_site_id_sites_id_fk",
           "tableFrom": "recurring_charges",
           "tableTo": "sites",
-          "columnsFrom": [
-            "site_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["site_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -827,12 +783,8 @@
           "name": "sites_customer_id_customers_id_fk",
           "tableFrom": "sites",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -934,12 +886,8 @@
           "name": "subscriptions_customer_id_customers_id_fk",
           "tableFrom": "subscriptions",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -947,12 +895,8 @@
           "name": "subscriptions_site_id_sites_id_fk",
           "tableFrom": "subscriptions",
           "tableTo": "sites",
-          "columnsFrom": [
-            "site_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["site_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1074,12 +1018,8 @@
           "name": "wallet_transactions_customer_id_customers_id_fk",
           "tableFrom": "wallet_transactions",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1087,12 +1027,8 @@
           "name": "wallet_transactions_site_id_sites_id_fk",
           "tableFrom": "wallet_transactions",
           "tableTo": "sites",
-          "columnsFrom": [
-            "site_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["site_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1108,123 +1044,67 @@
     "public.admin_role": {
       "name": "admin_role",
       "schema": "public",
-      "values": [
-        "owner",
-        "admin",
-        "support"
-      ]
+      "values": ["owner", "admin", "support"]
     },
     "public.billing_interval": {
       "name": "billing_interval",
       "schema": "public",
-      "values": [
-        "month",
-        "year"
-      ]
+      "values": ["month", "year"]
     },
     "public.change_request_status": {
       "name": "change_request_status",
       "schema": "public",
-      "values": [
-        "open",
-        "quoted",
-        "approved",
-        "done",
-        "declined"
-      ]
+      "values": ["open", "quoted", "approved", "done", "declined"]
     },
     "public.db_hosting": {
       "name": "db_hosting",
       "schema": "public",
-      "values": [
-        "none",
-        "self_hosted",
-        "managed"
-      ]
+      "values": ["none", "self_hosted", "managed"]
     },
     "public.invoice_status": {
       "name": "invoice_status",
       "schema": "public",
-      "values": [
-        "open",
-        "paid",
-        "failed",
-        "refunded"
-      ]
+      "values": ["open", "paid", "failed", "refunded"]
     },
     "public.invoice_type": {
       "name": "invoice_type",
       "schema": "public",
-      "values": [
-        "build",
-        "hosting",
-        "domain",
-        "care",
-        "feature"
-      ]
+      "values": ["build", "hosting", "domain", "care", "feature"]
     },
     "public.lead_status": {
       "name": "lead_status",
       "schema": "public",
-      "values": [
-        "new",
-        "contacted",
-        "won",
-        "lost"
-      ]
+      "values": ["new", "contacted", "won", "lost"]
     },
     "public.recurring_kind": {
       "name": "recurring_kind",
       "schema": "public",
-      "values": [
-        "hosting",
-        "database"
-      ]
+      "values": ["hosting", "database"]
     },
     "public.recurring_status": {
       "name": "recurring_status",
       "schema": "public",
-      "values": [
-        "active",
-        "paused",
-        "canceled"
-      ]
+      "values": ["active", "paused", "canceled"]
     },
     "public.site_origin": {
       "name": "site_origin",
       "schema": "public",
-      "values": [
-        "built",
-        "brought"
-      ]
+      "values": ["built", "brought"]
     },
     "public.site_status": {
       "name": "site_status",
       "schema": "public",
-      "values": [
-        "draft",
-        "live",
-        "suspended",
-        "offboarded"
-      ]
+      "values": ["draft", "live", "suspended", "offboarded"]
     },
     "public.site_type": {
       "name": "site_type",
       "schema": "public",
-      "values": [
-        "static",
-        "dynamic",
-        "app"
-      ]
+      "values": ["static", "dynamic", "app"]
     },
     "public.subscription_status": {
       "name": "subscription_status",
       "schema": "public",
-      "values": [
-        "active",
-        "past_due",
-        "canceled"
-      ]
+      "values": ["active", "past_due", "canceled"]
     },
     "public.wallet_txn_type": {
       "name": "wallet_txn_type",

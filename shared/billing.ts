@@ -91,17 +91,62 @@ export interface RecurringService {
  * (self-hosted + 50% handling) variants.
  */
 export const recurringServices: Record<string, RecurringService> = {
-  hosting_static: { key: "hosting_static", kind: "hosting", label: "Static Hosting", amountUsdCents: 1_500 }, // $15
-  hosting_dynamic: { key: "hosting_dynamic", kind: "hosting", label: "Dynamic Hosting", amountUsdCents: 4_500 }, // $45
-  hosting_app: { key: "hosting_app", kind: "hosting", label: "App Hosting", amountUsdCents: 12_000 }, // $120
+  hosting_static: {
+    key: "hosting_static",
+    kind: "hosting",
+    label: "Static Hosting",
+    amountUsdCents: 1_500,
+  }, // $15
+  hosting_dynamic: {
+    key: "hosting_dynamic",
+    kind: "hosting",
+    label: "Dynamic Hosting",
+    amountUsdCents: 4_500,
+  }, // $45
+  hosting_app: {
+    key: "hosting_app",
+    kind: "hosting",
+    label: "App Hosting",
+    amountUsdCents: 12_000,
+  }, // $120
 
-  db_self_small: { key: "db_self_small", kind: "database", label: "Database — Small (self-hosted)", amountUsdCents: 1_000 }, // $10
-  db_self_medium: { key: "db_self_medium", kind: "database", label: "Database — Medium (self-hosted)", amountUsdCents: 2_500 }, // $25
-  db_self_large: { key: "db_self_large", kind: "database", label: "Database — Large (self-hosted)", amountUsdCents: 6_000 }, // $60
+  db_self_small: {
+    key: "db_self_small",
+    kind: "database",
+    label: "Database — Small (self-hosted)",
+    amountUsdCents: 1_000,
+  }, // $10
+  db_self_medium: {
+    key: "db_self_medium",
+    kind: "database",
+    label: "Database — Medium (self-hosted)",
+    amountUsdCents: 2_500,
+  }, // $25
+  db_self_large: {
+    key: "db_self_large",
+    kind: "database",
+    label: "Database — Large (self-hosted)",
+    amountUsdCents: 6_000,
+  }, // $60
 
-  db_managed_small: { key: "db_managed_small", kind: "database", label: "Database — Small (managed)", amountUsdCents: 1_500 }, // $15
-  db_managed_medium: { key: "db_managed_medium", kind: "database", label: "Database — Medium (managed)", amountUsdCents: 3_750 }, // $37.50
-  db_managed_large: { key: "db_managed_large", kind: "database", label: "Database — Large (managed)", amountUsdCents: 9_000 }, // $90
+  db_managed_small: {
+    key: "db_managed_small",
+    kind: "database",
+    label: "Database — Small (managed)",
+    amountUsdCents: 1_500,
+  }, // $15
+  db_managed_medium: {
+    key: "db_managed_medium",
+    kind: "database",
+    label: "Database — Medium (managed)",
+    amountUsdCents: 3_750,
+  }, // $37.50
+  db_managed_large: {
+    key: "db_managed_large",
+    kind: "database",
+    label: "Database — Large (managed)",
+    amountUsdCents: 9_000,
+  }, // $90
 };
 
 export function getRecurringService(key: string): RecurringService | undefined {

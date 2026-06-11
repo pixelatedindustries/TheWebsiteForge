@@ -16,11 +16,19 @@ const style = computed(() => ({
     <!-- sheen -->
     <div
       class="absolute inset-0 opacity-60"
-      style="background: radial-gradient(120% 80% at 20% 0%, rgba(255, 255, 255, 0.35), transparent 55%);"
+      style="
+        background: radial-gradient(
+          120% 80% at 20% 0%,
+          rgba(255, 255, 255, 0.35),
+          transparent 55%
+        );
+      "
     />
 
     <!-- faux browser window -->
-    <div class="absolute inset-x-5 bottom-0 top-7 rounded-t-lg bg-ink-900/85 backdrop-blur-sm ring-1 ring-white/10">
+    <div
+      class="absolute inset-x-5 bottom-0 top-7 rounded-t-lg bg-ink-900/85 backdrop-blur-sm ring-1 ring-white/10"
+    >
       <div class="flex items-center gap-1.5 border-b border-white/10 px-3 py-2">
         <span class="h-2 w-2 rounded-full bg-white/30" />
         <span class="h-2 w-2 rounded-full bg-white/20" />

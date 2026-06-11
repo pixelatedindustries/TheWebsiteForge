@@ -65,7 +65,9 @@ const values = [
             <h3 class="mt-4 font-display text-lg font-semibold text-white">
               {{ value.title }}
             </h3>
-            <p class="mt-2 text-sm leading-relaxed text-slate-400">{{ value.body }}</p>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">
+              {{ value.body }}
+            </p>
           </div>
         </div>
       </div>

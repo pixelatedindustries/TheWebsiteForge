@@ -55,9 +55,14 @@ onMounted(async () => {
     subscriptions.value = res.subscriptions;
     invoices.value = res.invoices;
   } catch (e) {
-    const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
     error.value =
-      err?.data?.statusMessage || err?.statusMessage || "Failed to load billing.";
+      err?.data?.statusMessage ||
+      err?.statusMessage ||
+      "Failed to load billing.";
   } finally {
     pending.value = false;
   }
@@ -106,7 +111,9 @@ onMounted(async () => {
                     {{ titleCase(s.provider) }}
                   </td>
                   <td class="px-4 py-3 text-slate-300">
-                    {{ formatCents(s.amountCents, s.currency) }}/{{ s.interval }}
+                    {{ formatCents(s.amountCents, s.currency) }}/{{
+                      s.interval
+                    }}
                   </td>
                   <td class="whitespace-nowrap px-4 py-3 text-slate-400">
                     {{ formatDate(s.currentPeriodEnd) }}
@@ -114,7 +121,9 @@ onMounted(async () => {
                   <td class="px-4 py-3">
                     <span
                       class="rounded-full px-2 py-0.5 text-xs font-medium"
-                      :class="subStatus[s.status] || 'bg-slate-500/15 text-slate-400'"
+                      :class="
+                        subStatus[s.status] || 'bg-slate-500/15 text-slate-400'
+                      "
                     >
                       {{ titleCase(s.status) }}
                     </span>
@@ -165,7 +174,9 @@ onMounted(async () => {
                   <td class="px-4 py-3">
                     <span
                       class="rounded-full px-2 py-0.5 text-xs font-medium"
-                      :class="invStatus[i.status] || 'bg-slate-500/15 text-slate-400'"
+                      :class="
+                        invStatus[i.status] || 'bg-slate-500/15 text-slate-400'
+                      "
                     >
                       {{ titleCase(i.status) }}
                     </span>

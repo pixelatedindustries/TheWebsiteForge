@@ -13,8 +13,8 @@ const sections = [
   {
     heading: "1. Who we are",
     body: [
-      "These Terms of Service (\"Terms\") govern your access to and use of the websites, design and development services, hosting, domain management, and related services (collectively, the \"Services\") provided by TheWebsiteForge (\"we\", \"us\", \"our\").",
-      "By engaging us, paying an invoice, or using the Services, you (\"you\", \"the Client\") agree to these Terms. If you do not agree, do not use the Services.",
+      'These Terms of Service ("Terms") govern your access to and use of the websites, design and development services, hosting, domain management, and related services (collectively, the "Services") provided by TheWebsiteForge ("we", "us", "our").',
+      'By engaging us, paying an invoice, or using the Services, you ("you", "the Client") agree to these Terms. If you do not agree, do not use the Services.',
     ],
   },
   {
@@ -51,7 +51,7 @@ const sections = [
   {
     heading: "6. Intellectual property and ownership",
     body: [
-      "For one-time \"own it\" builds, ownership of the final, paid-for website code and delivered assets transfers to you upon receipt of full payment. We may retain the right to display the work in our portfolio unless you ask us in writing not to.",
+      'For one-time "own it" builds, ownership of the final, paid-for website code and delivered assets transfers to you upon receipt of full payment. We may retain the right to display the work in our portfolio unless you ask us in writing not to.',
       "For managed (hosted) builds, ownership of the delivered website transfers on full payment; the terms of any source-code handover are as set out in your quote or the Hosting Agreement.",
       "We retain ownership of our pre-existing tools, libraries, frameworks, and know-how. Third-party components remain subject to their own licences.",
     ],
@@ -130,8 +130,9 @@ const sections = [
         </div>
 
         <p class="text-center text-xs leading-relaxed text-slate-500">
-          This page is a starting template provided for convenience and is not legal
-          advice. Please have it reviewed by a qualified attorney before relying on it.
+          This page is a starting template provided for convenience and is not
+          legal advice. Please have it reviewed by a qualified attorney before
+          relying on it.
         </p>
       </div>
     </section>

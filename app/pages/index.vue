@@ -41,7 +41,7 @@ type Item = {
   sk: (v: number) => void;
 };
 let items: Item[] = [];
-let gsapRef: typeof import("gsap")["gsap"] | null = null;
+let gsapRef: (typeof import("gsap"))["gsap"] | null = null;
 const mouse = { x: 0, y: 0 }; // cursor in normalized screen space (-0.5..0.5, y down)
 let entering = false;
 let ambientReady = false; // hold the ambient effects until the entrance settles
@@ -109,9 +109,14 @@ onMounted(async () => {
   };
   const collect = () => {
     const root = content.value!;
-    const letters = Array.from(root.querySelectorAll<HTMLElement>("[data-letter]"));
+    const letters = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-letter]"),
+    );
     const grav = Array.from(root.querySelectorAll<HTMLElement>("[data-grav]"));
-    items = [...letters.map((el) => make(el, "lens")), ...grav.map((el) => make(el, "tug"))];
+    items = [
+      ...letters.map((el) => make(el, "lens")),
+      ...grav.map((el) => make(el, "tug")),
+    ];
   };
   collect();
 
@@ -129,7 +134,8 @@ onMounted(async () => {
   const sub = content.value.querySelector<HTMLElement>("[data-decode]");
   if (sub) {
     const final = sub.textContent ?? "";
-    const glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789·—#%&";
+    const glyphs =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789·—#%&";
     const startT = performance.now() + 700;
     const dur = 1100;
     const step = (now: number) => {
@@ -138,7 +144,10 @@ onMounted(async () => {
       let out = "";
       for (let i = 0; i < final.length; i++) {
         const ch = final[i]!;
-        out += i < shown || ch === " " ? ch : glyphs[(Math.random() * glyphs.length) | 0];
+        out +=
+          i < shown || ch === " "
+            ? ch
+            : glyphs[(Math.random() * glyphs.length) | 0];
       }
       sub.textContent = out;
       if (t < 1) requestAnimationFrame(step);
@@ -246,10 +255,28 @@ async function enter() {
 
     // the field swirls down into the hole and the screen drains to black
     const vx = { v: 0 };
-    tl.to(vx, { v: 1, duration: 1.4, ease: "power2.in", onUpdate: () => (swallow.value.vortex = vx.v) }, 0);
+    tl.to(
+      vx,
+      {
+        v: 1,
+        duration: 1.4,
+        ease: "power2.in",
+        onUpdate: () => (swallow.value.vortex = vx.v),
+      },
+      0,
+    );
     // seal the blackness as the drain completes
     const cv = { v: 0 };
-    tl.to(cv, { v: 1, duration: 0.45, ease: "power2.in", onUpdate: () => (swallow.value.cover = cv.v) }, 1.0);
+    tl.to(
+      cv,
+      {
+        v: 1,
+        duration: 0.45,
+        ease: "power2.in",
+        onUpdate: () => (swallow.value.cover = cv.v),
+      },
+      1.0,
+    );
   });
 
   // we're in blackness — swap to /home behind the cover
@@ -285,7 +312,14 @@ async function enter() {
     <!-- left-to-right scrim keeps the copy crisp against the giant orb -->
     <div
       class="pointer-events-none absolute inset-0 z-5"
-      style="background: linear-gradient(to right, #04070d 20%, rgba(4, 7, 13, 0.72) 46%, transparent 76%)"
+      style="
+        background: linear-gradient(
+          to right,
+          #04070d 20%,
+          rgba(4, 7, 13, 0.72) 46%,
+          transparent 76%
+        );
+      "
       aria-hidden="true"
     />
 
@@ -297,11 +331,15 @@ async function enter() {
           data-chroma
           class="mb-6 flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-brand-200/80"
         >
-          <span class="h-px w-9 bg-gradient-to-r from-brand-400 to-transparent" />
+          <span
+            class="h-px w-9 bg-gradient-to-r from-brand-400 to-transparent"
+          />
           Premium websites · built &amp; sold
         </p>
 
-        <h1 class="intro-word font-display font-bold leading-[0.9] tracking-tight text-white">
+        <h1
+          class="intro-word font-display font-bold leading-[0.9] tracking-tight text-white"
+        >
           <span class="sr-only">TheWebsite Forge</span>
           <span aria-hidden="true" class="block whitespace-nowrap">
             <span
@@ -312,7 +350,9 @@ async function enter() {
               >{{ ch }}</span
             >
           </span>
-          <span aria-hidden="true" data-letter class="source-word block">Forge</span>
+          <span aria-hidden="true" data-letter class="source-word block"
+            >Forge</span
+          >
         </h1>
 
         <p
@@ -333,7 +373,19 @@ async function enter() {
           @click="enter"
         >
           Enter the site
-          <svg class="transition-transform duration-300 group-hover:translate-x-1" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          <svg
+            class="transition-transform duration-300 group-hover:translate-x-1"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
         </button>
       </div>
     </div>
@@ -342,11 +394,22 @@ async function enter() {
     <button
       type="button"
       :aria-pressed="hum.enabled.value"
-      :aria-label="hum.enabled.value ? 'Mute ambient sound' : 'Play ambient sound'"
+      :aria-label="
+        hum.enabled.value ? 'Mute ambient sound' : 'Play ambient sound'
+      "
       class="hum-toggle absolute bottom-6 right-6 z-20 grid h-11 w-11 place-items-center rounded-full text-brand-100/80 transition hover:text-white"
       @click="hum.toggle()"
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
         <path d="M4 9v6h4l5 4V5L8 9H4z" />
         <template v-if="hum.enabled.value">
           <path d="M16 8.5a4 4 0 0 1 0 7" />

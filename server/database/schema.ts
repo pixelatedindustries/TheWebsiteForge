@@ -35,7 +35,11 @@ export const siteStatus = pgEnum("site_status", [
   "offboarded",
 ]);
 
-export const dbHosting = pgEnum("db_hosting", ["none", "self_hosted", "managed"]);
+export const dbHosting = pgEnum("db_hosting", [
+  "none",
+  "self_hosted",
+  "managed",
+]);
 
 export const subscriptionStatus = pgEnum("subscription_status", [
   "active",
@@ -237,38 +241,44 @@ export const auditLog = pgTable("audit_log", {
  * movement. All amounts are signed USD cents: positive = credit, negative =
  * debit. `balance_after_cents` snapshots the balance immediately after the row.
  */
-export const walletTransactions = pgTable("wallet_transactions", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  customerId: uuid("customer_id")
-    .notNull()
-    .references(() => customers.id, { onDelete: "cascade" }),
-  type: walletTxnType("type").notNull(),
-  /** Signed USD cents: + credit, - debit. */
-  amountCents: integer("amount_cents").notNull(),
-  /** USD-cents balance immediately after this entry. */
-  balanceAfterCents: integer("balance_after_cents").notNull(),
-  currency: text("currency").default("USD").notNull(),
-  /** For top-ups: the actual ZAR amount Paystack charged (audit trail). */
-  chargedZarCents: integer("charged_zar_cents"),
-  /** For top-ups: the USD→ZAR rate used. */
-  fxRate: text("fx_rate"),
-  description: text("description").notNull(),
-  /** Paystack reference for top-ups; null for internal debits. */
-  reference: text("reference"),
-  siteId: uuid("site_id").references(() => sites.id, { onDelete: "set null" }),
-  /** Admin email, or "system" for the scheduled job. */
-  createdBy: text("created_by").default("system").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-}, (t) => [
-  // One ledger row per Paystack reference (top-ups) — hard guard against
-  // double-crediting when the webhook and the verify step race. Internal
-  // debits have a null reference and are exempt (partial index).
-  uniqueIndex("wallet_txn_reference_uq")
-    .on(t.reference)
-    .where(sql`${t.reference} is not null`),
-]);
+export const walletTransactions = pgTable(
+  "wallet_transactions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => customers.id, { onDelete: "cascade" }),
+    type: walletTxnType("type").notNull(),
+    /** Signed USD cents: + credit, - debit. */
+    amountCents: integer("amount_cents").notNull(),
+    /** USD-cents balance immediately after this entry. */
+    balanceAfterCents: integer("balance_after_cents").notNull(),
+    currency: text("currency").default("USD").notNull(),
+    /** For top-ups: the actual ZAR amount Paystack charged (audit trail). */
+    chargedZarCents: integer("charged_zar_cents"),
+    /** For top-ups: the USD→ZAR rate used. */
+    fxRate: text("fx_rate"),
+    description: text("description").notNull(),
+    /** Paystack reference for top-ups; null for internal debits. */
+    reference: text("reference"),
+    siteId: uuid("site_id").references(() => sites.id, {
+      onDelete: "set null",
+    }),
+    /** Admin email, or "system" for the scheduled job. */
+    createdBy: text("created_by").default("system").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    // One ledger row per Paystack reference (top-ups) — hard guard against
+    // double-crediting when the webhook and the verify step race. Internal
+    // debits have a null reference and are exempt (partial index).
+    uniqueIndex("wallet_txn_reference_uq")
+      .on(t.reference)
+      .where(sql`${t.reference} is not null`),
+  ],
+);
 
 /**
  * Recurring monthly charges debited from the wallet (hosting / database).

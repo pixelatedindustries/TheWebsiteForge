@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { pricingTiers } from "~~/shared/site";
 
-withDefaults(
-  defineProps<{ showHeading?: boolean }>(),
-  { showHeading: true },
-);
+withDefaults(defineProps<{ showHeading?: boolean }>(), { showHeading: true });
 </script>
 
 <template>
@@ -27,8 +24,12 @@ withDefaults(
       </div>
 
       <p class="mt-8 text-center text-sm text-slate-500">
-        Prices in USD; you'll be charged the ZAR equivalent at checkout. Need something custom?
-        <NuxtLink to="/contact" class="text-brand-300 underline-offset-4 hover:underline">
+        Prices in USD; you'll be charged the ZAR equivalent at checkout. Need
+        something custom?
+        <NuxtLink
+          to="/contact"
+          class="text-brand-300 underline-offset-4 hover:underline"
+        >
           Tell us about your project
         </NuxtLink>
       </p>

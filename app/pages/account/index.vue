@@ -5,49 +5,24 @@ import {
   formatUsdCents,
   estimateZar,
 } from "~~/shared/billing";
+import type { Invoice, Site, Txn, WalletData } from "~/types/account";
 
 /**
  * Customer portal (WebForgePlan2 §4.5): wallet balance + runway, add funds,
  * transaction ledger, recurring services, sites, one-off invoices, and a
  * change-request form. Any signed-in customer (not gated by ADMIN_EMAILS).
  */
-const { user, ready, configured, signInWithGoogle, signOut, authFetch } = useAuth();
-const { startCheckout, loading: topupLoading, error: topupError } = useCheckout();
+const { user, ready, configured, signInWithGoogle, signOut, authFetch } =
+  useAuth();
+const {
+  startCheckout,
+  loading: topupLoading,
+  error: topupError,
+} = useCheckout();
 const { balanceCents, refresh: refreshWalletBalance } = useWalletBalance();
 
 const config = useRuntimeConfig();
 const rate = Number(config.public.usdToZar) || 17;
-
-interface WalletData {
-  currency: string;
-  balanceCents: number;
-  monthlyBurnCents: number;
-  runwayMonths: number | null;
-  recurring: Array<{ id: string; kind: string; label: string; amountCents: number; nextChargeAt: string }>;
-}
-interface Txn {
-  id: string;
-  type: string;
-  amountCents: number;
-  balanceAfterCents: number;
-  description: string;
-  reference: string | null;
-  createdAt: string;
-}
-interface Invoice {
-  id: string;
-  number: number;
-  type: string;
-  amountCents: number;
-  currency: string;
-  status: string;
-  issuedAt: string;
-}
-interface Site {
-  id: string;
-  name: string;
-  status: string;
-}
 
 const wallet = ref<WalletData | null>(null);
 const txns = ref<Txn[]>([]);
@@ -89,9 +64,14 @@ async function load() {
     invoices.value = b.invoices;
     sites.value = b.sites;
   } catch (e) {
-    const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
     loadError.value =
-      err?.data?.statusMessage || err?.statusMessage || "Failed to load your account.";
+      err?.data?.statusMessage ||
+      err?.statusMessage ||
+      "Failed to load your account.";
   } finally {
     pending.value = false;
   }
@@ -109,7 +89,8 @@ function topupCustom() {
 }
 
 async function submitChangeRequest() {
-  if (crTitle.value.trim().length < 3 || crDetails.value.trim().length < 10) return;
+  if (crTitle.value.trim().length < 3 || crDetails.value.trim().length < 10)
+    return;
   crBusy.value = true;
   crMessage.value = null;
   try {
@@ -124,17 +105,27 @@ async function submitChangeRequest() {
     crTitle.value = "";
     crDetails.value = "";
     crSiteId.value = "";
-    crMessage.value = "Thanks! We've received your request and will be in touch with a quote.";
+    crMessage.value =
+      "Thanks! We've received your request and will be in touch with a quote.";
   } catch (e) {
-    const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
-    crMessage.value = err?.data?.statusMessage || err?.statusMessage || "Could not submit.";
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
+    crMessage.value =
+      err?.data?.statusMessage || err?.statusMessage || "Could not submit.";
   } finally {
     crBusy.value = false;
   }
 }
 
 const txnSign = (c: number) => (c >= 0 ? "+" : "−");
-const fmtDate = (s: string) => new Date(s).toLocaleDateString("en", { year: "numeric", month: "short", day: "numeric" });
+const fmtDate = (s: string) =>
+  new Date(s).toLocaleDateString("en", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 const statusClass = (s: string) =>
   ({
     paid: "bg-emerald-500/15 text-emerald-300",
@@ -148,9 +139,13 @@ const statusClass = (s: string) =>
   })[s] || "bg-slate-500/15 text-slate-400";
 
 if (import.meta.client) {
-  watch([ready, () => user.value?.uid], () => {
-    if (ready.value && user.value) load();
-  }, { immediate: true });
+  watch(
+    [ready, () => user.value?.uid],
+    () => {
+      if (ready.value && user.value) load();
+    },
+    { immediate: true },
+  );
 }
 
 useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
@@ -160,22 +155,30 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
   <div class="px-4 pt-36 pb-24 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-5xl">
       <!-- loading auth -->
-      <div v-if="!ready" class="glass rounded-2xl p-10 text-center text-slate-400">
+      <div
+        v-if="!ready"
+        class="glass rounded-2xl p-10 text-center text-slate-400"
+      >
         Loading…
       </div>
 
       <!-- not configured -->
       <div v-else-if="!configured" class="glass rounded-2xl p-10 text-center">
-        <h1 class="font-display text-2xl font-bold text-white">Sign-in unavailable</h1>
+        <h1 class="font-display text-2xl font-bold text-white">
+          Sign-in unavailable
+        </h1>
         <p class="mt-3 text-slate-400">Authentication isn't configured yet.</p>
       </div>
 
       <!-- signed out -->
       <div v-else-if="!user" v-motion="reveal(0)" class="mx-auto max-w-md">
         <div class="glass-strong rounded-2xl p-8 text-center">
-          <h1 class="font-display text-3xl font-bold text-white">Your account</h1>
+          <h1 class="font-display text-3xl font-bold text-white">
+            Your account
+          </h1>
           <p class="mt-3 text-slate-400">
-            Sign in to manage your wallet, top up credit, view invoices, and request changes.
+            Sign in to manage your wallet, top up credit, view invoices, and
+            request changes.
           </p>
           <button
             type="button"
@@ -191,7 +194,9 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
       <div v-else>
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 class="font-display text-3xl font-bold text-white">My account</h1>
+            <h1 class="font-display text-3xl font-bold text-white">
+              My account
+            </h1>
             <p class="mt-1 text-sm text-slate-400">{{ user.email }}</p>
           </div>
           <button
@@ -203,8 +208,12 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
           </button>
         </div>
 
-        <p v-if="loadError" class="mt-8 text-sm text-rose-400">{{ loadError }}</p>
-        <p v-else-if="pending" class="mt-8 text-sm text-slate-500">Loading your account…</p>
+        <p v-if="loadError" class="mt-8 text-sm text-rose-400">
+          {{ loadError }}
+        </p>
+        <p v-else-if="pending" class="mt-8 text-sm text-slate-500">
+          Loading your account…
+        </p>
 
         <div v-else class="mt-8 grid gap-6 lg:grid-cols-3">
           <!-- wallet + add funds -->
@@ -216,7 +225,10 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
               </p>
               <p class="mt-1 text-sm text-slate-400">
                 {{ runwayLabel }}
-                <span v-if="wallet && wallet.monthlyBurnCents > 0" class="text-slate-500">
+                <span
+                  v-if="wallet && wallet.monthlyBurnCents > 0"
+                  class="text-slate-500"
+                >
                   · {{ formatUsdCents(wallet.monthlyBurnCents) }}/mo
                 </span>
               </p>
@@ -237,18 +249,23 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                 </div>
                 <div class="mt-3 flex items-center gap-2">
                   <div class="relative flex-1">
-                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                    <span
+                      class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                      >$</span
+                    >
                     <input
                       v-model.number="customAmount"
                       type="number"
                       :min="minTopupUsd"
                       :placeholder="`Custom (min $${minTopupUsd})`"
                       class="w-full rounded-lg border border-white/10 bg-black/30 py-2.5 pl-7 pr-3 text-white outline-none transition focus:border-brand-400/60"
-                    >
+                    />
                   </div>
                   <button
                     type="button"
-                    :disabled="topupLoading || (customAmount ?? 0) < minTopupUsd"
+                    :disabled="
+                      topupLoading || (customAmount ?? 0) < minTopupUsd
+                    "
                     class="btn-gradient rounded-lg px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
                     @click="topupCustom"
                   >
@@ -256,15 +273,22 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                   </button>
                 </div>
                 <p class="mt-2 text-xs text-slate-500">
-                  Charged in ZAR (≈ {{ estimateZar(MIN_TOPUP_USD_CENTS, rate) }} per ${{ minTopupUsd }}). Credit never expires.
+                  Charged in ZAR (≈
+                  {{ estimateZar(MIN_TOPUP_USD_CENTS, rate) }} per ${{
+                    minTopupUsd
+                  }}). Credit never expires.
                 </p>
-                <p v-if="topupError" class="mt-2 text-sm text-rose-400">{{ topupError }}</p>
+                <p v-if="topupError" class="mt-2 text-sm text-rose-400">
+                  {{ topupError }}
+                </p>
               </div>
             </div>
 
             <!-- transactions -->
             <div class="glass rounded-2xl p-6">
-              <h2 class="text-sm font-semibold text-white">Transaction history</h2>
+              <h2 class="text-sm font-semibold text-white">
+                Transaction history
+              </h2>
               <p v-if="!txns.length" class="mt-3 text-sm text-slate-500">
                 No transactions yet. Add funds to get started.
               </p>
@@ -278,14 +302,25 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="t in txns" :key="t.id" class="border-b border-white/5 last:border-0">
-                    <td class="py-2.5 text-slate-400">{{ fmtDate(t.createdAt) }}</td>
+                  <tr
+                    v-for="t in txns"
+                    :key="t.id"
+                    class="border-b border-white/5 last:border-0"
+                  >
+                    <td class="py-2.5 text-slate-400">
+                      {{ fmtDate(t.createdAt) }}
+                    </td>
                     <td class="py-2.5 text-slate-200">{{ t.description }}</td>
                     <td
                       class="py-2.5 text-right font-medium"
-                      :class="t.amountCents >= 0 ? 'text-emerald-300' : 'text-slate-200'"
+                      :class="
+                        t.amountCents >= 0
+                          ? 'text-emerald-300'
+                          : 'text-slate-200'
+                      "
                     >
-                      {{ txnSign(t.amountCents) }}{{ formatUsdCents(Math.abs(t.amountCents)) }}
+                      {{ txnSign(t.amountCents)
+                      }}{{ formatUsdCents(Math.abs(t.amountCents)) }}
                     </td>
                     <td class="py-2.5 text-right text-slate-400">
                       {{ formatUsdCents(t.balanceAfterCents) }}
@@ -311,12 +346,23 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="i in invoices" :key="i.id" class="border-b border-white/5 last:border-0">
+                  <tr
+                    v-for="i in invoices"
+                    :key="i.id"
+                    class="border-b border-white/5 last:border-0"
+                  >
                     <td class="py-2.5 text-slate-400">{{ i.number }}</td>
-                    <td class="py-2.5 capitalize text-slate-200">{{ i.type }}</td>
-                    <td class="py-2.5 text-right text-slate-200">{{ formatUsdCents(i.amountCents) }}</td>
+                    <td class="py-2.5 capitalize text-slate-200">
+                      {{ i.type }}
+                    </td>
+                    <td class="py-2.5 text-right text-slate-200">
+                      {{ formatUsdCents(i.amountCents) }}
+                    </td>
                     <td class="py-2.5 text-right">
-                      <span class="rounded-full px-2 py-0.5 text-xs font-semibold" :class="statusClass(i.status)">
+                      <span
+                        class="rounded-full px-2 py-0.5 text-xs font-semibold"
+                        :class="statusClass(i.status)"
+                      >
                         {{ i.status }}
                       </span>
                     </td>
@@ -329,15 +375,26 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
           <!-- right column: services, sites, change request -->
           <div class="space-y-6">
             <div class="glass rounded-2xl p-6">
-              <h2 class="text-sm font-semibold text-white">Recurring services</h2>
-              <p v-if="!wallet?.recurring.length" class="mt-3 text-sm text-slate-500">
+              <h2 class="text-sm font-semibold text-white">
+                Recurring services
+              </h2>
+              <p
+                v-if="!wallet?.recurring.length"
+                class="mt-3 text-sm text-slate-500"
+              >
                 None yet. We'll set these up when your site goes live.
               </p>
               <ul v-else class="mt-4 space-y-3">
-                <li v-for="r in wallet.recurring" :key="r.id" class="flex items-center justify-between gap-3 text-sm">
+                <li
+                  v-for="r in wallet.recurring"
+                  :key="r.id"
+                  class="flex items-center justify-between gap-3 text-sm"
+                >
                   <div>
                     <p class="font-medium text-white">{{ r.label }}</p>
-                    <p class="text-xs text-slate-500">Next: {{ fmtDate(r.nextChargeAt) }}</p>
+                    <p class="text-xs text-slate-500">
+                      Next: {{ fmtDate(r.nextChargeAt) }}
+                    </p>
                   </div>
                   <span class="whitespace-nowrap font-semibold text-brand-300">
                     {{ formatUsdCents(r.amountCents) }}/mo
@@ -348,11 +405,20 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
 
             <div class="glass rounded-2xl p-6">
               <h2 class="text-sm font-semibold text-white">Your sites</h2>
-              <p v-if="!sites.length" class="mt-3 text-sm text-slate-500">No sites yet.</p>
+              <p v-if="!sites.length" class="mt-3 text-sm text-slate-500">
+                No sites yet.
+              </p>
               <ul v-else class="mt-4 space-y-2">
-                <li v-for="s in sites" :key="s.id" class="flex items-center justify-between gap-3 text-sm">
+                <li
+                  v-for="s in sites"
+                  :key="s.id"
+                  class="flex items-center justify-between gap-3 text-sm"
+                >
                   <span class="text-slate-200">{{ s.name }}</span>
-                  <span class="rounded-full px-2 py-0.5 text-xs font-semibold" :class="statusClass(s.status)">
+                  <span
+                    class="rounded-full px-2 py-0.5 text-xs font-semibold"
+                    :class="statusClass(s.status)"
+                  >
                     {{ s.status }}
                   </span>
                 </li>
@@ -362,7 +428,8 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
             <div class="glass rounded-2xl p-6">
               <h2 class="text-sm font-semibold text-white">Request a change</h2>
               <p class="mt-1 text-xs text-slate-500">
-                Need an update or new feature? Tell us and we'll quote it from your wallet.
+                Need an update or new feature? Tell us and we'll quote it from
+                your wallet.
               </p>
               <div class="mt-4 space-y-3">
                 <input
@@ -370,14 +437,16 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                   type="text"
                   placeholder="Short title"
                   class="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none transition focus:border-brand-400/60"
-                >
+                />
                 <select
                   v-if="sites.length"
                   v-model="crSiteId"
                   class="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none transition focus:border-brand-400/60"
                 >
                   <option value="">Which site? (optional)</option>
-                  <option v-for="s in sites" :key="s.id" :value="s.id">{{ s.name }}</option>
+                  <option v-for="s in sites" :key="s.id" :value="s.id">
+                    {{ s.name }}
+                  </option>
                 </select>
                 <textarea
                   v-model="crDetails"
@@ -393,7 +462,9 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                 >
                   {{ crBusy ? "Sending…" : "Submit request" }}
                 </button>
-                <p v-if="crMessage" class="text-xs text-brand-300">{{ crMessage }}</p>
+                <p v-if="crMessage" class="text-xs text-brand-300">
+                  {{ crMessage }}
+                </p>
               </div>
             </div>
           </div>

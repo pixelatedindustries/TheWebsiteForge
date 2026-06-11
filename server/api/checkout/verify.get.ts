@@ -13,7 +13,10 @@ import { eq } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   const reference = String(getQuery(event).reference ?? "").trim();
   if (!reference) {
-    throw createError({ statusCode: 422, statusMessage: "`reference` is required." });
+    throw createError({
+      statusCode: 422,
+      statusMessage: "`reference` is required.",
+    });
   }
 
   try {
@@ -48,7 +51,10 @@ export default defineEventHandler(async (event) => {
       balanceAfterCents: result.balanceAfterCents ?? null,
     };
   } catch (err) {
-    console.error(`[checkout/verify] fulfillment failed for ${reference}:`, err);
+    console.error(
+      `[checkout/verify] fulfillment failed for ${reference}:`,
+      err,
+    );
     // Don't leak details; the UI just shows a pending/contact-us state.
     return { reference, status: "unknown", paid: false };
   }

@@ -10,7 +10,10 @@ export default defineEventHandler(async (event) => {
   const identity = await requireCustomer(event);
   const customer = await resolveCustomer(identity, { createIfMissing: true });
   if (!customer) {
-    throw createError({ statusCode: 404, statusMessage: "No customer record." });
+    throw createError({
+      statusCode: 404,
+      statusMessage: "No customer record.",
+    });
   }
 
   const query = getQuery(event);

@@ -17,17 +17,35 @@ const dollars = (n: number) =>
 
 // Plan comparison matrix: true / false / string per plan [Starter, Business, Custom]
 const matrix: { label: string; values: (boolean | string)[] }[] = [
-  { label: "Best for", values: ["New offers", "Growing businesses", "Apps and systems"] },
-  { label: "Page count", values: ["1 page", "Up to 6 pages", "Scoped to project"] },
+  {
+    label: "Best for",
+    values: ["New offers", "Growing businesses", "Apps and systems"],
+  },
+  {
+    label: "Page count",
+    values: ["1 page", "Up to 6 pages", "Scoped to project"],
+  },
   { label: "Custom layout", values: [true, true, true] },
-  { label: "Animations and transitions", values: ["Light", "Included", "Advanced"] },
+  {
+    label: "Animations and transitions",
+    values: ["Light", "Included", "Advanced"],
+  },
   { label: "Contact forms", values: [true, true, true] },
   { label: "CMS or editable content", values: [false, "Optional", true] },
   { label: "Ecommerce, auth, or database", values: [false, false, true] },
-  { label: "SEO setup", values: ["Basic", "Full page setup", "Technical setup"] },
+  {
+    label: "SEO setup",
+    values: ["Basic", "Full page setup", "Technical setup"],
+  },
   { label: "Revision rounds", values: ["1", "3", "Scoped"] },
-  { label: "Typical timeline", values: ["3-5 days", "1-3 weeks", "By milestone"] },
-  { label: "After-launch support", values: ["Handover", "Launch support", "Optional retainer"] },
+  {
+    label: "Typical timeline",
+    values: ["3-5 days", "1-3 weeks", "By milestone"],
+  },
+  {
+    label: "After-launch support",
+    values: ["Handover", "Launch support", "Optional retainer"],
+  },
 ];
 const plans = ["Starter", "Business", "Custom"];
 </script>
@@ -130,7 +148,9 @@ const plans = ["Starter", "Business", "Custom"];
             </h3>
             <p class="mt-2 text-sm text-slate-400">{{ plan.tagline }}</p>
             <p class="mt-5">
-              <span class="text-xs text-slate-500">{{ plan.from ? "from" : "" }}</span>
+              <span class="text-xs text-slate-500">{{
+                plan.from ? "from" : ""
+              }}</span>
               <span class="font-display text-3xl font-semibold text-white">
                 {{ dollars(plan.price) }}
               </span>
@@ -186,8 +206,11 @@ const plans = ["Starter", "Business", "Custom"];
               </div>
               <div class="whitespace-nowrap text-right">
                 <p class="text-sm font-semibold text-brand-300">
-                  {{ dollars(tier.price) }}<span class="text-slate-400">/{{ tier.period }}</span>
-                  <span class="text-xs font-normal text-slate-500"> self-hosted</span>
+                  {{ dollars(tier.price)
+                  }}<span class="text-slate-400">/{{ tier.period }}</span>
+                  <span class="text-xs font-normal text-slate-500">
+                    self-hosted</span
+                  >
                 </p>
                 <p v-if="tier.managedPrice" class="text-xs text-slate-400">
                   {{ dollars(tier.managedPrice) }}/{{ tier.period }} managed

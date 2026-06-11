@@ -8,7 +8,10 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
 
   const [customerRows, siteRows, subs] = await Promise.all([
-    db.select().from(schema.customers).orderBy(desc(schema.customers.createdAt)),
+    db
+      .select()
+      .from(schema.customers)
+      .orderBy(desc(schema.customers.createdAt)),
     db.select().from(schema.sites),
     db.select().from(schema.subscriptions),
   ]);

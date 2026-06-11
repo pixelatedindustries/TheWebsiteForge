@@ -32,21 +32,28 @@ export default defineEventHandler(async (event) => {
     // Misconfiguration — fail loudly so it's caught in dev, never silently.
     throw createError({
       statusCode: 500,
-      statusMessage: "PAYSTACK_SECRET_KEY is not set. Add it to .env (see plan §3.1).",
+      statusMessage:
+        "PAYSTACK_SECRET_KEY is not set. Add it to .env (see plan §3.1).",
     });
   }
 
   // 1) Read the RAW body — required for an exact signature match.
   const raw = await readRawBody(event, "utf8");
   if (!raw) {
-    throw createError({ statusCode: 400, statusMessage: "Empty webhook body." });
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Empty webhook body.",
+    });
   }
 
   // 2) Verify the x-paystack-signature header (HMAC-SHA512 of the raw body).
   const signature = getHeader(event, "x-paystack-signature");
   const expected = createHmac("sha512", secret).update(raw).digest("hex");
   if (!signature || !safeEqualHex(signature, expected)) {
-    throw createError({ statusCode: 401, statusMessage: "Invalid Paystack signature." });
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Invalid Paystack signature.",
+    });
   }
 
   // 3) Signature is valid — now it's safe to parse and act on the payload.
@@ -54,7 +61,10 @@ export default defineEventHandler(async (event) => {
   try {
     payload = JSON.parse(raw) as PaystackEvent;
   } catch {
-    throw createError({ statusCode: 400, statusMessage: "Malformed JSON body." });
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Malformed JSON body.",
+    });
   }
 
   const type = payload.event;
@@ -118,7 +128,9 @@ async function handleSubscriptionCreate(data: PaystackData) {
   const db = useDb();
   const email = data.customer?.email;
   if (!email) {
-    console.warn(`[paystack] subscription.create ${subCode} had no customer email.`);
+    console.warn(
+      `[paystack] subscription.create ${subCode} had no customer email.`,
+    );
     return;
   }
 
@@ -197,7 +209,7 @@ async function handleInvoiceUpsert(data: PaystackData) {
     status: (paid ? "paid" : "open") as "paid" | "open",
     provider: "paystack",
     providerInvoiceId: invoiceCode,
-    paidAt: paid ? parseDate(data.paid_at) ?? new Date() : null,
+    paidAt: paid ? (parseDate(data.paid_at) ?? new Date()) : null,
   };
 
   if (existing) {
@@ -263,10 +275,16 @@ async function handleInvoicePaymentFailed(data: PaystackData) {
         const { link } = await getSubscriptionManageLink(subCode);
         manageUrl = link;
       } catch (err) {
-        console.warn(`[paystack] could not get manage link for ${subCode}:`, err);
+        console.warn(
+          `[paystack] could not get manage link for ${subCode}:`,
+          err,
+        );
       }
     }
-    const dunning = paymentFailedEmail({ name: fullName(data.customer), manageUrl });
+    const dunning = paymentFailedEmail({
+      name: fullName(data.customer),
+      manageUrl,
+    });
     void sendEmail({ to: email, ...dunning });
   }
 }
@@ -325,7 +343,10 @@ function safeEqualHex(a: string, b: string): boolean {
 
 function fullName(customer?: PaystackCustomer): string {
   if (!customer) return "";
-  return [customer.first_name, customer.last_name].filter(Boolean).join(" ").trim();
+  return [customer.first_name, customer.last_name]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
 }
 
 /** Map Paystack's plan interval to our `billing_interval` enum. */

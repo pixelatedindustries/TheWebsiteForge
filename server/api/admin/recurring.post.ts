@@ -1,4 +1,7 @@
-import { getRecurringService, type RecurringKind } from "../../../shared/billing";
+import {
+  getRecurringService,
+  type RecurringKind,
+} from "../../../shared/billing";
 
 interface RecurringPayload {
   customerId?: string;
@@ -25,7 +28,10 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<RecurringPayload>(event);
 
   if (!body?.customerId) {
-    throw createError({ statusCode: 422, statusMessage: "`customerId` is required." });
+    throw createError({
+      statusCode: 422,
+      statusMessage: "`customerId` is required.",
+    });
   }
 
   let kind: RecurringKind;
@@ -36,7 +42,10 @@ export default defineEventHandler(async (event) => {
   if (body.planKey) {
     const svc = getRecurringService(body.planKey);
     if (!svc) {
-      throw createError({ statusCode: 422, statusMessage: `Unknown service "${body.planKey}".` });
+      throw createError({
+        statusCode: 422,
+        statusMessage: `Unknown service "${body.planKey}".`,
+      });
     }
     kind = svc.kind;
     label = svc.label;
@@ -55,12 +64,20 @@ export default defineEventHandler(async (event) => {
   }
 
   if (!Number.isFinite(amountCents) || amountCents <= 0) {
-    throw createError({ statusCode: 422, statusMessage: "A positive amount is required." });
+    throw createError({
+      statusCode: 422,
+      statusMessage: "A positive amount is required.",
+    });
   }
 
-  const nextChargeAt = body.nextChargeAt ? new Date(body.nextChargeAt) : new Date();
+  const nextChargeAt = body.nextChargeAt
+    ? new Date(body.nextChargeAt)
+    : new Date();
   if (Number.isNaN(nextChargeAt.getTime())) {
-    throw createError({ statusCode: 422, statusMessage: "Invalid nextChargeAt date." });
+    throw createError({
+      statusCode: 422,
+      statusMessage: "Invalid nextChargeAt date.",
+    });
   }
 
   const db = useDb();

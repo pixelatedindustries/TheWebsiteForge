@@ -36,7 +36,11 @@ export default defineEventHandler(async (event) => {
 
   // Reuse an existing customer with this email, else create one.
   let customer = (
-    await db.select().from(schema.customers).where(eq(schema.customers.email, email)).limit(1)
+    await db
+      .select()
+      .from(schema.customers)
+      .where(eq(schema.customers.email, email))
+      .limit(1)
   )[0];
   let created = false;
   if (!customer) {
@@ -47,7 +51,10 @@ export default defineEventHandler(async (event) => {
     created = true;
   }
   if (!customer) {
-    throw createError({ statusCode: 500, statusMessage: "Could not create customer." });
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Could not create customer.",
+    });
   }
 
   // Convert the lead if supplied.

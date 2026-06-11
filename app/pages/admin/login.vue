@@ -36,7 +36,9 @@ async function handleSignIn() {
   <div
     class="flex min-h-screen items-center justify-center bg-[#05070d] px-4 text-slate-200"
   >
-    <div class="glass gradient-border w-full max-w-sm rounded-2xl p-8 text-center">
+    <div
+      class="glass gradient-border w-full max-w-sm rounded-2xl p-8 text-center"
+    >
       <div class="flex justify-center">
         <LogoMark :size="40" />
       </div>
@@ -52,8 +54,8 @@ async function handleSignIn() {
         class="mt-6 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-left text-xs text-amber-200"
       >
         Firebase is not configured yet. Add the
-        <code class="text-amber-100">NUXT_PUBLIC_FIREBASE_*</code> values to your
-        <code class="text-amber-100">.env</code> to enable Google sign-in.
+        <code class="text-amber-100">NUXT_PUBLIC_FIREBASE_*</code> values to
+        your <code class="text-amber-100">.env</code> to enable Google sign-in.
       </div>
 
       <button

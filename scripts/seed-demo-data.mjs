@@ -70,7 +70,12 @@ const demoCustomers = [
       domain: "harbor-legal.example.com",
     },
     subscriptions: [
-      { plan: "hosting_static", amountCents: 22000, status: "active", interval: "year" },
+      {
+        plan: "hosting_static",
+        amountCents: 22000,
+        status: "active",
+        interval: "year",
+      },
     ],
     buildCents: 65000,
     domainCostCents: 1199,
@@ -243,7 +248,8 @@ const demoLeads = [
     email: "rafael.costa@demo.thewebsiteforge.test",
     company: "Orbit Docs",
     budget: "$1,850 - $5,000",
-    message: "Need a documentation site and managed hosting for a developer tool launch.",
+    message:
+      "Need a documentation site and managed hosting for a developer tool launch.",
     status: "new",
   },
   {
@@ -251,7 +257,8 @@ const demoLeads = [
     email: "hannah.brooks@demo.thewebsiteforge.test",
     company: "Meridian Neo",
     budget: "$5,000+",
-    message: "Looking for an app landing page, onboarding flow, and recurring hosting.",
+    message:
+      "Looking for an app landing page, onboarding flow, and recurring hosting.",
     status: "contacted",
   },
   {
@@ -259,7 +266,8 @@ const demoLeads = [
     email: "samir.patel@demo.thewebsiteforge.test",
     company: "Ember Coffee",
     budget: "$650 - $1,850",
-    message: "Small brochure site with domain management and monthly text updates.",
+    message:
+      "Small brochure site with domain management and monthly text updates.",
     status: "new",
   },
 ];
@@ -286,7 +294,9 @@ function invoiceNumber(index, type) {
 
 async function seed() {
   if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is not set. Copy .env.example to .env first.");
+    throw new Error(
+      "DATABASE_URL is not set. Copy .env.example to .env first.",
+    );
   }
 
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -357,7 +367,11 @@ async function seed() {
           customer.site.domain,
           "cloudflare",
           dateOnly(daysAgo(95 - index * 6)),
-          dateOnly(customer.expiresSoon ? daysFromNow(18) : daysFromNow(120 + index * 23)),
+          dateOnly(
+            customer.expiresSoon
+              ? daysFromNow(18)
+              : daysFromNow(120 + index * 23),
+          ),
           true,
           customer.domainCostCents,
           daysAgo(95 - index * 6),
@@ -483,7 +497,9 @@ async function seed() {
   } catch (error) {
     await client.query("ROLLBACK");
     if (error?.code === "42P01") {
-      console.error("Missing database tables. Run `pnpm db:migrate` before `pnpm db:seed`.");
+      console.error(
+        "Missing database tables. Run `pnpm db:migrate` before `pnpm db:seed`.",
+      );
     }
     throw error;
   } finally {

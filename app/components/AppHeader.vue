@@ -19,8 +19,8 @@ const accountMenu = ref<HTMLElement | null>(null);
 const isAdmin = ref(false);
 const route = useRoute();
 
-const accountName = computed(() =>
-  user.value?.displayName || user.value?.email || "Account",
+const accountName = computed(
+  () => user.value?.displayName || user.value?.email || "Account",
 );
 const avatarInitials = computed(() => {
   const name = accountName.value.replace(/@.*/, "").trim();
@@ -32,13 +32,13 @@ const avatarInitials = computed(() => {
 const mobileLinks = computed(() => [
   ...links,
   { label: "Contact", to: "/contact" },
-  ...(ready.value && user.value ? [{ label: "My account", to: "/account" }] : []),
+  ...(ready.value && user.value
+    ? [{ label: "My account", to: "/account" }]
+    : []),
   ...(ready.value && user.value && isAdmin.value
     ? [{ label: "Admin", to: "/admin" }]
     : []),
-  ...(ready.value && !user.value
-    ? [{ label: "Sign in", to: "/account" }]
-    : []),
+  ...(ready.value && !user.value ? [{ label: "Sign in", to: "/account" }] : []),
 ]);
 
 async function refreshAdminStatus() {
@@ -62,7 +62,9 @@ async function handleSignOut() {
 }
 
 if (import.meta.client) {
-  watch([ready, () => user.value?.uid], refreshAdminStatus, { immediate: true });
+  watch([ready, () => user.value?.uid], refreshAdminStatus, {
+    immediate: true,
+  });
   onClickOutside(accountMenu, () => {
     accountOpen.value = false;
   });
@@ -169,7 +171,7 @@ watch(
                 :src="user.photoURL"
                 :alt="accountName"
                 class="h-full w-full object-cover"
-              >
+              />
               <span v-else>{{ avatarInitials }}</span>
             </button>
 

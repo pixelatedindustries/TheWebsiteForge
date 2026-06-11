@@ -101,7 +101,10 @@ onMounted(async () => {
 
   // soft atmospheric glow halo ringing the sphere (brighter on the lit side)
   const haloMat = new THREE.ShaderMaterial({
-    uniforms: { uColor: { value: new THREE.Color("#74dbff") }, uLight: uniforms.uLight },
+    uniforms: {
+      uColor: { value: new THREE.Color("#74dbff") },
+      uLight: uniforms.uLight,
+    },
     transparent: true,
     blending: THREE.AdditiveBlending,
     side: THREE.BackSide,
@@ -146,7 +149,11 @@ onMounted(async () => {
     // slow continuous spin so facets catch the light + sparkle as it turns
     orb.rotation.y += 0.0026;
     orb.rotation.x = THREE.MathUtils.lerp(orb.rotation.x, target.y * 0.3, 0.05);
-    orb.rotation.z = THREE.MathUtils.lerp(orb.rotation.z, -target.x * 0.25, 0.05);
+    orb.rotation.z = THREE.MathUtils.lerp(
+      orb.rotation.z,
+      -target.x * 0.25,
+      0.05,
+    );
     renderer.render(scene, camera);
   };
   const loop = () => {

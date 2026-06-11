@@ -66,7 +66,10 @@ export default defineEventHandler(async (event) => {
       .returning({ id: schema.leads.id });
     leadId = row?.id ?? id;
   } catch (err) {
-    console.error("[contact] DB insert failed, falling back to file storage:", err);
+    console.error(
+      "[contact] DB insert failed, falling back to file storage:",
+      err,
+    );
     await useStorage("leads").setItem(id, lead);
   }
 

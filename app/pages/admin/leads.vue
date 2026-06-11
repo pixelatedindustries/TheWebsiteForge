@@ -34,7 +34,10 @@ async function load() {
     const res = await adminFetch<{ leads: Lead[] }>("/api/admin/leads");
     leads.value = res.leads;
   } catch (e) {
-    const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
     error.value =
       err?.data?.statusMessage || err?.statusMessage || "Failed to load leads.";
   } finally {
@@ -78,8 +81,12 @@ async function convertLead(lead: Lead) {
     lead.status = "won";
     convertMsg.value = `${lead.name} is now a customer.`;
   } catch (e) {
-    const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
-    convertMsg.value = err?.data?.statusMessage || err?.statusMessage || "Convert failed.";
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
+    convertMsg.value =
+      err?.data?.statusMessage || err?.statusMessage || "Convert failed.";
   } finally {
     converting.value = null;
   }
@@ -98,7 +105,9 @@ onMounted(load);
     <p class="mt-1 text-sm text-slate-400">
       Enquiries from the contact form and other sources.
     </p>
-    <p v-if="convertMsg" class="mt-2 text-sm text-brand-300">{{ convertMsg }}</p>
+    <p v-if="convertMsg" class="mt-2 text-sm text-brand-300">
+      {{ convertMsg }}
+    </p>
 
     <p v-if="pending" class="mt-8 text-sm text-slate-500">Loading…</p>
     <p v-else-if="error" class="mt-8 text-sm text-rose-400">{{ error }}</p>
@@ -106,13 +115,12 @@ onMounted(load);
       No leads yet.
     </p>
 
-    <div
-      v-else
-      class="glass gradient-border mt-8 overflow-hidden rounded-2xl"
-    >
+    <div v-else class="glass gradient-border mt-8 overflow-hidden rounded-2xl">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
-          <thead class="border-b border-white/10 text-xs uppercase text-slate-500">
+          <thead
+            class="border-b border-white/10 text-xs uppercase text-slate-500"
+          >
             <tr>
               <th class="px-4 py-3 font-medium">Contact</th>
               <th class="px-4 py-3 font-medium">Budget</th>
@@ -158,7 +166,8 @@ onMounted(load);
                     @change="
                       updateStatus(
                         lead,
-                        ($event.target as HTMLSelectElement).value as Lead['status'],
+                        ($event.target as HTMLSelectElement)
+                          .value as Lead['status'],
                       )
                     "
                   >
@@ -214,13 +223,18 @@ onMounted(load);
           >
             <div class="flex items-start justify-between gap-4">
               <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">
+                <p
+                  class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-300"
+                >
                   Lead details
                 </p>
                 <h2 class="mt-2 font-display text-2xl font-semibold text-white">
                   {{ selectedLead.name }}
                 </h2>
-                <p v-if="selectedLead.company" class="mt-1 text-sm text-slate-400">
+                <p
+                  v-if="selectedLead.company"
+                  class="mt-1 text-sm text-slate-400"
+                >
                   {{ selectedLead.company }}
                 </p>
               </div>
@@ -279,7 +293,9 @@ onMounted(load);
 
             <div class="mt-6 rounded-xl border border-white/10 bg-black/20 p-4">
               <h3 class="text-sm font-semibold text-white">Message</h3>
-              <p class="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-300">
+              <p
+                class="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-300"
+              >
                 {{ selectedLead.message || "No message provided." }}
               </p>
             </div>

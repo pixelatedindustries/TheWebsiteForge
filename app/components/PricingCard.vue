@@ -29,7 +29,13 @@ const priceLabel = computed(() =>
       v-if="tier.highlighted"
       aria-hidden="true"
       class="animate-pulse-glow pointer-events-none absolute -inset-px -z-10 rounded-2xl opacity-70 blur-xl"
-      style="background: linear-gradient(135deg, var(--color-brand-500), var(--color-accent-600))"
+      style="
+        background: linear-gradient(
+          135deg,
+          var(--color-brand-500),
+          var(--color-accent-600)
+        );
+      "
     />
     <span
       v-if="tier.highlighted"
@@ -38,11 +44,15 @@ const priceLabel = computed(() =>
       Most popular
     </span>
 
-    <h3 class="font-display text-xl font-semibold text-white">{{ tier.name }}</h3>
+    <h3 class="font-display text-xl font-semibold text-white">
+      {{ tier.name }}
+    </h3>
     <p class="mt-1.5 text-sm text-slate-400">{{ tier.tagline }}</p>
 
     <div class="mt-6 flex items-baseline gap-1.5">
-      <span v-count class="font-display text-4xl font-bold text-white">{{ priceLabel }}</span>
+      <span v-count class="font-display text-4xl font-bold text-white">{{
+        priceLabel
+      }}</span>
       <span class="text-sm text-slate-500">/ {{ tier.period }}</span>
     </div>
 

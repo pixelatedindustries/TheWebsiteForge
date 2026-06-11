@@ -30,9 +30,14 @@ onMounted(async () => {
   try {
     data.value = await adminFetch<Overview>("/api/admin/overview");
   } catch (e) {
-    const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
     error.value =
-      err?.data?.statusMessage || err?.statusMessage || "Failed to load overview.";
+      err?.data?.statusMessage ||
+      err?.statusMessage ||
+      "Failed to load overview.";
   } finally {
     pending.value = false;
   }
@@ -49,9 +54,7 @@ const salesTypes = computed(() =>
 <template>
   <div>
     <h1 class="font-display text-2xl font-semibold text-white">Overview</h1>
-    <p class="mt-1 text-sm text-slate-400">
-      Business health at a glance.
-    </p>
+    <p class="mt-1 text-sm text-slate-400">Business health at a glance.</p>
 
     <p v-if="pending" class="mt-8 text-sm text-slate-500">Loading…</p>
     <p v-else-if="error" class="mt-8 text-sm text-rose-400">{{ error }}</p>
@@ -136,7 +139,9 @@ const salesTypes = computed(() =>
           <p class="text-xs text-slate-500">Domains expiring (30d)</p>
           <p
             class="mt-1 text-lg font-semibold"
-            :class="data.domainsExpiringSoon > 0 ? 'text-amber-400' : 'text-white'"
+            :class="
+              data.domainsExpiringSoon > 0 ? 'text-amber-400' : 'text-white'
+            "
           >
             {{ data.domainsExpiringSoon }}
           </p>

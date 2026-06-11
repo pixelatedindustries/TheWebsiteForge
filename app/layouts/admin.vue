@@ -34,9 +34,14 @@ async function check() {
     authorized.value = true;
   } catch (e) {
     authorized.value = false;
-    const err = e as { statusMessage?: string; data?: { statusMessage?: string } };
+    const err = e as {
+      statusMessage?: string;
+      data?: { statusMessage?: string };
+    };
     accessError.value =
-      err?.data?.statusMessage || err?.statusMessage || "You are not authorized for the admin area.";
+      err?.data?.statusMessage ||
+      err?.statusMessage ||
+      "You are not authorized for the admin area.";
   } finally {
     checking.value = false;
   }
@@ -97,9 +102,7 @@ const isActive = (to: string) =>
       >
         <NuxtLink to="/admin" class="flex items-center gap-2.5">
           <LogoMark :size="28" />
-          <span class="font-semibold tracking-tight text-white">
-            Admin
-          </span>
+          <span class="font-semibold tracking-tight text-white"> Admin </span>
         </NuxtLink>
 
         <nav class="mt-8 flex flex-1 flex-col gap-1">

@@ -30,7 +30,18 @@ useSeoMeta({ title: "Payment — TheWebsiteForge", robots: "noindex" });
         <span
           class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent-600"
         >
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+          <svg
+            width="26"
+            height="26"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
         </span>
         <h1 class="mt-6 font-display text-3xl font-bold text-white">
           Payment confirmed
@@ -60,7 +71,9 @@ useSeoMeta({ title: "Payment — TheWebsiteForge", robots: "noindex" });
           If you completed the payment, it may take a moment to process. You'll
           receive a receipt by email once it's confirmed. If you think something
           went wrong, please
-          <NuxtLink to="/contact" class="text-brand-300 underline">contact us</NuxtLink>.
+          <NuxtLink to="/contact" class="text-brand-300 underline"
+            >contact us</NuxtLink
+          >.
         </p>
         <p v-if="reference" class="mt-4 text-xs text-slate-500">
           Reference: {{ reference }}

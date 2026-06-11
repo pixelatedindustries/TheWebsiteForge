@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 type Stage = "reaching" | "designing" | "building" | "live" | "optimising";
 const stage = ref<Stage>("reaching");
 const stageLabel = computed(
@@ -38,10 +37,23 @@ onMounted(async () => {
   const blockFeat2 = svg.querySelector('[data-block="feat2"]');
   const blockFeat3 = svg.querySelector('[data-block="feat3"]');
   const blockFooter = svg.querySelector('[data-block="footer"]');
-  const blocks = [blockHero, blockHeader, blockFeat1, blockFeat2, blockFeat3, blockFooter].filter(
-    Boolean,
-  );
-  if (!personL || !personR || !bubbles.length || !frame || !topbar || blocks.length < 6) return;
+  const blocks = [
+    blockHero,
+    blockHeader,
+    blockFeat1,
+    blockFeat2,
+    blockFeat3,
+    blockFooter,
+  ].filter(Boolean);
+  if (
+    !personL ||
+    !personR ||
+    !bubbles.length ||
+    !frame ||
+    !topbar ||
+    blocks.length < 6
+  )
+    return;
 
   // initial hidden state — matches what every loop iteration starts at
   gsap.set([personL, personR], { opacity: 0 });
@@ -74,7 +86,13 @@ onMounted(async () => {
   tl.fromTo(
     bubbles,
     { opacity: 0, scale: 0 },
-    { opacity: 1, scale: 1, duration: 0.32, stagger: 0.32, ease: "back.out(2)" },
+    {
+      opacity: 1,
+      scale: 1,
+      duration: 0.32,
+      stagger: 0.32,
+      ease: "back.out(2)",
+    },
     "+=0.1",
   );
   tl.to({}, { duration: 0.6 });
@@ -89,7 +107,11 @@ onMounted(async () => {
     "<",
   );
   // the frame grows out of the chat's centre
-  tl.to(frame, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, "<0.25");
+  tl.to(
+    frame,
+    { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" },
+    "<0.25",
+  );
   tl.to(topbar, { opacity: 1, duration: 0.35 }, "<0.3");
 
   // ── PHASE 3 — BUILD (one thing → bigger site) ─────────────────────
@@ -120,7 +142,13 @@ onMounted(async () => {
   tl.fromTo(
     [blockFeat2, blockFeat3],
     { scaleY: 0, opacity: 0 },
-    { scaleY: 1, opacity: 1, duration: 0.4, stagger: 0.18, ease: "back.out(1.7)" },
+    {
+      scaleY: 1,
+      opacity: 1,
+      duration: 0.4,
+      stagger: 0.18,
+      ease: "back.out(1.7)",
+    },
     "+=0.35",
   );
   // footer closes it out
@@ -135,7 +163,11 @@ onMounted(async () => {
   tl.call(() => (stage.value = "live"));
   tl.to({}, { duration: 0.4 });
   blocks.forEach((b) => {
-    tl.to(b, { filter: "brightness(1.45)", scale: 1.03, duration: 0.22 }, "+=0.12");
+    tl.to(
+      b,
+      { filter: "brightness(1.45)", scale: 1.03, duration: 0.22 },
+      "+=0.12",
+    );
     tl.to(b, { filter: "brightness(1)", scale: 1, duration: 0.38 });
   });
 
@@ -143,7 +175,15 @@ onMounted(async () => {
   tl.call(() => (stage.value = "optimising"));
   tl.to({}, { duration: 0.4 });
   tl.to(
-    [blockFooter, blockFeat3, blockFeat2, blockFeat1, blockHero, blockHeader, topbar],
+    [
+      blockFooter,
+      blockFeat3,
+      blockFeat2,
+      blockFeat1,
+      blockHero,
+      blockHeader,
+      topbar,
+    ],
     { opacity: 0, duration: 0.5, stagger: 0.04 },
   );
   tl.to(frame, { opacity: 0, scale: 0.6, duration: 0.5 }, "<0.2");
@@ -164,7 +204,11 @@ onBeforeUnmount(() => kill?.());
       <span>{{ stageLabel }}</span>
     </div>
 
-    <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <svg
+      viewBox="0 0 480 360"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
       <defs>
         <linearGradient id="bs-hero" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stop-color="#34d8a6" stop-opacity="0.9" />
@@ -218,13 +262,41 @@ onBeforeUnmount(() => kill?.());
       </defs>
 
       <!-- ambient breathing aura behind everything -->
-      <ellipse class="aura" cx="240" cy="180" rx="230" ry="140" fill="url(#bs-aura)" />
+      <ellipse
+        class="aura"
+        cx="240"
+        cy="180"
+        rx="230"
+        ry="140"
+        fill="url(#bs-aura)"
+      />
 
       <!-- launchpad / horizon line -->
       <g class="launchpad">
-        <ellipse cx="240" cy="334" rx="200" ry="5" fill="url(#bs-pad)" opacity="0.65" />
-        <line x1="40" y1="334" x2="440" y2="334" stroke="rgba(127,223,255,0.35)" stroke-width="0.6" />
-        <line x1="100" y1="344" x2="380" y2="344" stroke="rgba(127,223,255,0.18)" stroke-width="0.5" />
+        <ellipse
+          cx="240"
+          cy="334"
+          rx="200"
+          ry="5"
+          fill="url(#bs-pad)"
+          opacity="0.65"
+        />
+        <line
+          x1="40"
+          y1="334"
+          x2="440"
+          y2="334"
+          stroke="rgba(127,223,255,0.35)"
+          stroke-width="0.6"
+        />
+        <line
+          x1="100"
+          y1="344"
+          x2="380"
+          y2="344"
+          stroke="rgba(127,223,255,0.18)"
+          stroke-width="0.5"
+        />
       </g>
 
       <!-- ── SCENE 1 — TWO PEOPLE + CHAT BUBBLES ─────────────────── -->
@@ -268,7 +340,13 @@ onBeforeUnmount(() => kill?.());
         />
       </g>
       <g class="person-right">
-        <ellipse cx="360" cy="185" rx="46" ry="48" fill="url(#bs-halo-emerald)" />
+        <ellipse
+          cx="360"
+          cy="185"
+          rx="46"
+          ry="48"
+          fill="url(#bs-halo-emerald)"
+        />
         <path
           d="M 340 200 q 0 -40 20 -40 q 20 0 20 40 v 16 h -40 z"
           fill="url(#bs-shirt-emerald)"
@@ -304,32 +382,124 @@ onBeforeUnmount(() => kill?.());
       <g class="chat">
         <!-- left-person bubble: tail down-left -->
         <g class="bubble">
-          <rect x="160" y="142" width="76" height="22" rx="11" fill="rgba(127,223,255,0.18)" stroke="rgba(127,223,255,0.45)" />
-          <path d="M 168 164 L 162 170 L 174 164 z" fill="rgba(127,223,255,0.18)" stroke="rgba(127,223,255,0.45)" stroke-linejoin="round" />
-          <rect x="172" y="151" width="30" height="4" rx="2" fill="rgba(200,225,255,0.78)" />
-          <rect x="172" y="158" width="42" height="3" rx="1.5" fill="rgba(200,225,255,0.48)" />
+          <rect
+            x="160"
+            y="142"
+            width="76"
+            height="22"
+            rx="11"
+            fill="rgba(127,223,255,0.18)"
+            stroke="rgba(127,223,255,0.45)"
+          />
+          <path
+            d="M 168 164 L 162 170 L 174 164 z"
+            fill="rgba(127,223,255,0.18)"
+            stroke="rgba(127,223,255,0.45)"
+            stroke-linejoin="round"
+          />
+          <rect
+            x="172"
+            y="151"
+            width="30"
+            height="4"
+            rx="2"
+            fill="rgba(200,225,255,0.78)"
+          />
+          <rect
+            x="172"
+            y="158"
+            width="42"
+            height="3"
+            rx="1.5"
+            fill="rgba(200,225,255,0.48)"
+          />
         </g>
         <!-- right-person bubble: tail down-right -->
         <g class="bubble">
-          <rect x="246" y="170" width="84" height="22" rx="11" fill="rgba(52,216,166,0.18)" stroke="rgba(52,216,166,0.45)" />
-          <path d="M 318 192 L 324 198 L 312 192 z" fill="rgba(52,216,166,0.18)" stroke="rgba(52,216,166,0.45)" stroke-linejoin="round" />
-          <rect x="258" y="179" width="40" height="4" rx="2" fill="rgba(200,255,235,0.78)" />
-          <rect x="258" y="186" width="52" height="3" rx="1.5" fill="rgba(200,255,235,0.48)" />
+          <rect
+            x="246"
+            y="170"
+            width="84"
+            height="22"
+            rx="11"
+            fill="rgba(52,216,166,0.18)"
+            stroke="rgba(52,216,166,0.45)"
+          />
+          <path
+            d="M 318 192 L 324 198 L 312 192 z"
+            fill="rgba(52,216,166,0.18)"
+            stroke="rgba(52,216,166,0.45)"
+            stroke-linejoin="round"
+          />
+          <rect
+            x="258"
+            y="179"
+            width="40"
+            height="4"
+            rx="2"
+            fill="rgba(200,255,235,0.78)"
+          />
+          <rect
+            x="258"
+            y="186"
+            width="52"
+            height="3"
+            rx="1.5"
+            fill="rgba(200,255,235,0.48)"
+          />
         </g>
         <!-- left-person typing bubble: three dots -->
         <g class="bubble">
-          <rect x="174" y="198" width="48" height="20" rx="10" fill="rgba(127,223,255,0.18)" stroke="rgba(127,223,255,0.45)" />
-          <path d="M 182 218 L 178 224 L 188 218 z" fill="rgba(127,223,255,0.18)" stroke="rgba(127,223,255,0.45)" stroke-linejoin="round" />
-          <circle class="typing-dot" cx="187" cy="208" r="1.7" fill="rgba(127,223,255,0.85)" />
-          <circle class="typing-dot" cx="195" cy="208" r="1.7" fill="rgba(127,223,255,0.85)" />
-          <circle class="typing-dot" cx="203" cy="208" r="1.7" fill="rgba(127,223,255,0.85)" />
+          <rect
+            x="174"
+            y="198"
+            width="48"
+            height="20"
+            rx="10"
+            fill="rgba(127,223,255,0.18)"
+            stroke="rgba(127,223,255,0.45)"
+          />
+          <path
+            d="M 182 218 L 178 224 L 188 218 z"
+            fill="rgba(127,223,255,0.18)"
+            stroke="rgba(127,223,255,0.45)"
+            stroke-linejoin="round"
+          />
+          <circle
+            class="typing-dot"
+            cx="187"
+            cy="208"
+            r="1.7"
+            fill="rgba(127,223,255,0.85)"
+          />
+          <circle
+            class="typing-dot"
+            cx="195"
+            cy="208"
+            r="1.7"
+            fill="rgba(127,223,255,0.85)"
+          />
+          <circle
+            class="typing-dot"
+            cx="203"
+            cy="208"
+            r="1.7"
+            fill="rgba(127,223,255,0.85)"
+          />
         </g>
       </g>
 
       <!-- ── SCENE 2+ — THE WEBSITE FRAME ────────────────────────── -->
       <g class="frame-shell">
         <!-- soft glow under the frame -->
-        <ellipse cx="240" cy="322" rx="180" ry="11" fill="#38bdf8" opacity="0.22" />
+        <ellipse
+          cx="240"
+          cy="322"
+          rx="180"
+          ry="11"
+          fill="#38bdf8"
+          opacity="0.22"
+        />
         <!-- body -->
         <rect
           x="40"
@@ -345,8 +515,20 @@ onBeforeUnmount(() => kill?.());
         <g clip-path="url(#bs-clip)">
           <!-- top bar (revealed once the frame appears) -->
           <g class="topbar">
-            <rect x="40" y="40" width="400" height="34" fill="rgba(8,14,28,0.65)" />
-            <line x1="40" y1="74" x2="440" y2="74" stroke="rgba(127,223,255,0.18)" />
+            <rect
+              x="40"
+              y="40"
+              width="400"
+              height="34"
+              fill="rgba(8,14,28,0.65)"
+            />
+            <line
+              x1="40"
+              y1="74"
+              x2="440"
+              y2="74"
+              stroke="rgba(127,223,255,0.18)"
+            />
             <!-- traffic lights with a subtle highlight on top -->
             <circle cx="58" cy="57" r="4" fill="#ff6b6b" />
             <circle cx="58" cy="56" r="3.2" fill="#ff8a8a" opacity="0.55" />
@@ -355,19 +537,77 @@ onBeforeUnmount(() => kill?.());
             <circle cx="86" cy="57" r="4" fill="#34d8a6" />
             <circle cx="86" cy="56" r="3.2" fill="#6cebbf" opacity="0.55" />
             <!-- back / forward / refresh -->
-            <path d="M 104 53 L 100 57 L 104 61" stroke="rgba(127,223,255,0.6)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M 114 53 L 118 57 L 114 61" stroke="rgba(127,223,255,0.4)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M 130 54 a 3 3 0 1 0 0.7 3.3" stroke="rgba(127,223,255,0.55)" stroke-width="1.1" fill="none" stroke-linecap="round" />
-            <path d="M 130 51 L 130 54 L 127 54" stroke="rgba(127,223,255,0.55)" stroke-width="1.1" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            <path
+              d="M 104 53 L 100 57 L 104 61"
+              stroke="rgba(127,223,255,0.6)"
+              stroke-width="1.2"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M 114 53 L 118 57 L 114 61"
+              stroke="rgba(127,223,255,0.4)"
+              stroke-width="1.2"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M 130 54 a 3 3 0 1 0 0.7 3.3"
+              stroke="rgba(127,223,255,0.55)"
+              stroke-width="1.1"
+              fill="none"
+              stroke-linecap="round"
+            />
+            <path
+              d="M 130 51 L 130 54 L 127 54"
+              stroke="rgba(127,223,255,0.55)"
+              stroke-width="1.1"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
             <!-- address bar -->
-            <rect x="142" y="48" width="228" height="16" rx="3" fill="rgba(127,223,255,0.08)" stroke="rgba(127,223,255,0.22)" />
+            <rect
+              x="142"
+              y="48"
+              width="228"
+              height="16"
+              rx="3"
+              fill="rgba(127,223,255,0.08)"
+              stroke="rgba(127,223,255,0.22)"
+            />
             <!-- favicon (brand mark) -->
             <circle cx="151" cy="56" r="3.4" fill="url(#bs-hero)" />
             <!-- lock icon -->
-            <rect x="160" y="54" width="4" height="5" rx="0.8" fill="rgba(127,223,255,0.55)" />
-            <rect x="160.8" y="52" width="2.4" height="2.4" rx="1.2" fill="none" stroke="rgba(127,223,255,0.55)" stroke-width="0.6" />
+            <rect
+              x="160"
+              y="54"
+              width="4"
+              height="5"
+              rx="0.8"
+              fill="rgba(127,223,255,0.55)"
+            />
+            <rect
+              x="160.8"
+              y="52"
+              width="2.4"
+              height="2.4"
+              rx="1.2"
+              fill="none"
+              stroke="rgba(127,223,255,0.55)"
+              stroke-width="0.6"
+            />
             <!-- url text bar -->
-            <rect x="170" y="55" width="118" height="3" rx="1" fill="rgba(200,225,255,0.4)" />
+            <rect
+              x="170"
+              y="55"
+              width="118"
+              height="3"
+              rx="1"
+              fill="rgba(200,225,255,0.4)"
+            />
             <!-- right-side menu dots -->
             <circle cx="414" cy="57" r="1.4" fill="rgba(200,225,255,0.45)" />
             <circle cx="420" cy="57" r="1.4" fill="rgba(200,225,255,0.45)" />
@@ -376,86 +616,393 @@ onBeforeUnmount(() => kill?.());
 
           <!-- content blocks build in over time (data-block names referenced by JS) -->
           <g data-block="hero">
-            <rect x="60" y="116" width="360" height="72" rx="6" fill="url(#bs-hero)" />
+            <rect
+              x="60"
+              y="116"
+              width="360"
+              height="72"
+              rx="6"
+              fill="url(#bs-hero)"
+            />
             <!-- decorative diagonal accent in the corner -->
-            <path d="M 340 116 L 420 116 L 420 188 L 380 188 Z" fill="rgba(255,255,255,0.08)" />
-            <path d="M 380 116 L 420 116 L 420 188 L 400 188 Z" fill="rgba(255,255,255,0.06)" />
+            <path
+              d="M 340 116 L 420 116 L 420 188 L 380 188 Z"
+              fill="rgba(255,255,255,0.08)"
+            />
+            <path
+              d="M 380 116 L 420 116 L 420 188 L 400 188 Z"
+              fill="rgba(255,255,255,0.06)"
+            />
             <!-- text bars + CTA pill with arrow -->
-            <rect x="76" y="132" width="160" height="9" rx="2" fill="rgba(255,255,255,0.95)" />
-            <rect x="76" y="148" width="200" height="6" rx="2" fill="rgba(255,255,255,0.7)" />
-            <rect x="76" y="160" width="180" height="6" rx="2" fill="rgba(255,255,255,0.6)" />
-            <rect x="76" y="172" width="62" height="12" rx="6" fill="rgba(255,255,255,0.95)" />
-            <path d="M 124 175 L 128 178 L 124 181" stroke="rgba(8,14,28,0.75)" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            <rect
+              x="76"
+              y="132"
+              width="160"
+              height="9"
+              rx="2"
+              fill="rgba(255,255,255,0.95)"
+            />
+            <rect
+              x="76"
+              y="148"
+              width="200"
+              height="6"
+              rx="2"
+              fill="rgba(255,255,255,0.7)"
+            />
+            <rect
+              x="76"
+              y="160"
+              width="180"
+              height="6"
+              rx="2"
+              fill="rgba(255,255,255,0.6)"
+            />
+            <rect
+              x="76"
+              y="172"
+              width="62"
+              height="12"
+              rx="6"
+              fill="rgba(255,255,255,0.95)"
+            />
+            <path
+              d="M 124 175 L 128 178 L 124 181"
+              stroke="rgba(8,14,28,0.75)"
+              stroke-width="1.3"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </g>
 
           <g data-block="header">
             <!-- logo: gradient pill + a tiny hex inside (echoes the site mark) -->
-            <rect x="60" y="86" width="36" height="18" rx="4" fill="url(#bs-hero)" />
-            <path d="M 71 90 L 78 95 L 78 99 L 71 102 L 64 99 L 64 95 Z" fill="rgba(14,22,38,0.95)" />
+            <rect
+              x="60"
+              y="86"
+              width="36"
+              height="18"
+              rx="4"
+              fill="url(#bs-hero)"
+            />
+            <path
+              d="M 71 90 L 78 95 L 78 99 L 71 102 L 64 99 L 64 95 Z"
+              fill="rgba(14,22,38,0.95)"
+            />
             <!-- nav links -->
-            <rect x="118" y="92" width="22" height="7" rx="2" fill="rgba(200,225,255,0.6)" />
-            <rect x="148" y="92" width="28" height="7" rx="2" fill="rgba(200,225,255,0.4)" />
-            <rect x="184" y="92" width="24" height="7" rx="2" fill="rgba(200,225,255,0.4)" />
-            <rect x="216" y="92" width="22" height="7" rx="2" fill="rgba(200,225,255,0.4)" />
+            <rect
+              x="118"
+              y="92"
+              width="22"
+              height="7"
+              rx="2"
+              fill="rgba(200,225,255,0.6)"
+            />
+            <rect
+              x="148"
+              y="92"
+              width="28"
+              height="7"
+              rx="2"
+              fill="rgba(200,225,255,0.4)"
+            />
+            <rect
+              x="184"
+              y="92"
+              width="24"
+              height="7"
+              rx="2"
+              fill="rgba(200,225,255,0.4)"
+            />
+            <rect
+              x="216"
+              y="92"
+              width="22"
+              height="7"
+              rx="2"
+              fill="rgba(200,225,255,0.4)"
+            />
             <!-- CTA pill with label + arrow -->
-            <rect x="338" y="86" width="84" height="20" rx="10" fill="url(#bs-hero)" />
-            <rect x="350" y="94" width="40" height="4" rx="2" fill="rgba(255,255,255,0.95)" />
-            <path d="M 398 92 L 404 96 L 398 100" stroke="rgba(255,255,255,0.95)" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+            <rect
+              x="338"
+              y="86"
+              width="84"
+              height="20"
+              rx="10"
+              fill="url(#bs-hero)"
+            />
+            <rect
+              x="350"
+              y="94"
+              width="40"
+              height="4"
+              rx="2"
+              fill="rgba(255,255,255,0.95)"
+            />
+            <path
+              d="M 398 92 L 404 96 L 398 100"
+              stroke="rgba(255,255,255,0.95)"
+              stroke-width="1.4"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </g>
 
           <!-- FEATURE 1 — Lightning (speed) -->
           <g data-block="feat1">
-            <rect x="60" y="200" width="112" height="80" rx="6" fill="rgba(127,223,255,0.1)" stroke="rgba(127,223,255,0.3)" />
-            <path d="M 80 210 L 86 210 L 83 218 L 88 218 L 78 232 L 82 222 L 77 222 Z" fill="url(#bs-hero)" />
-            <rect x="72" y="238" width="64" height="6" rx="2" fill="rgba(200,225,255,0.6)" />
-            <rect x="72" y="248" width="84" height="4" rx="1.5" fill="rgba(200,225,255,0.32)" />
-            <rect x="72" y="256" width="76" height="4" rx="1.5" fill="rgba(200,225,255,0.32)" />
-            <rect x="72" y="264" width="80" height="4" rx="1.5" fill="rgba(200,225,255,0.32)" />
+            <rect
+              x="60"
+              y="200"
+              width="112"
+              height="80"
+              rx="6"
+              fill="rgba(127,223,255,0.1)"
+              stroke="rgba(127,223,255,0.3)"
+            />
+            <path
+              d="M 80 210 L 86 210 L 83 218 L 88 218 L 78 232 L 82 222 L 77 222 Z"
+              fill="url(#bs-hero)"
+            />
+            <rect
+              x="72"
+              y="238"
+              width="64"
+              height="6"
+              rx="2"
+              fill="rgba(200,225,255,0.6)"
+            />
+            <rect
+              x="72"
+              y="248"
+              width="84"
+              height="4"
+              rx="1.5"
+              fill="rgba(200,225,255,0.32)"
+            />
+            <rect
+              x="72"
+              y="256"
+              width="76"
+              height="4"
+              rx="1.5"
+              fill="rgba(200,225,255,0.32)"
+            />
+            <rect
+              x="72"
+              y="264"
+              width="80"
+              height="4"
+              rx="1.5"
+              fill="rgba(200,225,255,0.32)"
+            />
           </g>
 
           <!-- FEATURE 2 — Sparkle (premium) -->
           <g data-block="feat2">
-            <rect x="184" y="200" width="112" height="80" rx="6" fill="rgba(127,223,255,0.1)" stroke="rgba(127,223,255,0.3)" />
-            <path d="M 204 210 L 207 219 L 216 222 L 207 225 L 204 234 L 201 225 L 192 222 L 201 219 Z" fill="url(#bs-hero)" />
+            <rect
+              x="184"
+              y="200"
+              width="112"
+              height="80"
+              rx="6"
+              fill="rgba(127,223,255,0.1)"
+              stroke="rgba(127,223,255,0.3)"
+            />
+            <path
+              d="M 204 210 L 207 219 L 216 222 L 207 225 L 204 234 L 201 225 L 192 222 L 201 219 Z"
+              fill="url(#bs-hero)"
+            />
             <circle cx="214" cy="212" r="1.5" fill="rgba(255,255,255,0.9)" />
             <circle cx="196" cy="232" r="1.2" fill="rgba(255,255,255,0.7)" />
-            <rect x="196" y="238" width="60" height="6" rx="2" fill="rgba(200,225,255,0.6)" />
-            <rect x="196" y="248" width="84" height="4" rx="1.5" fill="rgba(200,225,255,0.32)" />
-            <rect x="196" y="256" width="72" height="4" rx="1.5" fill="rgba(200,225,255,0.32)" />
-            <rect x="196" y="264" width="80" height="4" rx="1.5" fill="rgba(200,225,255,0.32)" />
+            <rect
+              x="196"
+              y="238"
+              width="60"
+              height="6"
+              rx="2"
+              fill="rgba(200,225,255,0.6)"
+            />
+            <rect
+              x="196"
+              y="248"
+              width="84"
+              height="4"
+              rx="1.5"
+              fill="rgba(200,225,255,0.32)"
+            />
+            <rect
+              x="196"
+              y="256"
+              width="72"
+              height="4"
+              rx="1.5"
+              fill="rgba(200,225,255,0.32)"
+            />
+            <rect
+              x="196"
+              y="264"
+              width="80"
+              height="4"
+              rx="1.5"
+              fill="rgba(200,225,255,0.32)"
+            />
           </g>
 
           <!-- FEATURE 3 — Gear (custom) -->
           <g data-block="feat3">
-            <rect x="308" y="200" width="112" height="80" rx="6" fill="rgba(127,223,255,0.1)" stroke="rgba(127,223,255,0.3)" />
+            <rect
+              x="308"
+              y="200"
+              width="112"
+              height="80"
+              rx="6"
+              fill="rgba(127,223,255,0.1)"
+              stroke="rgba(127,223,255,0.3)"
+            />
             <g transform="translate(326 220)">
-              <circle r="5" fill="none" stroke="url(#bs-hero)" stroke-width="1.6" />
+              <circle
+                r="5"
+                fill="none"
+                stroke="url(#bs-hero)"
+                stroke-width="1.6"
+              />
               <circle r="1.8" fill="url(#bs-hero)" />
-              <rect x="-1.2" y="-8.5" width="2.4" height="2.6" rx="0.8" fill="url(#bs-hero)" />
-              <rect x="-1.2" y="5.9" width="2.4" height="2.6" rx="0.8" fill="url(#bs-hero)" />
-              <rect x="-8.5" y="-1.2" width="2.6" height="2.4" rx="0.8" fill="url(#bs-hero)" />
-              <rect x="5.9" y="-1.2" width="2.6" height="2.4" rx="0.8" fill="url(#bs-hero)" />
+              <rect
+                x="-1.2"
+                y="-8.5"
+                width="2.4"
+                height="2.6"
+                rx="0.8"
+                fill="url(#bs-hero)"
+              />
+              <rect
+                x="-1.2"
+                y="5.9"
+                width="2.4"
+                height="2.6"
+                rx="0.8"
+                fill="url(#bs-hero)"
+              />
+              <rect
+                x="-8.5"
+                y="-1.2"
+                width="2.6"
+                height="2.4"
+                rx="0.8"
+                fill="url(#bs-hero)"
+              />
+              <rect
+                x="5.9"
+                y="-1.2"
+                width="2.6"
+                height="2.4"
+                rx="0.8"
+                fill="url(#bs-hero)"
+              />
             </g>
-            <rect x="320" y="238" width="68" height="6" rx="2" fill="rgba(200,225,255,0.6)" />
-            <rect x="320" y="248" width="84" height="4" rx="1.5" fill="rgba(200,225,255,0.32)" />
-            <rect x="320" y="256" width="72" height="4" rx="1.5" fill="rgba(200,225,255,0.32)" />
-            <rect x="320" y="264" width="80" height="4" rx="1.5" fill="rgba(200,225,255,0.32)" />
+            <rect
+              x="320"
+              y="238"
+              width="68"
+              height="6"
+              rx="2"
+              fill="rgba(200,225,255,0.6)"
+            />
+            <rect
+              x="320"
+              y="248"
+              width="84"
+              height="4"
+              rx="1.5"
+              fill="rgba(200,225,255,0.32)"
+            />
+            <rect
+              x="320"
+              y="256"
+              width="72"
+              height="4"
+              rx="1.5"
+              fill="rgba(200,225,255,0.32)"
+            />
+            <rect
+              x="320"
+              y="264"
+              width="80"
+              height="4"
+              rx="1.5"
+              fill="rgba(200,225,255,0.32)"
+            />
           </g>
 
           <!-- FOOTER — logo + tagline + social icons -->
           <g data-block="footer">
-            <rect x="60" y="290" width="360" height="22" rx="4" fill="rgba(127,223,255,0.08)" stroke="rgba(127,223,255,0.2)" />
+            <rect
+              x="60"
+              y="290"
+              width="360"
+              height="22"
+              rx="4"
+              fill="rgba(127,223,255,0.08)"
+              stroke="rgba(127,223,255,0.2)"
+            />
             <circle cx="76" cy="301" r="3" fill="url(#bs-hero)" />
-            <rect x="86" y="298" width="68" height="6" rx="2" fill="rgba(200,225,255,0.42)" />
+            <rect
+              x="86"
+              y="298"
+              width="68"
+              height="6"
+              rx="2"
+              fill="rgba(200,225,255,0.42)"
+            />
             <!-- X mark -->
-            <path d="M 372 297 L 379 305 M 379 297 L 372 305" stroke="rgba(127,223,255,0.55)" stroke-width="1.1" stroke-linecap="round" />
+            <path
+              d="M 372 297 L 379 305 M 379 297 L 372 305"
+              stroke="rgba(127,223,255,0.55)"
+              stroke-width="1.1"
+              stroke-linecap="round"
+            />
             <!-- github-ish circle with notch -->
-            <circle cx="391" cy="301" r="3.6" fill="none" stroke="rgba(127,223,255,0.55)" stroke-width="1.1" />
-            <path d="M 391 304 v 1.6" stroke="rgba(127,223,255,0.55)" stroke-width="1.1" stroke-linecap="round" />
+            <circle
+              cx="391"
+              cy="301"
+              r="3.6"
+              fill="none"
+              stroke="rgba(127,223,255,0.55)"
+              stroke-width="1.1"
+            />
+            <path
+              d="M 391 304 v 1.6"
+              stroke="rgba(127,223,255,0.55)"
+              stroke-width="1.1"
+              stroke-linecap="round"
+            />
             <!-- linkedin-ish square -->
-            <rect x="404" y="297.5" width="8" height="8" rx="1" fill="none" stroke="rgba(127,223,255,0.55)" stroke-width="1.1" />
-            <rect x="405.8" y="300" width="1.2" height="3.4" fill="rgba(127,223,255,0.55)" />
-            <rect x="408" y="300" width="1.2" height="3.4" fill="rgba(127,223,255,0.55)" />
+            <rect
+              x="404"
+              y="297.5"
+              width="8"
+              height="8"
+              rx="1"
+              fill="none"
+              stroke="rgba(127,223,255,0.55)"
+              stroke-width="1.1"
+            />
+            <rect
+              x="405.8"
+              y="300"
+              width="1.2"
+              height="3.4"
+              fill="rgba(127,223,255,0.55)"
+            />
+            <rect
+              x="408"
+              y="300"
+              width="1.2"
+              height="3.4"
+              fill="rgba(127,223,255,0.55)"
+            />
           </g>
         </g>
       </g>

@@ -1,28 +1,11 @@
 import type { FetchOptions } from "ofetch";
-
-interface CheckoutResponse {
-  reference: string;
-  authorizationUrl: string;
-  accessCode: string;
-  usdCents: number;
-  zarCents: number;
-  walletAppliedCents?: number;
-  publicKey: string;
-}
-
-interface BuildCheckout {
-  purpose: "build";
-  planKey: string;
-  email?: string;
-  name?: string;
-  siteId?: string;
-  useWalletFirst?: boolean;
-}
-
-interface TopupCheckout {
-  purpose: "topup";
-  amountUsdCents: number;
-}
+import { storeToRefs } from "pinia";
+import { useCheckoutStore } from "~/stores/checkout";
+import type {
+  BuildCheckout,
+  CheckoutResponse,
+  TopupCheckout,
+} from "~~/shared/checkout";
 
 /**
  * Client checkout helper. Calls /api/checkout/create and redirects the browser
@@ -32,14 +15,14 @@ interface TopupCheckout {
  */
 export function useCheckout() {
   const { user, getToken } = useAuth();
-  const loading = useState<boolean>("checkout-loading", () => false);
-  const error = ref<string | null>(null);
+  const checkoutStore = useCheckoutStore();
+  const { loading, error } = storeToRefs(checkoutStore);
 
   async function startCheckout(
     body: BuildCheckout | TopupCheckout,
   ): Promise<void> {
-    loading.value = true;
-    error.value = null;
+    checkoutStore.setLoading(true);
+    checkoutStore.setError(null);
     try {
       const opts: FetchOptions = { method: "POST", body };
       // Attach the bearer token when signed in (required for top-ups).
@@ -47,17 +30,26 @@ export function useCheckout() {
       if (token) {
         opts.headers = { Authorization: `Bearer ${token}` };
       }
-      const res = await $fetch<CheckoutResponse>("/api/checkout/create", opts as never);
+      const res = await $fetch<CheckoutResponse>(
+        "/api/checkout/create",
+        opts as never,
+      );
       if (res?.authorizationUrl) {
         window.location.href = res.authorizationUrl;
       } else {
         throw new Error("No checkout URL returned.");
       }
     } catch (e) {
-      const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
-      error.value =
-        err?.data?.statusMessage || err?.statusMessage || "Could not start checkout.";
-      loading.value = false;
+      const err = e as {
+        data?: { statusMessage?: string };
+        statusMessage?: string;
+      };
+      checkoutStore.setError(
+        err?.data?.statusMessage ||
+          err?.statusMessage ||
+          "Could not start checkout.",
+      );
+      checkoutStore.setLoading(false);
     }
   }
 

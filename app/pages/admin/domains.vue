@@ -30,9 +30,14 @@ onMounted(async () => {
     const res = await adminFetch<{ domains: Domain[] }>("/api/admin/domains");
     domains.value = res.domains;
   } catch (e) {
-    const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
     error.value =
-      err?.data?.statusMessage || err?.statusMessage || "Failed to load domains.";
+      err?.data?.statusMessage ||
+      err?.statusMessage ||
+      "Failed to load domains.";
   } finally {
     pending.value = false;
   }
@@ -42,9 +47,7 @@ onMounted(async () => {
 <template>
   <div>
     <h1 class="font-display text-2xl font-semibold text-white">Domains</h1>
-    <p class="mt-1 text-sm text-slate-400">
-      Registrations and renewal dates.
-    </p>
+    <p class="mt-1 text-sm text-slate-400">Registrations and renewal dates.</p>
 
     <p v-if="pending" class="mt-8 text-sm text-slate-500">Loading…</p>
     <p v-else-if="error" class="mt-8 text-sm text-rose-400">{{ error }}</p>
@@ -52,13 +55,12 @@ onMounted(async () => {
       No domains yet.
     </p>
 
-    <div
-      v-else
-      class="glass gradient-border mt-8 overflow-hidden rounded-2xl"
-    >
+    <div v-else class="glass gradient-border mt-8 overflow-hidden rounded-2xl">
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
-          <thead class="border-b border-white/10 text-xs uppercase text-slate-500">
+          <thead
+            class="border-b border-white/10 text-xs uppercase text-slate-500"
+          >
             <tr>
               <th class="px-4 py-3 font-medium">Domain</th>
               <th class="px-4 py-3 font-medium">Customer</th>
@@ -76,7 +78,11 @@ onMounted(async () => {
                 {{ titleCase(d.registrar) }}
               </td>
               <td class="px-4 py-3 text-slate-300">
-                {{ d.annualCostCents != null ? formatCents(d.annualCostCents) : "—" }}
+                {{
+                  d.annualCostCents != null
+                    ? formatCents(d.annualCostCents)
+                    : "—"
+                }}
               </td>
               <td class="px-4 py-3">
                 <span

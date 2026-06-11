@@ -20,7 +20,9 @@ export default defineEventHandler(async (event) => {
     ...d,
     customerName: nameById.get(d.customerId) ?? "—",
     daysToExpiry: d.expiresAt
-      ? Math.ceil((new Date(d.expiresAt).getTime() - now) / (24 * 60 * 60 * 1000))
+      ? Math.ceil(
+          (new Date(d.expiresAt).getTime() - now) / (24 * 60 * 60 * 1000),
+        )
       : null,
   }));
 

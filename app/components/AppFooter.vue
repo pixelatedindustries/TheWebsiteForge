@@ -72,8 +72,13 @@ const columns = [
       >
         <p>© {{ year }} TheWebsiteForge. All rights reserved.</p>
         <nav class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-          <NuxtLink to="/terms" class="transition hover:text-brand-300">Terms</NuxtLink>
-          <NuxtLink to="/hosting-agreement" class="transition hover:text-brand-300">
+          <NuxtLink to="/terms" class="transition hover:text-brand-300"
+            >Terms</NuxtLink
+          >
+          <NuxtLink
+            to="/hosting-agreement"
+            class="transition hover:text-brand-300"
+          >
             Hosting Agreement
           </NuxtLink>
           <NuxtLink to="/refund-policy" class="transition hover:text-brand-300">
@@ -81,7 +86,9 @@ const columns = [
           </NuxtLink>
         </nav>
         <p class="flex items-center gap-2">
-          <span class="inline-block h-2 w-2 animate-pulse-glow rounded-full bg-brand-400" />
+          <span
+            class="inline-block h-2 w-2 animate-pulse-glow rounded-full bg-brand-400"
+          />
           Built with Nuxt 4 · Tailwind v4
         </p>
       </div>

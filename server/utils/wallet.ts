@@ -128,7 +128,10 @@ async function applyDelta(
       .limit(1);
 
     if (!customer) {
-      throw createError({ statusCode: 404, statusMessage: "Customer not found." });
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Customer not found.",
+      });
     }
 
     const current = customer.balance ?? 0;
@@ -157,7 +160,9 @@ async function applyDelta(
 
     await tx
       .update(schema.customers)
-      .set({ walletBalanceCents: sql`${schema.customers.walletBalanceCents} + ${delta}` })
+      .set({
+        walletBalanceCents: sql`${schema.customers.walletBalanceCents} + ${delta}`,
+      })
       .where(eq(schema.customers.id, input.customerId));
 
     return { ok: true, balanceAfterCents: next, transactionId: txn?.id };

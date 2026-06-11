@@ -20,7 +20,11 @@ services:
     volumes:
       - twf_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-twf} -d ${POSTGRES_DB:-thewebsiteforge}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-twf} -d ${POSTGRES_DB:-thewebsiteforge}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5

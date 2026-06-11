@@ -77,9 +77,7 @@ const sections = [
   },
   {
     heading: "10. Contact",
-    body: [
-      `Questions about hosting can be sent to ${contactEmail}.`,
-    ],
+    body: [`Questions about hosting can be sent to ${contactEmail}.`],
   },
 ];
 </script>
@@ -119,8 +117,9 @@ const sections = [
         </div>
 
         <p class="text-center text-xs leading-relaxed text-slate-500">
-          This page is a starting template provided for convenience and is not legal
-          advice. Please have it reviewed by a qualified attorney before relying on it.
+          This page is a starting template provided for convenience and is not
+          legal advice. Please have it reviewed by a qualified attorney before
+          relying on it.
         </p>
       </div>
     </section>

@@ -44,7 +44,8 @@ onMounted(() => {
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) =>
-              progress.value && gsap.set(progress.value, { scaleX: self.progress }),
+              progress.value &&
+              gsap.set(progress.value, { scaleX: self.progress }),
           },
         });
         return () => tween.kill();
@@ -81,7 +82,18 @@ onMounted(() => {
             class="glass mt-6 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
           >
             View all work
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
           </NuxtLink>
         </div>
 
@@ -92,7 +104,9 @@ onMounted(() => {
           v-tilt
           class="w-[clamp(20rem,30vw,28rem)] shrink-0"
         >
-          <span class="mb-3 block font-display text-sm font-semibold text-white/30">
+          <span
+            class="mb-3 block font-display text-sm font-semibold text-white/30"
+          >
             0{{ i + 1 }} — {{ project.category }}
           </span>
           <ShowcaseCard :project="project" :show-price="false" />
@@ -125,11 +139,25 @@ onMounted(() => {
           class="glass inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
         >
           View all work
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
         </NuxtLink>
       </div>
 
-      <div v-reveal:stagger="{ selector: '.card', stagger: 0.14 }" class="mt-12 grid gap-6 sm:grid-cols-2">
+      <div
+        v-reveal:stagger="{ selector: '.card', stagger: 0.14 }"
+        class="mt-12 grid gap-6 sm:grid-cols-2"
+      >
         <div v-for="project in featured" :key="project.id" class="card">
           <ShowcaseCard :project="project" :show-price="false" />
         </div>

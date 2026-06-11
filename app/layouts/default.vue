@@ -39,7 +39,10 @@ onBeforeUnmount(() => {
          Solid dark bg so the container instantly covers everything from first
          paint, even before Three.js finishes loading the canvas. -->
     <ClientOnly>
-      <div v-if="isIntro" class="black-hole pointer-events-none fixed inset-0 z-0">
+      <div
+        v-if="isIntro"
+        class="black-hole pointer-events-none fixed inset-0 z-0"
+      >
         <BlackHole />
       </div>
     </ClientOnly>

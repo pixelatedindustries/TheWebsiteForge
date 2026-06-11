@@ -6,7 +6,8 @@
    ============================================================ */
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display:
+    "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
 
   /* Brand spectrum: emerald-green → teal → cyan → blue */
   --color-brand-50: #ecfdf7;
@@ -211,12 +212,14 @@
     background-position 0.4s ease,
     transform 0.2s ease,
     box-shadow 0.3s ease;
-  box-shadow: 0 10px 30px -10px color-mix(in oklab, var(--color-accent-500) 70%, transparent);
+  box-shadow: 0 10px 30px -10px
+    color-mix(in oklab, var(--color-accent-500) 70%, transparent);
 }
 .btn-gradient:hover {
   background-position: right center;
   transform: translateY(-2px);
-  box-shadow: 0 18px 40px -12px color-mix(in oklab, var(--color-brand-400) 80%, transparent);
+  box-shadow: 0 18px 40px -12px
+    color-mix(in oklab, var(--color-brand-400) 80%, transparent);
 }
 
 .glow-ring {

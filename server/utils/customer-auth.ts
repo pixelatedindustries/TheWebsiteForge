@@ -39,7 +39,9 @@ export async function getOptionalCustomer(
 }
 
 /** Verify the Bearer token or throw 401. */
-export async function requireCustomer(event: H3Event): Promise<CustomerIdentity> {
+export async function requireCustomer(
+  event: H3Event,
+): Promise<CustomerIdentity> {
   const identity = await getOptionalCustomer(event);
   if (!identity) {
     throw createError({ statusCode: 401, statusMessage: "Sign in required." });

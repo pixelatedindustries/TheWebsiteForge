@@ -63,7 +63,9 @@ export interface SendEmailResult {
  * Send a transactional email. Resolves to a result object rather than throwing,
  * so callers can fire-and-forget without risking the parent request.
  */
-export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult> {
+export async function sendEmail(
+  input: SendEmailInput,
+): Promise<SendEmailResult> {
   const resend = getResend();
 
   if (!resend) {
@@ -91,6 +93,9 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
     return { ok: true, id: data?.id };
   } catch (err) {
     console.error("[email] send failed:", err);
-    return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : String(err),
+    };
   }
 }

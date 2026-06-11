@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth, onIdTokenChanged, type User } from "firebase/auth";
-import type { AuthUser } from "~/composables/useAuth";
+import { useAuthStore } from "~/stores/auth";
 
 /**
  * Client-only Firebase init. Creates the web app, wires the auth-state
@@ -15,41 +15,41 @@ export default defineNuxtPlugin(() => {
     appId?: string;
   };
 
-  const user = useState<AuthUser | null>("auth-user", () => null);
-  const ready = useState<boolean>("auth-ready", () => false);
-  const configured = useState<boolean>("auth-configured", () => false);
+  const authStore = useAuthStore();
+  let firebaseAuth: ReturnType<typeof getAuth> | null = null;
 
   if (!cfg?.apiKey) {
     // Not configured — let the UI show a setup message instead of crashing.
-    ready.value = true;
-    configured.value = false;
-    return { provide: { firebaseAuth: null } };
+    authStore.setReady(true);
+    authStore.setConfigured(false);
+  } else {
+    authStore.setConfigured(true);
+
+    const app = getApps().length
+      ? getApps()[0]!
+      : initializeApp({
+          apiKey: cfg.apiKey,
+          authDomain: cfg.authDomain,
+          projectId: cfg.projectId,
+          appId: cfg.appId,
+        });
+
+    firebaseAuth = getAuth(app);
+
+    onIdTokenChanged(firebaseAuth, (u: User | null) => {
+      authStore.setUser(
+        u
+          ? {
+              email: u.email,
+              uid: u.uid,
+              displayName: u.displayName,
+              photoURL: u.photoURL,
+            }
+          : null,
+      );
+      authStore.setReady(true);
+    });
   }
 
-  configured.value = true;
-
-  const app = getApps().length
-    ? getApps()[0]!
-    : initializeApp({
-        apiKey: cfg.apiKey,
-        authDomain: cfg.authDomain,
-        projectId: cfg.projectId,
-        appId: cfg.appId,
-      });
-
-  const auth = getAuth(app);
-
-  onIdTokenChanged(auth, (u: User | null) => {
-    user.value = u
-      ? {
-          email: u.email,
-          uid: u.uid,
-          displayName: u.displayName,
-          photoURL: u.photoURL,
-        }
-      : null;
-    ready.value = true;
-  });
-
-  return { provide: { firebaseAuth: auth } };
+  return { provide: { firebaseAuth } };
 });

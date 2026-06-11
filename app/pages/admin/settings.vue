@@ -26,7 +26,9 @@ onMounted(async () => {
       <dl class="mt-4 space-y-3 text-sm">
         <div class="flex justify-between">
           <dt class="text-slate-500">Name</dt>
-          <dd class="text-slate-200">{{ me?.name || user?.displayName || "—" }}</dd>
+          <dd class="text-slate-200">
+            {{ me?.name || user?.displayName || "—" }}
+          </dd>
         </div>
         <div class="flex justify-between">
           <dt class="text-slate-500">Email</dt>

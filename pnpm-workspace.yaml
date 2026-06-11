@@ -1,5 +1,5 @@
 allowBuilds:
-  '@firebase/util': true
-  '@parcel/watcher': false
+  "@firebase/util": true
+  "@parcel/watcher": false
   esbuild: false
   protobufjs: true
