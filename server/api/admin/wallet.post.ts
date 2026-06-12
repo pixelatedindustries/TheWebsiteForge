@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import type { WalletAdjustPayload } from "../../models/admin";
 
 const CREDIT_TYPES = new Set(["topup", "refund", "adjustment"]);
 const DEBIT_TYPES = new Set([
@@ -8,17 +9,6 @@ const DEBIT_TYPES = new Set([
   "change",
   "adjustment",
 ]);
-
-interface WalletAdjustPayload {
-  customerId?: string;
-  direction?: "credit" | "debit";
-  /** USD cents (positive). */
-  amountUsdCents?: number;
-  type?: string;
-  description?: string;
-  /** Allow a debit to push the balance negative (admin override). */
-  force?: boolean;
-}
 
 /**
  * POST /api/admin/wallet (WebForgePlan2 §5)

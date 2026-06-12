@@ -1,5 +1,10 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { and, eq } from "drizzle-orm";
+import type {
+  PaystackCustomer,
+  PaystackData,
+  PaystackEvent,
+} from "../../types/paystack";
 
 /**
  * POST /api/webhooks/paystack
@@ -368,52 +373,3 @@ function parseDate(value?: string | null): Date | null {
   return Number.isNaN(d.getTime()) ? null : d;
 }
 
-/* -------------------------------- types -------------------------------- */
-
-interface PaystackEvent {
-  event: string;
-  data: PaystackData;
-}
-
-interface PaystackCustomer {
-  email?: string;
-  first_name?: string;
-  last_name?: string;
-  customer_code?: string;
-}
-
-interface PaystackPlan {
-  name?: string;
-  plan_code?: string;
-  amount?: number;
-  interval?: string;
-  currency?: string;
-}
-
-interface PaystackData {
-  reference?: string;
-  amount?: number;
-  currency?: string;
-  status?: string;
-  paid?: boolean;
-  paid_at?: string;
-  invoice_code?: string;
-  subscription_code?: string;
-  next_payment_date?: string;
-  customer?: PaystackCustomer;
-  plan?: PaystackPlan;
-  metadata?: {
-    purpose?: string;
-    customerId?: string;
-    usdCents?: number | string;
-    fxRate?: number | string;
-    planKey?: string | null;
-    siteId?: string | null;
-    label?: string;
-    [key: string]: unknown;
-  };
-  subscription?: {
-    subscription_code?: string;
-    next_payment_date?: string;
-  };
-}

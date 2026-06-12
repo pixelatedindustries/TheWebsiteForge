@@ -19,6 +19,7 @@
 import type { Directive, DirectiveBinding } from "vue";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import type { RevealOpts, SplitOpts } from "~/types/motion";
 
 // per-element teardown bag (keeps `el` free of ad-hoc props for TS' sake)
 const cleanups = new WeakMap<HTMLElement, Array<() => void>>();
@@ -435,19 +436,3 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 });
 
-interface RevealOpts {
-  y?: number;
-  scale?: number;
-  duration?: number;
-  ease?: string;
-  delay?: number;
-  start?: string;
-  stagger?: number;
-  selector?: string;
-}
-interface SplitOpts {
-  delay?: number;
-  stagger?: number;
-  start?: string;
-  scroll?: boolean;
-}

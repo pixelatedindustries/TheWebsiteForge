@@ -1,31 +1,8 @@
 <script setup lang="ts">
+import type { Invoice, Subscription } from "~/models/admin";
+
 definePageMeta({ layout: "admin" });
 useSeoMeta({ title: "Billing — Admin", robots: "noindex" });
-
-interface Subscription {
-  id: string;
-  customerName: string;
-  plan: string;
-  provider: string;
-  status: string;
-  amountCents: number;
-  currency: string;
-  interval: string;
-  currentPeriodEnd: string | null;
-}
-
-interface Invoice {
-  id: string;
-  number: number;
-  customerName: string;
-  type: string;
-  amountCents: number;
-  currency: string;
-  status: string;
-  provider: string | null;
-  issuedAt: string;
-  paidAt: string | null;
-}
 
 const subStatus: Record<string, string> = {
   active: "bg-emerald-500/15 text-emerald-300",

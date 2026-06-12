@@ -1,25 +1,8 @@
 <script setup lang="ts">
+import type { Overview } from "~/models/admin";
+
 definePageMeta({ layout: "admin" });
 useSeoMeta({ title: "Overview — Admin", robots: "noindex" });
-
-interface Overview {
-  mrrCents: number;
-  revenueThisMonthCents: number;
-  revenueYtdCents: number;
-  activeSites: number;
-  suspendedSites: number;
-  activeSubscriptions: number;
-  canceledSubscriptions: number;
-  newBuildsThisMonth: number;
-  openInvoices: number;
-  openInvoicesCents: number;
-  failedInvoices: number;
-  domainsExpiringSoon: number;
-  newLeads: number;
-  totalCustomers: number;
-  revenueByMonth: { label: string; cents: number }[];
-  salesByType: Record<string, number>;
-}
 
 const { adminFetch } = useAuth();
 const data = ref<Overview | null>(null);

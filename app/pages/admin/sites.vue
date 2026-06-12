@@ -1,19 +1,8 @@
 <script setup lang="ts">
+import type { Site } from "~/models/admin";
+
 definePageMeta({ layout: "admin" });
 useSeoMeta({ title: "Sites — Admin", robots: "noindex" });
-
-interface Site {
-  id: string;
-  customerName: string;
-  name: string;
-  type: string;
-  origin: string;
-  status: string;
-  dbHosting: string;
-  repoUrl: string | null;
-  deployUrl: string | null;
-  createdAt: string;
-}
 
 const statusStyles: Record<string, string> = {
   live: "bg-emerald-500/15 text-emerald-300",

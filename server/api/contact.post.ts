@@ -1,14 +1,5 @@
 import { isValidEmail } from "../../shared/validation";
-
-interface ContactPayload {
-  name?: string;
-  email?: string;
-  company?: string;
-  budget?: string;
-  message?: string;
-  /** honeypot — must stay empty */
-  website?: string;
-}
+import type { ContactPayload } from "../models/contact";
 
 /**
  * POST /api/contact

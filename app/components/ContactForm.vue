@@ -1,29 +1,11 @@
 <script setup lang="ts">
-interface Form {
-  name: string;
-  email: string;
-  company: string;
-  phone: string;
-  businessType: string;
-  siteType: string;
-  existingWebsite: string;
-  budget: string;
-  deadline: string;
-  goals: string;
-  pages: string;
-  features: string[];
-  references: string;
-  extraDetails: string;
-  website: string; // honeypot
-}
+import type {
+  ContactErrorBody,
+  ContactFormStep,
+  ContactFormValues,
+} from "~/types/contact";
 
-interface Step {
-  title: string;
-  eyebrow: string;
-  description: string;
-}
-
-const steps: Step[] = [
+const steps: ContactFormStep[] = [
   {
     eyebrow: "Step 01",
     title: "Contact Details",
@@ -48,7 +30,7 @@ const steps: Step[] = [
   },
 ];
 
-const initialForm = (): Form => ({
+const initialForm = (): ContactFormValues => ({
   name: "",
   email: "",
   company: "",
@@ -66,7 +48,7 @@ const initialForm = (): Form => ({
   website: "",
 });
 
-const form = reactive<Form>(initialForm());
+const form = reactive<ContactFormValues>(initialForm());
 const currentStep = ref(0);
 const status = ref<"idle" | "loading" | "success" | "error">("idle");
 const fieldErrors = ref<Record<string, string>>({});
@@ -234,9 +216,9 @@ async function submit() {
     });
     status.value = "success";
     serverMessage.value = res.message;
-  } catch (err: any) {
+  } catch (err) {
     status.value = "error";
-    const data = err?.data?.data;
+    const data = (err as ContactErrorBody)?.data?.data;
     if (data?.errors) {
       fieldErrors.value = data.errors;
       serverMessage.value = "Please fix the highlighted fields.";

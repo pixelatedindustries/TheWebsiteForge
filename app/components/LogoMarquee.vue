@@ -1,26 +1,5 @@
 <script setup lang="ts">
-type TechIcon =
-  | "html"
-  | "css"
-  | "tailwind"
-  | "nuxt"
-  | "csharp"
-  | "java"
-  | "python"
-  | "xml"
-  | "aspnet"
-  | "typescript"
-  | "vue"
-  | "node"
-  | "sql"
-  | "git"
-  | "azure";
-
-interface TechStackItem {
-  name: string;
-  icon: TechIcon;
-  color: string;
-}
+import type { TechStackItem } from "~/types/tech-stack";
 
 const techStack: TechStackItem[] = [
   { name: "HTML5", icon: "html", color: "#e44d26" },

@@ -4,19 +4,7 @@ import {
   MAX_RECURRING_MONTHLY_USD_CENTS,
   type RecurringKind,
 } from "../../../shared/billing";
-
-interface RecurringPayload {
-  customerId?: string;
-  siteId?: string;
-  /** A recurring catalogue key (e.g. "hosting_dynamic") — fills kind/label/amount. */
-  planKey?: string;
-  /** Or specify manually: */
-  kind?: RecurringKind;
-  label?: string;
-  amountUsdCents?: number;
-  /** ISO date for the first charge; defaults to now (charges on next run). */
-  nextChargeAt?: string;
-}
+import type { RecurringPayload } from "../../models/admin";
 
 /**
  * POST /api/admin/recurring (WebForgePlan2 §5)

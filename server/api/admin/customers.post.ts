@@ -1,12 +1,5 @@
 import { eq } from "drizzle-orm";
-
-interface CustomerPayload {
-  name?: string;
-  email?: string;
-  company?: string;
-  /** When converting a won lead, link + mark it. */
-  leadId?: string;
-}
+import type { CustomerPayload } from "../../models/admin";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

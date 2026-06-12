@@ -1,10 +1,5 @@
 import { and, eq } from "drizzle-orm";
-
-interface ChangeRequestPayload {
-  title?: string;
-  details?: string;
-  siteId?: string;
-}
+import type { ChangeRequestPayload } from "../../models/account";
 
 /**
  * POST /api/account/change-request (WebForgePlan2 §4.5)

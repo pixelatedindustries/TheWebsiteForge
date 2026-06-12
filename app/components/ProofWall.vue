@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import { projects, type ProjectCategory } from "~~/shared/site";
-
-interface WebsiteType {
-  category: ProjectCategory;
-  title: string;
-  description: string;
-  bestFor: string;
-  pieces: string[];
-  icon: "dashboard" | "cart" | "layers" | "gallery" | "app" | "target";
-  accent: string;
-}
+import type { WebsiteType } from "~/types/proof";
 
 const websiteTypes: WebsiteType[] = [
   {

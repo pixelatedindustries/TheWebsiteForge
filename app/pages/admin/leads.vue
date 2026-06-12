@@ -1,18 +1,8 @@
 <script setup lang="ts">
+import type { Lead } from "~/models/admin";
+
 definePageMeta({ layout: "admin" });
 useSeoMeta({ title: "Leads — Admin", robots: "noindex" });
-
-interface Lead {
-  id: string;
-  name: string;
-  email: string;
-  company: string | null;
-  budget: string | null;
-  message: string | null;
-  status: "new" | "contacted" | "won" | "lost";
-  source: string;
-  createdAt: string;
-}
 
 const STATUSES = ["new", "contacted", "won", "lost"] as const;
 const statusStyles: Record<string, string> = {

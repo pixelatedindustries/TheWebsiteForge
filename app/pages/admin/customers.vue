@@ -1,36 +1,9 @@
 <script setup lang="ts">
 import { recurringServices, formatUsdCents } from "~~/shared/billing";
+import type { Customer, Recurring, Txn } from "~/models/admin";
 
 definePageMeta({ layout: "admin" });
 useSeoMeta({ title: "Customers — Admin", robots: "noindex" });
-
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  company: string | null;
-  country: string | null;
-  siteCount: number;
-  mrrCents: number;
-  walletBalanceCents: number;
-  createdAt: string;
-}
-interface Recurring {
-  id: string;
-  kind: string;
-  label: string;
-  amountCents: number;
-  status: string;
-  nextChargeAt: string;
-}
-interface Txn {
-  id: string;
-  type: string;
-  amountCents: number;
-  balanceAfterCents: number;
-  description: string;
-  createdAt: string;
-}
 
 const { adminFetch } = useAuth();
 const customers = ref<Customer[]>([]);

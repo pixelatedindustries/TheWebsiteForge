@@ -1,12 +1,8 @@
 import { eq } from "drizzle-orm";
-
-const STATUSES = ["active", "paused", "canceled"] as const;
-type RecurringStatus = (typeof STATUSES)[number];
-
-interface PatchPayload {
-  id?: string;
-  status?: RecurringStatus;
-}
+import {
+  RECURRING_STATUSES,
+  type RecurringPatchPayload,
+} from "../../models/admin";
 
 /**
  * PATCH /api/admin/recurring — pause, resume, or cancel a recurring charge.
@@ -14,9 +10,9 @@ interface PatchPayload {
  */
 export default defineEventHandler(async (event) => {
   const admin = await requireAdmin(event);
-  const body = await readBody<PatchPayload>(event);
+  const body = await readBody<RecurringPatchPayload>(event);
 
-  if (!body?.id || !body?.status || !STATUSES.includes(body.status)) {
+  if (!body?.id || !body?.status || !RECURRING_STATUSES.includes(body.status)) {
     throw createError({
       statusCode: 422,
       statusMessage:

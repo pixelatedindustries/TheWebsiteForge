@@ -1,12 +1,5 @@
 import { eq } from "drizzle-orm";
-
-const STATUSES = ["draft", "live", "suspended", "offboarded"] as const;
-type SiteStatus = (typeof STATUSES)[number];
-
-interface PatchPayload {
-  id?: string;
-  status?: SiteStatus;
-}
+import { SITE_STATUSES, type SitePatchPayload } from "../../models/admin";
 
 /**
  * PATCH /api/admin/sites — change a site's lifecycle status
@@ -15,9 +8,9 @@ interface PatchPayload {
  */
 export default defineEventHandler(async (event) => {
   const admin = await requireAdmin(event);
-  const body = await readBody<PatchPayload>(event);
+  const body = await readBody<SitePatchPayload>(event);
 
-  if (!body?.id || !body?.status || !STATUSES.includes(body.status)) {
+  if (!body?.id || !body?.status || !SITE_STATUSES.includes(body.status)) {
     throw createError({
       statusCode: 422,
       statusMessage: "A valid `id` and `status` are required.",

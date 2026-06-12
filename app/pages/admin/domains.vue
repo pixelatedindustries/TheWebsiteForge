@@ -1,17 +1,8 @@
 <script setup lang="ts">
+import type { Domain } from "~/models/admin";
+
 definePageMeta({ layout: "admin" });
 useSeoMeta({ title: "Domains — Admin", robots: "noindex" });
-
-interface Domain {
-  id: string;
-  customerName: string;
-  fqdn: string;
-  registrar: string;
-  autoRenew: boolean;
-  annualCostCents: number | null;
-  expiresAt: string | null;
-  daysToExpiry: number | null;
-}
 
 const { adminFetch } = useAuth();
 const domains = ref<Domain[]>([]);
