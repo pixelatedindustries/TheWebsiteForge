@@ -13,6 +13,7 @@ import {
   timestamp,
   date,
   serial,
+  index,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -111,105 +112,140 @@ export const customers = pgTable("customers", {
     .notNull(),
 });
 
-export const leads = pgTable("leads", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull(),
-  company: text("company"),
-  budget: text("budget"),
-  message: text("message").notNull(),
-  status: leadStatus("status").default("new").notNull(),
-  source: text("source").default("contact_form").notNull(),
-  customerId: uuid("customer_id").references(() => customers.id, {
-    onDelete: "set null",
-  }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const leads = pgTable(
+  "leads",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name").notNull(),
+    email: text("email").notNull(),
+    company: text("company"),
+    budget: text("budget"),
+    message: text("message").notNull(),
+    status: leadStatus("status").default("new").notNull(),
+    source: text("source").default("contact_form").notNull(),
+    customerId: uuid("customer_id").references(() => customers.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("leads_customer_id_idx").on(t.customerId)],
+);
 
-export const sites = pgTable("sites", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  customerId: uuid("customer_id")
-    .notNull()
-    .references(() => customers.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  type: siteType("type").notNull(),
-  origin: siteOrigin("origin").notNull(),
-  status: siteStatus("status").default("draft").notNull(),
-  /** Which database option the customer chose for this site (plan §3.2.1). */
-  dbHosting: dbHosting("db_hosting").default("none").notNull(),
-  repoUrl: text("repo_url"),
-  deployUrl: text("deploy_url"),
-  /** Which VPS this site lives on, for capacity tracking. */
-  vpsHost: text("vps_host"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const sites = pgTable(
+  "sites",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => customers.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    type: siteType("type").notNull(),
+    origin: siteOrigin("origin").notNull(),
+    status: siteStatus("status").default("draft").notNull(),
+    /** Which database option the customer chose for this site (plan §3.2.1). */
+    dbHosting: dbHosting("db_hosting").default("none").notNull(),
+    repoUrl: text("repo_url"),
+    deployUrl: text("deploy_url"),
+    /** Which VPS this site lives on, for capacity tracking. */
+    vpsHost: text("vps_host"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("sites_customer_id_idx").on(t.customerId)],
+);
 
-export const domains = pgTable("domains", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  customerId: uuid("customer_id")
-    .notNull()
-    .references(() => customers.id, { onDelete: "cascade" }),
-  siteId: uuid("site_id").references(() => sites.id, { onDelete: "set null" }),
-  fqdn: text("fqdn").notNull().unique(),
-  registrar: text("registrar").default("cloudflare").notNull(),
-  registeredAt: date("registered_at"),
-  expiresAt: date("expires_at"),
-  autoRenew: boolean("auto_renew").default(true).notNull(),
-  /** Annual registrar cost in cents (USD), excluding our management fee. */
-  annualCostCents: integer("annual_cost_cents"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const domains = pgTable(
+  "domains",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => customers.id, { onDelete: "cascade" }),
+    siteId: uuid("site_id").references(() => sites.id, {
+      onDelete: "set null",
+    }),
+    fqdn: text("fqdn").notNull().unique(),
+    registrar: text("registrar").default("cloudflare").notNull(),
+    registeredAt: date("registered_at"),
+    expiresAt: date("expires_at"),
+    autoRenew: boolean("auto_renew").default(true).notNull(),
+    /** Annual registrar cost in cents (USD), excluding our management fee. */
+    annualCostCents: integer("annual_cost_cents"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("domains_customer_id_idx").on(t.customerId),
+    index("domains_site_id_idx").on(t.siteId),
+  ],
+);
 
-export const subscriptions = pgTable("subscriptions", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  customerId: uuid("customer_id")
-    .notNull()
-    .references(() => customers.id, { onDelete: "cascade" }),
-  siteId: uuid("site_id").references(() => sites.id, { onDelete: "set null" }),
-  /** e.g. "hosting_dynamic", "care_basic", "db_medium". */
-  plan: text("plan").notNull(),
-  provider: text("provider").default("paystack").notNull(),
-  providerSubId: text("provider_sub_id"),
-  status: subscriptionStatus("status").default("active").notNull(),
-  amountCents: integer("amount_cents").notNull(),
-  currency: text("currency").default("USD").notNull(),
-  interval: billingInterval("interval").default("month").notNull(),
-  currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => customers.id, { onDelete: "cascade" }),
+    siteId: uuid("site_id").references(() => sites.id, {
+      onDelete: "set null",
+    }),
+    /** e.g. "hosting_dynamic", "care_basic", "db_medium". */
+    plan: text("plan").notNull(),
+    provider: text("provider").default("paystack").notNull(),
+    providerSubId: text("provider_sub_id"),
+    status: subscriptionStatus("status").default("active").notNull(),
+    amountCents: integer("amount_cents").notNull(),
+    currency: text("currency").default("USD").notNull(),
+    interval: billingInterval("interval").default("month").notNull(),
+    currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("subscriptions_customer_id_idx").on(t.customerId),
+    index("subscriptions_provider_sub_id_idx").on(t.providerSubId),
+  ],
+);
 
-export const invoices = pgTable("invoices", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  /** Human-friendly sequential invoice number. */
-  number: serial("number").notNull(),
-  customerId: uuid("customer_id")
-    .notNull()
-    .references(() => customers.id, { onDelete: "cascade" }),
-  siteId: uuid("site_id").references(() => sites.id, { onDelete: "set null" }),
-  type: invoiceType("type").notNull(),
-  amountCents: integer("amount_cents").notNull(),
-  /** VAT in cents — 0 while not VAT-registered (plan §10.1). */
-  vatCents: integer("vat_cents").default(0).notNull(),
-  currency: text("currency").default("USD").notNull(),
-  status: invoiceStatus("status").default("open").notNull(),
-  provider: text("provider"),
-  providerInvoiceId: text("provider_invoice_id"),
-  issuedAt: timestamp("issued_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  paidAt: timestamp("paid_at", { withTimezone: true }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const invoices = pgTable(
+  "invoices",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    /** Human-friendly sequential invoice number. */
+    number: serial("number").notNull(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => customers.id, { onDelete: "cascade" }),
+    siteId: uuid("site_id").references(() => sites.id, {
+      onDelete: "set null",
+    }),
+    type: invoiceType("type").notNull(),
+    amountCents: integer("amount_cents").notNull(),
+    /** VAT in cents — 0 while not VAT-registered (plan §10.1). */
+    vatCents: integer("vat_cents").default(0).notNull(),
+    currency: text("currency").default("USD").notNull(),
+    status: invoiceStatus("status").default("open").notNull(),
+    provider: text("provider"),
+    providerInvoiceId: text("provider_invoice_id"),
+    issuedAt: timestamp("issued_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("invoices_customer_id_idx").on(t.customerId),
+    index("invoices_provider_invoice_id_idx").on(t.providerInvoiceId),
+  ],
+);
 
 /**
  * Admin roster. Authorization currently uses the ADMIN_EMAILS env allowlist
@@ -277,6 +313,7 @@ export const walletTransactions = pgTable(
     uniqueIndex("wallet_txn_reference_uq")
       .on(t.reference)
       .where(sql`${t.reference} is not null`),
+    index("wallet_txn_customer_id_idx").on(t.customerId),
   ],
 );
 
@@ -284,46 +321,68 @@ export const walletTransactions = pgTable(
  * Recurring monthly charges debited from the wallet (hosting / database).
  * The scheduled task (server/tasks/billing/charge-recurring.ts) reads these.
  */
-export const recurringCharges = pgTable("recurring_charges", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  customerId: uuid("customer_id")
-    .notNull()
-    .references(() => customers.id, { onDelete: "cascade" }),
-  siteId: uuid("site_id").references(() => sites.id, { onDelete: "set null" }),
-  kind: recurringKind("kind").notNull(),
-  /** Catalogue key from shared/billing.ts (e.g. "hosting_dynamic"), optional. */
-  planKey: text("plan_key"),
-  label: text("label").notNull(),
-  /** Monthly amount in USD cents. */
-  amountCents: integer("amount_cents").notNull(),
-  interval: billingInterval("interval").default("month").notNull(),
-  status: recurringStatus("status").default("active").notNull(),
-  /** When the low-balance grace window started (null = not in grace). */
-  lowBalanceNotifiedAt: timestamp("low_balance_notified_at", {
-    withTimezone: true,
-  }),
-  nextChargeAt: timestamp("next_charge_at", { withTimezone: true }).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const recurringCharges = pgTable(
+  "recurring_charges",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => customers.id, { onDelete: "cascade" }),
+    siteId: uuid("site_id").references(() => sites.id, {
+      onDelete: "set null",
+    }),
+    kind: recurringKind("kind").notNull(),
+    /** Catalogue key from shared/billing.ts (e.g. "hosting_dynamic"), optional. */
+    planKey: text("plan_key"),
+    label: text("label").notNull(),
+    /** Monthly amount in USD cents. */
+    amountCents: integer("amount_cents").notNull(),
+    interval: billingInterval("interval").default("month").notNull(),
+    status: recurringStatus("status").default("active").notNull(),
+    /** When the low-balance grace window started (null = not in grace). */
+    lowBalanceNotifiedAt: timestamp("low_balance_notified_at", {
+      withTimezone: true,
+    }),
+    nextChargeAt: timestamp("next_charge_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("recurring_charges_customer_id_idx").on(t.customerId),
+    // Speeds up the daily "due charges" scan in the billing task.
+    index("recurring_charges_next_charge_at_idx").on(t.nextChargeAt),
+    // Backstop against duplicate ACTIVE charges for the same customer/site/kind
+    // (the billing task would otherwise debit both). Application code also
+    // checks this so the null-siteId case is covered.
+    uniqueIndex("recurring_charges_active_uq")
+      .on(t.customerId, t.siteId, t.kind)
+      .where(sql`${t.status} = 'active'`),
+  ],
+);
 
 /** Customer-submitted change requests (portal) — admin quotes + debits the wallet. */
-export const changeRequests = pgTable("change_requests", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  customerId: uuid("customer_id")
-    .notNull()
-    .references(() => customers.id, { onDelete: "cascade" }),
-  siteId: uuid("site_id").references(() => sites.id, { onDelete: "set null" }),
-  title: text("title").notNull(),
-  details: text("details").notNull(),
-  status: changeRequestStatus("status").default("open").notNull(),
-  /** Optional quoted amount in USD cents once an admin scopes it. */
-  quotedCents: integer("quoted_cents"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const changeRequests = pgTable(
+  "change_requests",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => customers.id, { onDelete: "cascade" }),
+    siteId: uuid("site_id").references(() => sites.id, {
+      onDelete: "set null",
+    }),
+    title: text("title").notNull(),
+    details: text("details").notNull(),
+    status: changeRequestStatus("status").default("open").notNull(),
+    /** Optional quoted amount in USD cents once an admin scopes it. */
+    quotedCents: integer("quoted_cents"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("change_requests_customer_id_idx").on(t.customerId)],
+);
 
 /* --------------------------- inferred types ---------------------- */
 

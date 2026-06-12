@@ -323,14 +323,21 @@ async function upsertCustomerByEmail(
     .limit(1);
   if (existing) return existing;
 
-  const [created] = await db
+  // Atomic insert-or-fetch: concurrent webhook retries for the same new email
+  // would otherwise race the check-then-insert and the loser would throw a
+  // unique-constraint error. ON CONFLICT makes this a no-op upsert.
+  const [upserted] = await db
     .insert(schema.customers)
     .values({ name: input.name, email: input.email })
+    .onConflictDoUpdate({
+      target: schema.customers.email,
+      set: { email: input.email },
+    })
     .returning();
-  if (!created) {
+  if (!upserted) {
     throw new Error(`Failed to create customer for ${input.email}`);
   }
-  return created;
+  return upserted;
 }
 
 /** Constant-time compare of two hex-encoded strings. */

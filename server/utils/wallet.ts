@@ -46,6 +46,15 @@ export interface WalletResult {
   duplicate?: boolean;
 }
 
+/**
+ * A Drizzle transaction handle, as passed to the `db.transaction()` callback.
+ * Lets callers run a wallet mutation inside an existing transaction so the
+ * balance change commits/rolls back atomically with their own writes.
+ */
+export type WalletTx = Parameters<
+  Parameters<ReturnType<typeof useDb>["transaction"]>[0]
+>[0];
+
 /** Current cached USD-cents balance for a customer. */
 export async function getWalletBalance(customerId: string): Promise<number> {
   const db = useDb();
@@ -89,7 +98,7 @@ export async function creditWallet(
 }
 
 /** Detect a Postgres unique-constraint violation (SQLSTATE 23505). */
-function isUniqueViolation(err: unknown): boolean {
+export function isUniqueViolation(err: unknown): boolean {
   return (
     typeof err === "object" &&
     err !== null &&
@@ -103,68 +112,82 @@ function isUniqueViolation(err: unknown): boolean {
  * would go negative, unless `allowNegative` is true.
  */
 export async function debitWallet(
-  input: WalletMutationInput & { allowNegative?: boolean },
+  input: WalletMutationInput & { allowNegative?: boolean; tx?: WalletTx },
 ): Promise<WalletResult> {
   const magnitude = Math.abs(Math.round(input.amountCents));
-  return applyDelta(input, -magnitude, input.allowNegative ?? false);
+  return applyDelta(input, -magnitude, input.allowNegative ?? false, input.tx);
 }
 
-/** Shared transactional balance mutation. `delta` is signed USD cents. */
+/**
+ * Shared transactional balance mutation. `delta` is signed USD cents. When an
+ * existing `tx` is supplied, the mutation joins that transaction so it commits
+ * or rolls back atomically with the caller's other writes; otherwise it opens
+ * its own transaction.
+ */
 async function applyDelta(
   input: WalletMutationInput,
   delta: number,
   allowNegative = true,
+  existingTx?: WalletTx,
 ): Promise<WalletResult> {
   const db = useDb();
+  if (existingTx) return mutate(existingTx, input, delta, allowNegative);
+  return db.transaction((tx) => mutate(tx, input, delta, allowNegative));
+}
 
-  return db.transaction(async (tx) => {
-    // Lock the customer row for the duration of the transaction so concurrent
-    // debits/credits can't race on the balance.
-    const [customer] = await tx
-      .select({ balance: schema.customers.walletBalanceCents })
-      .from(schema.customers)
-      .where(eq(schema.customers.id, input.customerId))
-      .for("update")
-      .limit(1);
+/** Core balance mutation, always run inside a transaction `tx`. */
+async function mutate(
+  tx: WalletTx,
+  input: WalletMutationInput,
+  delta: number,
+  allowNegative: boolean,
+): Promise<WalletResult> {
+  // Lock the customer row for the duration of the transaction so concurrent
+  // debits/credits can't race on the balance.
+  const [customer] = await tx
+    .select({ balance: schema.customers.walletBalanceCents })
+    .from(schema.customers)
+    .where(eq(schema.customers.id, input.customerId))
+    .for("update")
+    .limit(1);
 
-    if (!customer) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: "Customer not found.",
-      });
-    }
+  if (!customer) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Customer not found.",
+    });
+  }
 
-    const current = customer.balance ?? 0;
-    const next = current + delta;
+  const current = customer.balance ?? 0;
+  const next = current + delta;
 
-    if (delta < 0 && next < 0 && !allowNegative) {
-      return { ok: false, balanceAfterCents: current, shortfallCents: -next };
-    }
+  if (delta < 0 && next < 0 && !allowNegative) {
+    return { ok: false, balanceAfterCents: current, shortfallCents: -next };
+  }
 
-    const [txn] = await tx
-      .insert(schema.walletTransactions)
-      .values({
-        customerId: input.customerId,
-        type: input.type,
-        amountCents: delta,
-        balanceAfterCents: next,
-        currency: "USD",
-        chargedZarCents: input.chargedZarCents ?? null,
-        fxRate: input.fxRate ?? null,
-        description: input.description,
-        reference: input.reference ?? null,
-        siteId: input.siteId ?? null,
-        createdBy: input.createdBy ?? "system",
-      })
-      .returning({ id: schema.walletTransactions.id });
+  const [txn] = await tx
+    .insert(schema.walletTransactions)
+    .values({
+      customerId: input.customerId,
+      type: input.type,
+      amountCents: delta,
+      balanceAfterCents: next,
+      currency: "USD",
+      chargedZarCents: input.chargedZarCents ?? null,
+      fxRate: input.fxRate ?? null,
+      description: input.description,
+      reference: input.reference ?? null,
+      siteId: input.siteId ?? null,
+      createdBy: input.createdBy ?? "system",
+    })
+    .returning({ id: schema.walletTransactions.id });
 
-    await tx
-      .update(schema.customers)
-      .set({
-        walletBalanceCents: sql`${schema.customers.walletBalanceCents} + ${delta}`,
-      })
-      .where(eq(schema.customers.id, input.customerId));
+  await tx
+    .update(schema.customers)
+    .set({
+      walletBalanceCents: sql`${schema.customers.walletBalanceCents} + ${delta}`,
+    })
+    .where(eq(schema.customers.id, input.customerId));
 
-    return { ok: true, balanceAfterCents: next, transactionId: txn?.id };
-  });
+  return { ok: true, balanceAfterCents: next, transactionId: txn?.id };
 }

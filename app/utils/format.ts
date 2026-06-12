@@ -14,7 +14,14 @@ export function formatCents(
 
 export function formatDate(d: string | Date | null | undefined): string {
   if (!d) return "—";
-  return new Date(d).toLocaleDateString("en-US", {
+  // A date-only string ("2025-01-15") is parsed as UTC midnight by the Date
+  // constructor, which can shift to the previous day in negative-offset zones.
+  // Anchor it to local midnight so the displayed calendar day is correct.
+  const date =
+    typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d)
+      ? new Date(`${d}T00:00:00`)
+      : new Date(d);
+  return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",

@@ -15,11 +15,23 @@
 /** Fallback used if USD_TO_ZAR is unset/invalid (kept conservative-high). */
 const DEFAULT_USD_TO_ZAR = 17;
 
+/**
+ * Sane bounds for the manual USD→ZAR rate. A value outside this band is almost
+ * certainly a misconfiguration (e.g. a stray decimal) that would badly over- or
+ * under-charge customers, so we reject it and fall back to the default.
+ */
+const MIN_USD_TO_ZAR = 10;
+const MAX_USD_TO_ZAR = 30;
+
 /** The configured USD→ZAR rate. */
 export function getUsdToZarRate(): number {
   const raw = process.env.USD_TO_ZAR;
   const parsed = raw ? Number(raw) : NaN;
-  if (!Number.isFinite(parsed) || parsed <= 0) {
+  if (
+    !Number.isFinite(parsed) ||
+    parsed < MIN_USD_TO_ZAR ||
+    parsed > MAX_USD_TO_ZAR
+  ) {
     return DEFAULT_USD_TO_ZAR;
   }
   return parsed;

@@ -2,8 +2,17 @@
 import { faqs } from "~~/shared/site";
 
 const openIndex = ref<number | null>(0);
-const toggle = (i: number) =>
-  (openIndex.value = openIndex.value === i ? null : i);
+const toggle = (i: number) => {
+  const opening = openIndex.value !== i;
+  openIndex.value = opening ? i : null;
+  // Move focus to the revealed panel so keyboard users land on the answer
+  // instead of having to tab past collapsed items (issues.md #17).
+  if (opening) {
+    nextTick(() => {
+      document.getElementById(`faq-panel-${i}`)?.focus();
+    });
+  }
+};
 </script>
 
 <template>
@@ -19,9 +28,11 @@ const toggle = (i: number) =>
           class="glass overflow-hidden rounded-xl"
         >
           <button
+            :id="`faq-trigger-${i}`"
             type="button"
             class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
             :aria-expanded="openIndex === i"
+            :aria-controls="`faq-panel-${i}`"
             @click="toggle(i)"
           >
             <span class="text-sm font-semibold text-white sm:text-base">
@@ -35,6 +46,7 @@ const toggle = (i: number) =>
               stroke="currentColor"
               stroke-width="2"
               stroke-linecap="round"
+              aria-hidden="true"
             >
               <path d="M12 5v14M5 12h14" />
             </svg>
@@ -47,7 +59,14 @@ const toggle = (i: number) =>
             leave-from-class="max-h-60 opacity-100"
             leave-to-class="max-h-0 opacity-0"
           >
-            <div v-if="openIndex === i" class="overflow-hidden">
+            <div
+              v-if="openIndex === i"
+              :id="`faq-panel-${i}`"
+              role="region"
+              :aria-labelledby="`faq-trigger-${i}`"
+              tabindex="-1"
+              class="overflow-hidden outline-none"
+            >
               <p class="px-5 pb-5 text-sm leading-relaxed text-slate-400">
                 {{ faq.a }}
               </p>

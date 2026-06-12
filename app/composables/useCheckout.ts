@@ -24,7 +24,13 @@ export function useCheckout() {
     checkoutStore.setLoading(true);
     checkoutStore.setError(null);
     try {
-      const opts: FetchOptions = { method: "POST", body };
+      const opts: FetchOptions = {
+        method: "POST",
+        body,
+        // Don't let a hung request strand the user on a loading screen.
+        timeout: 30_000,
+        retry: 0,
+      };
       // Attach the bearer token when signed in (required for top-ups).
       const token = user.value ? await getToken() : null;
       if (token) {
@@ -41,13 +47,18 @@ export function useCheckout() {
       }
     } catch (e) {
       const err = e as {
+        name?: string;
         data?: { statusMessage?: string };
         statusMessage?: string;
       };
+      const timedOut =
+        err?.name === "AbortError" || err?.name === "TimeoutError";
       checkoutStore.setError(
-        err?.data?.statusMessage ||
-          err?.statusMessage ||
-          "Could not start checkout.",
+        timedOut
+          ? "Checkout took too long to respond. Please try again."
+          : err?.data?.statusMessage ||
+              err?.statusMessage ||
+              "Could not start checkout.",
       );
       checkoutStore.setLoading(false);
     }

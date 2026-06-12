@@ -70,11 +70,27 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-/* intro: solid dark fallback so the container instantly covers the layout
-   before the WebGL canvas mounts (the shader's `uBirth` handles the visual
-   fade-in once it's there, so no CSS opacity fade is needed here). */
+/* intro: an instant, painted-on poster of the black hole so the page looks
+   complete from the very first paint — long before the three.js bundle has even
+   downloaded. The radial glow + dark core sit where the shader draws the orb
+   (right-of-centre). Once the WebGL canvas mounts it fades in over the top of
+   this (see BlackHole.vue), so there's no blank/dark loading gap. */
 .black-hole {
-  background: #04070d;
+  background:
+    radial-gradient(
+      42vmax 42vmax at 70% 50%,
+      rgba(20, 90, 165, 0.3) 0%,
+      rgba(12, 52, 110, 0.16) 26%,
+      rgba(6, 20, 48, 0.06) 46%,
+      transparent 62%
+    ),
+    radial-gradient(
+      11vmax 11vmax at 70% 50%,
+      rgba(2, 4, 9, 0.92) 0%,
+      rgba(2, 4, 9, 0.55) 45%,
+      transparent 72%
+    ),
+    #04070d;
 }
 
 .chrome-enter-active {

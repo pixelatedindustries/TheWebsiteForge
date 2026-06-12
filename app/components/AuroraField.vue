@@ -21,7 +21,9 @@ onMounted(async () => {
   if (disposed || !host.value) return;
 
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const SCALE = 0.55; // internal render scale — soft bg doesn't need full res
+  const tier = getDeviceTier();
+  const OCTAVES = fbmOctaves(tier); // 2 on low-power devices, 4 otherwise
+  const SCALE = tier === "low" ? 0.4 : 0.55; // internal render scale
 
   const scene = new THREE.Scene();
   const camera = new THREE.Camera();
@@ -64,7 +66,7 @@ onMounted(async () => {
       float fbm(vec2 p){
         float s = 0.0, a = 0.5;
         mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
-        for(int i = 0; i < 4; i++){ s += a*noise(p); p = m*p; a *= 0.5; }
+        for(int i = 0; i < ${OCTAVES}; i++){ s += a*noise(p); p = m*p; a *= 0.5; }
         return s;
       }
       void main(){
@@ -150,14 +152,32 @@ onMounted(async () => {
       raf = 0;
     }
   };
-  const onVisibility = () => (document.hidden ? pause() : play());
+  let onScreen = true;
+  const onVisibility = () => {
+    if (document.hidden || !onScreen) pause();
+    else play();
+  };
   document.addEventListener("visibilitychange", onVisibility);
+
+  // Pause the render loop while the field is scrolled out of view, not just
+  // when the tab is hidden — saves GPU on long pages (issues.md #6).
+  const io = new IntersectionObserver(
+    ([entry]) => {
+      onScreen = entry?.isIntersecting ?? true;
+      if (reduced) return;
+      if (onScreen && !document.hidden) play();
+      else pause();
+    },
+    { threshold: 0.01 },
+  );
+  io.observe(el);
 
   if (reduced) render();
   else loop();
 
   cleanup = () => {
     pause();
+    io.disconnect();
     window.removeEventListener("resize", resize);
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("scroll", onScroll);

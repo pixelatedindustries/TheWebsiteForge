@@ -94,5 +94,11 @@ export async function resolveCustomer(
       firebaseUid: identity.uid,
     })
     .returning();
+  if (!created) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Failed to create customer record.",
+    });
+  }
   return created;
 }

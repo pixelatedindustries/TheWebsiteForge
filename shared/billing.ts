@@ -26,6 +26,8 @@ export const CHARGE_CURRENCY = "ZAR" as const;
 
 /** Minimum top-up and quick presets, in USD cents. */
 export const MIN_TOPUP_USD_CENTS = 5_000; // $50
+/** Maximum single top-up, in USD cents — guards against fat-finger/abuse. */
+export const MAX_TOPUP_USD_CENTS = 1_000_000; // $10,000
 export const TOPUP_PRESETS_USD_CENTS = [5_000, 15_000, 30_000, 60_000]; // $50/$150/$300/$600
 
 export type BillingInterval = "month" | "year";
@@ -75,6 +77,13 @@ export function getBuildPackage(key: string): BuildPackage | undefined {
 }
 
 /* --------------------------- recurring services --------------------------- */
+
+/**
+ * Upper bound for a single manually-entered recurring charge, in USD cents.
+ * Guards against an admin fat-finger (e.g. $999,999/mo) that the scheduled
+ * debit job would otherwise keep applying every month.
+ */
+export const MAX_RECURRING_MONTHLY_USD_CENTS = 100_000_00; // $100,000 / month
 
 export interface RecurringService {
   key: string;

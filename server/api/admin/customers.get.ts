@@ -6,12 +6,15 @@ import { desc } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   await requireAdmin(event);
   const db = useDb();
+  const { limit, offset } = getPagination(event);
 
   const [customerRows, siteRows, subs] = await Promise.all([
     db
       .select()
       .from(schema.customers)
-      .orderBy(desc(schema.customers.createdAt)),
+      .orderBy(desc(schema.customers.createdAt))
+      .limit(limit)
+      .offset(offset),
     db.select().from(schema.sites),
     db.select().from(schema.subscriptions),
   ]);
@@ -27,5 +30,5 @@ export default defineEventHandler(async (event) => {
     return { ...c, siteCount, mrrCents };
   });
 
-  return { customers };
+  return { customers, pagination: { limit, offset } };
 });

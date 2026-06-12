@@ -7,9 +7,15 @@ import { asc } from "drizzle-orm";
 export default defineEventHandler(async (event) => {
   await requireAdmin(event);
   const db = useDb();
+  const { limit, offset } = getPagination(event);
 
   const [domainRows, customerRows] = await Promise.all([
-    db.select().from(schema.domains).orderBy(asc(schema.domains.expiresAt)),
+    db
+      .select()
+      .from(schema.domains)
+      .orderBy(asc(schema.domains.expiresAt))
+      .limit(limit)
+      .offset(offset),
     db.select().from(schema.customers),
   ]);
 
@@ -26,5 +32,5 @@ export default defineEventHandler(async (event) => {
       : null,
   }));
 
-  return { domains };
+  return { domains, pagination: { limit, offset } };
 });

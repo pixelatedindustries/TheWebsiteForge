@@ -175,6 +175,19 @@
   border: 1px solid color-mix(in oklab, white 12%, transparent);
 }
 
+/* Backdrop blur is fill-rate bound; on high-DPR screens (retina / 4K) a large
+   radius is very expensive, so halve it where the device packs more pixels. */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .glass {
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+  }
+  .glass-strong {
+    backdrop-filter: blur(11px);
+    -webkit-backdrop-filter: blur(11px);
+  }
+}
+
 /* Gradient border card via mask trick */
 .gradient-border {
   position: relative;
@@ -228,9 +241,10 @@
     0 0 40px -8px color-mix(in oklab, var(--color-accent-500) 55%, transparent);
 }
 
-/* ultra-fine film grain — adds organic depth without a hard grid */
+/* ultra-fine film grain — adds organic depth without a hard grid.
+   A larger tile (320px) reduces visible repetition on big/high-DPR screens. */
 .noise-overlay {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   opacity: 0.035;
   mix-blend-mode: overlay;
 }
@@ -284,12 +298,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Stop looping / scroll-driven / one-shot animations for motion-sensitive
+     users, but keep short state transitions (hover/focus) functional rather
+     than flattening all UI feedback to nothing. */
   *,
   *::before,
   *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
     scroll-behavior: auto !important;
+    transition-duration: 0.12s !important;
+    transition-delay: 0ms !important;
   }
 }

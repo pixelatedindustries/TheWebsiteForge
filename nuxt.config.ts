@@ -102,4 +102,35 @@ export default defineNuxtConfig({
       "0 6 * * *": ["billing:charge-recurring"],
     },
   },
+
+  // Baseline security headers applied to every response (defense-in-depth).
+  // The CSP allowlists the third parties this app actually loads: Google Fonts,
+  // Firebase Auth, and Paystack's hosted/inline checkout. Tighten further once
+  // the exact set of endpoints is confirmed against the live flows.
+  routeRules: {
+    "/**": {
+      headers: {
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Strict-Transport-Security":
+          "max-age=63072000; includeSubDomains; preload",
+        "Permissions-Policy":
+          "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+        "Content-Security-Policy": [
+          "default-src 'self'",
+          "base-uri 'self'",
+          "object-src 'none'",
+          "frame-ancestors 'none'",
+          "form-action 'self' https://checkout.paystack.com",
+          "img-src 'self' data: https:",
+          "font-src 'self' https://fonts.gstatic.com data:",
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+          "script-src 'self' 'unsafe-inline' https://js.paystack.co https://checkout.paystack.com https://apis.google.com",
+          "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://api.paystack.co https://*.paystack.co",
+          "frame-src https://checkout.paystack.com https://*.paystack.co https://*.firebaseapp.com https://*.web.app",
+        ].join("; "),
+      },
+    },
+  },
 });

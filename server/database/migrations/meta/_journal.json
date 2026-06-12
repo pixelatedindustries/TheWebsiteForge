@@ -29,6 +29,13 @@
       "when": 1781206960552,
       "tag": "0003_freezing_hydra",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1781274992531,
+      "tag": "0004_fancy_sue_storm",
+      "breakpoints": true
     }
   ]
 }

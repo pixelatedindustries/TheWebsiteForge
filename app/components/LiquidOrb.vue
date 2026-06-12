@@ -21,6 +21,7 @@ onMounted(async () => {
   if (disposed || !host.value) return;
 
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const tier = getDeviceTier();
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
   camera.position.z = 5.4;
@@ -30,7 +31,7 @@ onMounted(async () => {
     alpha: true,
     powerPreference: "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(cappedPixelRatio(2, tier));
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   el.appendChild(renderer.domElement);
@@ -130,7 +131,10 @@ onMounted(async () => {
       }
     `,
   });
-  const halo = new THREE.Mesh(new THREE.IcosahedronGeometry(1.5, 48), haloMat);
+  const halo = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(1.5, tier === "low" ? 24 : 48),
+    haloMat,
+  );
   scene.add(halo);
 
   // ── cursor influence (gentle tilt) ─────────────────────────────────────────

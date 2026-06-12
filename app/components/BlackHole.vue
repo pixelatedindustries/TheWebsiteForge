@@ -28,16 +28,22 @@ onMounted(async () => {
   if (disposed || !host.value) return;
 
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const tier = getDeviceTier();
+  const OCTAVES = fbmOctaves(tier); // 2 on low-power devices, 4 otherwise
   const scene = new THREE.Scene();
   const camera = new THREE.Camera();
   const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setPixelRatio(cappedPixelRatio(1.5, tier));
   renderer.setClearColor(0x04070d, 1);
   el.appendChild(renderer.domElement);
   Object.assign(renderer.domElement.style, {
     width: "100%",
     height: "100%",
     display: "block",
+    // start invisible and fade in over the CSS poster (see default.vue) so the
+    // hand-off from the painted-on placeholder to the live shader is seamless.
+    opacity: "0",
+    transition: "opacity 0.7s ease",
   });
 
   const uniforms = {
@@ -78,7 +84,7 @@ onMounted(async () => {
       }
       float fbm(vec2 p){
         float s = 0.0, a = 0.5;
-        for(int i=0;i<4;i++){ s += a*vnoise(p); p *= 2.02; a *= 0.5; }
+        for(int i=0;i<${OCTAVES};i++){ s += a*vnoise(p); p *= 2.02; a *= 0.5; }
         return s;
       }
 
@@ -260,6 +266,7 @@ onMounted(async () => {
   const timer = new THREE.Timer();
   let elapsed = 0;
   let raf = 0;
+  let firstFrame = true;
   const render = () => {
     timer.update();
     const dt = Math.min(0.05, timer.getDelta());
@@ -312,6 +319,10 @@ onMounted(async () => {
     }
 
     renderer.render(scene, camera);
+    if (firstFrame) {
+      firstFrame = false;
+      renderer.domElement.style.opacity = "1";
+    }
   };
   const loop = () => {
     render();

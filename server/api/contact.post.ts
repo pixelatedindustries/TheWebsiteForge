@@ -1,3 +1,5 @@
+import { isValidEmail } from "../../shared/validation";
+
 interface ContactPayload {
   name?: string;
   email?: string;
@@ -7,8 +9,6 @@ interface ContactPayload {
   /** honeypot — must stay empty */
   website?: string;
 }
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
  * POST /api/contact
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
 
   const errors: Record<string, string> = {};
   if (name.length < 2) errors.name = "Please enter your name.";
-  if (!EMAIL_RE.test(email)) errors.email = "Please enter a valid email.";
+  if (!isValidEmail(email)) errors.email = "Please enter a valid email.";
   if (message.length < 10)
     errors.message = "Tell us a little more (at least 10 characters).";
 

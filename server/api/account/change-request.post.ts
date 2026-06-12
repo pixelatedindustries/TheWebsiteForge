@@ -1,3 +1,5 @@
+import { and, eq } from "drizzle-orm";
+
 interface ChangeRequestPayload {
   title?: string;
   details?: string;
@@ -33,11 +35,36 @@ export default defineEventHandler(async (event) => {
   }
 
   const db = useDb();
+
+  // Validate site ownership: a customer may only attach a request to their own
+  // site. Without this, a signed-in user could reference another customer's
+  // siteId (horizontal privilege escalation / data-integrity corruption).
+  let siteId: string | null = null;
+  if (body?.siteId) {
+    const [site] = await db
+      .select({ id: schema.sites.id })
+      .from(schema.sites)
+      .where(
+        and(
+          eq(schema.sites.id, body.siteId),
+          eq(schema.sites.customerId, customer.id),
+        ),
+      )
+      .limit(1);
+    if (!site) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "That site doesn't belong to your account.",
+      });
+    }
+    siteId = site.id;
+  }
+
   const [row] = await db
     .insert(schema.changeRequests)
     .values({
       customerId: customer.id,
-      siteId: body?.siteId ?? null,
+      siteId,
       title,
       details,
     })
@@ -46,11 +73,14 @@ export default defineEventHandler(async (event) => {
   // Alert the admin inbox (best-effort; never blocks the response).
   const admin = getMailAdmin();
   if (admin) {
+    // Strip CR/LF from the subject (header-injection guard) and escape every
+    // user-supplied value before interpolating it into the HTML body (XSS guard).
+    const safeSubjectTitle = title.replace(/[\r\n]+/g, " ");
     void sendEmail({
       to: admin,
       replyTo: customer.email,
-      subject: `Change request from ${customer.name}: ${title}`,
-      html: `<p><strong>${customer.name}</strong> (${customer.email}) submitted a change request.</p><p><strong>${title}</strong></p><p style="white-space:pre-wrap">${details}</p>`,
+      subject: `Change request from ${customer.name}: ${safeSubjectTitle}`,
+      html: `<p><strong>${esc(customer.name)}</strong> (${esc(customer.email)}) submitted a change request.</p><p><strong>${esc(title)}</strong></p><p style="white-space:pre-wrap">${esc(details)}</p>`,
       text: `${customer.name} (${customer.email}) submitted a change request.\n\n${title}\n\n${details}`,
     });
   }

@@ -1,5 +1,7 @@
+import { and, eq, isNull } from "drizzle-orm";
 import {
   getRecurringService,
+  MAX_RECURRING_MONTHLY_USD_CENTS,
   type RecurringKind,
 } from "../../../shared/billing";
 
@@ -34,6 +36,22 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const db = useDb();
+
+  // Confirm the target customer exists so an unknown/malformed id surfaces as a
+  // clean 404 rather than a raw foreign-key violation.
+  const [customer] = await db
+    .select({ id: schema.customers.id })
+    .from(schema.customers)
+    .where(eq(schema.customers.id, body.customerId))
+    .limit(1);
+  if (!customer) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Customer not found.",
+    });
+  }
+
   let kind: RecurringKind;
   let label: string;
   let amountCents: number;
@@ -63,10 +81,16 @@ export default defineEventHandler(async (event) => {
     amountCents = Math.round(body.amountUsdCents);
   }
 
-  if (!Number.isFinite(amountCents) || amountCents <= 0) {
+  if (
+    !Number.isFinite(amountCents) ||
+    amountCents <= 0 ||
+    amountCents > MAX_RECURRING_MONTHLY_USD_CENTS
+  ) {
     throw createError({
       statusCode: 422,
-      statusMessage: "A positive amount is required.",
+      statusMessage: `Amount must be positive and at most $${(
+        MAX_RECURRING_MONTHLY_USD_CENTS / 100
+      ).toLocaleString("en-US")}/mo.`,
     });
   }
 
@@ -80,12 +104,61 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const db = useDb();
+  // A supplied siteId must belong to the target customer — otherwise the charge
+  // would be attributed to another customer's site (data-integrity corruption).
+  let siteId: string | null = null;
+  if (body.siteId) {
+    const [site] = await db
+      .select({ id: schema.sites.id })
+      .from(schema.sites)
+      .where(
+        and(
+          eq(schema.sites.id, body.siteId),
+          eq(schema.sites.customerId, body.customerId),
+        ),
+      )
+      .limit(1);
+    if (!site) {
+      throw createError({
+        statusCode: 422,
+        statusMessage: "That site doesn't belong to this customer.",
+      });
+    }
+    siteId = site.id;
+  }
+
+  // Reject a duplicate ACTIVE charge for the same customer/site/kind — the
+  // billing task would otherwise debit both and double-charge the customer.
+  // (A partial unique index backstops this for non-null sites; the explicit
+  // check also covers the null-siteId case, where SQL unique treats NULLs as
+  // distinct.)
+  const [duplicate] = await db
+    .select({ id: schema.recurringCharges.id })
+    .from(schema.recurringCharges)
+    .where(
+      and(
+        eq(schema.recurringCharges.customerId, body.customerId),
+        eq(schema.recurringCharges.kind, kind),
+        eq(schema.recurringCharges.status, "active"),
+        siteId
+          ? eq(schema.recurringCharges.siteId, siteId)
+          : isNull(schema.recurringCharges.siteId),
+      ),
+    )
+    .limit(1);
+  if (duplicate) {
+    throw createError({
+      statusCode: 409,
+      statusMessage:
+        "An active charge of this kind already exists for this customer/site.",
+    });
+  }
+
   const [row] = await db
     .insert(schema.recurringCharges)
     .values({
       customerId: body.customerId,
-      siteId: body.siteId ?? null,
+      siteId,
       kind,
       planKey,
       label,

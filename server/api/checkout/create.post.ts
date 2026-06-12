@@ -1,13 +1,13 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import {
   getBuildPackage,
   MIN_TOPUP_USD_CENTS,
+  MAX_TOPUP_USD_CENTS,
   WALLET_CURRENCY,
   CHARGE_CURRENCY,
 } from "../../../shared/billing";
 import type { CheckoutPayload } from "../../../shared/checkout";
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { isValidEmail } from "../../../shared/validation";
 
 /**
  * POST /api/checkout/create (WebForgePlan2 §4.3 / §4.6)
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
   const identity = await getOptionalCustomer(event);
   const email = (identity?.email || body?.email || "").trim().toLowerCase();
   const name = identity?.name || body?.name?.trim() || email;
-  if (!EMAIL_RE.test(email)) {
+  if (!isValidEmail(email)) {
     throw createError({
       statusCode: 422,
       statusMessage: "A valid email is required to check out.",
@@ -52,6 +52,12 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 422,
         statusMessage: `Minimum top-up is $${(MIN_TOPUP_USD_CENTS / 100).toFixed(0)}.`,
+      });
+    }
+    if (usdCents > MAX_TOPUP_USD_CENTS) {
+      throw createError({
+        statusCode: 422,
+        statusMessage: `Maximum top-up is $${(MAX_TOPUP_USD_CENTS / 100).toLocaleString("en-US")}.`,
       });
     }
     label = "Wallet top-up";
@@ -79,10 +85,21 @@ export default defineEventHandler(async (event) => {
       .limit(1)
   )[0];
   if (!customer) {
-    [customer] = await db
-      .insert(schema.customers)
-      .values({ name, email, firebaseUid: identity?.uid ?? null })
-      .returning();
+    try {
+      [customer] = await db
+        .insert(schema.customers)
+        .values({ name, email, firebaseUid: identity?.uid ?? null })
+        .returning();
+    } catch (err) {
+      // A concurrent checkout for the same new email can win the insert race
+      // (unique email constraint). Reuse the row it created instead of 500ing.
+      if (!isUniqueViolation(err)) throw err;
+      [customer] = await db
+        .select()
+        .from(schema.customers)
+        .where(eq(schema.customers.email, email))
+        .limit(1);
+    }
   } else if (identity?.uid && !customer.firebaseUid) {
     await db
       .update(schema.customers)
@@ -94,6 +111,30 @@ export default defineEventHandler(async (event) => {
       statusCode: 500,
       statusMessage: "Could not resolve customer.",
     });
+  }
+
+  // If a siteId is supplied, it must belong to the resolved customer — never
+  // trust a client-supplied siteId, or it could be attached to another
+  // customer's invoice/wallet debit (horizontal privilege escalation).
+  let siteId: string | null = null;
+  if (body?.siteId) {
+    const [site] = await db
+      .select({ id: schema.sites.id })
+      .from(schema.sites)
+      .where(
+        and(
+          eq(schema.sites.id, body.siteId),
+          eq(schema.sites.customerId, customer.id),
+        ),
+      )
+      .limit(1);
+    if (!site) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "That site doesn't belong to your account.",
+      });
+    }
+    siteId = site.id;
   }
 
   // Build checkout can apply prepaid wallet funds first for signed-in customers.
@@ -128,37 +169,56 @@ export default defineEventHandler(async (event) => {
     const fullyCoveredByWallet = chargeUsdCents === 0;
 
     if (fullyCoveredByWallet && walletApplyCents > 0) {
-      const debit = await debitWallet({
-        customerId: customer.id,
-        type: "adjustment",
-        amountCents: walletApplyCents,
-        description: `${label} (wallet payment)`,
-        reference,
-        siteId: body?.siteId ?? null,
-        createdBy: "system",
-        allowNegative: false,
-      });
-
-      if (!debit.ok) {
-        throw createError({
-          statusCode: 409,
-          statusMessage:
-            "Wallet balance changed. Please refresh and try again.",
+      // Debit the wallet and record the paid invoice in ONE transaction so a
+      // failed invoice insert rolls back the debit — we never take money
+      // without a matching order record.
+      await db.transaction(async (tx) => {
+        const debit = await debitWallet({
+          customerId: customer.id,
+          type: "adjustment",
+          amountCents: walletApplyCents,
+          description: `${label} (wallet payment)`,
+          reference,
+          siteId,
+          createdBy: "system",
+          allowNegative: false,
+          tx,
         });
-      }
-    }
 
-    await db.insert(schema.invoices).values({
-      customerId: customer.id,
-      siteId: body?.siteId ?? null,
-      type: "build",
-      amountCents: usdCents,
-      currency: WALLET_CURRENCY,
-      status: fullyCoveredByWallet ? "paid" : "open",
-      provider: fullyCoveredByWallet ? "wallet" : "paystack",
-      providerInvoiceId: reference,
-      paidAt: fullyCoveredByWallet ? now : null,
-    });
+        if (!debit.ok) {
+          throw createError({
+            statusCode: 409,
+            statusMessage:
+              "Wallet balance changed. Please refresh and try again.",
+          });
+        }
+
+        await tx.insert(schema.invoices).values({
+          customerId: customer.id,
+          siteId,
+          type: "build",
+          amountCents: usdCents,
+          currency: WALLET_CURRENCY,
+          status: "paid",
+          provider: "wallet",
+          providerInvoiceId: reference,
+          paidAt: now,
+        });
+      });
+    } else {
+      // Not wallet-covered: record an open invoice for Paystack to settle.
+      await db.insert(schema.invoices).values({
+        customerId: customer.id,
+        siteId,
+        type: "build",
+        amountCents: usdCents,
+        currency: WALLET_CURRENCY,
+        status: fullyCoveredByWallet ? "paid" : "open",
+        provider: fullyCoveredByWallet ? "wallet" : "paystack",
+        providerInvoiceId: reference,
+        paidAt: fullyCoveredByWallet ? now : null,
+      });
+    }
 
     // Wallet-only build purchase: no external checkout needed.
     if (fullyCoveredByWallet) {
@@ -184,7 +244,7 @@ export default defineEventHandler(async (event) => {
       purpose,
       planKey: buildKey,
       customerId: customer.id,
-      siteId: body?.siteId ?? null,
+      siteId,
       usdCents,
       walletApplyCents,
       fxRate,

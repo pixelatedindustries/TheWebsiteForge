@@ -170,6 +170,9 @@ watch(
                 v-if="user.photoURL"
                 :src="user.photoURL"
                 :alt="accountName"
+                loading="lazy"
+                decoding="async"
+                referrerpolicy="no-referrer"
                 class="h-full w-full object-cover"
               />
               <span v-else>{{ avatarInitials }}</span>

@@ -23,7 +23,7 @@ export interface EmailContent {
 }
 
 /** Escape user-supplied text before interpolating it into HTML. */
-function esc(value: string | null | undefined): string {
+export function esc(value: string | null | undefined): string {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")

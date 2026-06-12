@@ -12,6 +12,15 @@ const swallow = useState<{
   cover: number;
 }>("blackHoleSwallow", () => ({ active: false, vortex: 0, cover: 0 }));
 
+// Set the first time the visitor clicks "Enter the site". A route middleware
+// (app/middleware/intro.global.ts) reads it on later visits and redirects the
+// base route straight to /home — before this heavy intro page ever mounts.
+const enteredCookie = useCookie<string | null>("twf_entered", {
+  maxAge: 60 * 60 * 24 * 365,
+  path: "/",
+  sameSite: "lax",
+});
+
 // ambient cinematic audio (synthesised; muted by default)
 const hum = useAmbientHum();
 // Cleanup fns collected from inside the async onMounted. Vue lifecycle hooks
@@ -79,12 +88,6 @@ function applyLens(hole: { x: number; y: number }) {
 }
 
 onMounted(async () => {
-  // Returning visitors skip the intro and go straight to /home. The flag is set
-  // the first time they click "Enter the site" (see enter()).
-  if (localStorage.getItem("twf_entered") === "1") {
-    await navigateTo("/home", { replace: true });
-    return;
-  }
   if (!content.value) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const { default: gsap } = await import("gsap");
@@ -212,7 +215,7 @@ onMounted(async () => {
 async function enter() {
   if (entering) return;
   // Remember that the visitor has entered, so future visits skip the intro.
-  if (import.meta.client) localStorage.setItem("twf_entered", "1");
+  enteredCookie.value = "1";
   const reduced =
     import.meta.client &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -356,7 +359,7 @@ async function enter() {
         </h1>
 
         <p
-          v-reveal="{ delay: 0.72 }"
+          v-reveal="{ delay: 0.32 }"
           data-grav
           data-chroma
           data-decode
@@ -366,7 +369,7 @@ async function enter() {
         </p>
 
         <button
-          v-reveal="{ delay: 0.88, y: 16 }"
+          v-reveal="{ delay: 0.4, y: 16 }"
           data-grav
           type="button"
           class="btn-gradient intro-enter group mt-9 inline-flex items-center gap-2.5 rounded-full px-7 py-3.5 text-sm font-semibold text-white"

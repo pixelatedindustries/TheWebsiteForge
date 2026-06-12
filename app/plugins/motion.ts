@@ -297,7 +297,6 @@ export default defineNuxtPlugin((nuxtApp) => {
           const c = document.createElement("span");
           c.textContent = ch;
           c.style.display = "inline-block";
-          c.style.willChange = "transform, opacity";
           word.appendChild(c);
           chars.push(c);
         }
@@ -316,6 +315,12 @@ export default defineNuxtPlugin((nuxtApp) => {
         ease: "power4.out",
         stagger: o.stagger ?? 0.022,
         delay: o.delay ?? 0,
+        // Promote chars to their own layer only for the duration of the rise-in,
+        // then release so they don't hold compositor memory (issues.md #9).
+        onStart: () =>
+          chars.forEach((c) => (c.style.willChange = "transform, opacity")),
+        onComplete: () =>
+          chars.forEach((c) => (c.style.willChange = "auto")),
         scrollTrigger:
           o.scroll === false || isInitiallyVisible
             ? undefined

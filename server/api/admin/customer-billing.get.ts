@@ -34,7 +34,8 @@ export default defineEventHandler(async (event) => {
       .select()
       .from(schema.recurringCharges)
       .where(eq(schema.recurringCharges.customerId, customerId))
-      .orderBy(desc(schema.recurringCharges.createdAt)),
+      .orderBy(desc(schema.recurringCharges.createdAt))
+      .limit(100),
     db
       .select()
       .from(schema.walletTransactions)

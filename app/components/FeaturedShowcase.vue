@@ -32,6 +32,8 @@ onMounted(() => {
         if (!sec || !tr) return;
 
         const distance = () => Math.max(0, tr.scrollWidth - window.innerWidth);
+        // Promote to its own layer only while the pinned scroll is active.
+        gsap.set(tr, { willChange: "transform" });
         const tween = gsap.to(tr, {
           x: () => -distance(),
           ease: "none",
@@ -48,7 +50,10 @@ onMounted(() => {
               gsap.set(progress.value, { scaleX: self.progress }),
           },
         });
-        return () => tween.kill();
+        return () => {
+          tween.kill();
+          gsap.set(tr, { willChange: "auto" });
+        };
       },
     );
   };
@@ -66,7 +71,7 @@ onMounted(() => {
     <div class="flex h-full items-center overflow-hidden">
       <div
         ref="track"
-        class="flex h-full items-center gap-10 pr-[10vw] pl-[max(2rem,8vw)] will-change-transform"
+        class="flex h-full items-center gap-10 pr-[10vw] pl-[max(2rem,8vw)]"
       >
         <!-- intro panel -->
         <div class="w-[36vw] shrink-0">

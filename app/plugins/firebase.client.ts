@@ -23,32 +23,41 @@ export default defineNuxtPlugin(() => {
     authStore.setReady(true);
     authStore.setConfigured(false);
   } else {
-    authStore.setConfigured(true);
+    try {
+      authStore.setConfigured(true);
 
-    const app = getApps().length
-      ? getApps()[0]!
-      : initializeApp({
-          apiKey: cfg.apiKey,
-          authDomain: cfg.authDomain,
-          projectId: cfg.projectId,
-          appId: cfg.appId,
-        });
+      const app = getApps().length
+        ? getApps()[0]!
+        : initializeApp({
+            apiKey: cfg.apiKey,
+            authDomain: cfg.authDomain,
+            projectId: cfg.projectId,
+            appId: cfg.appId,
+          });
 
-    firebaseAuth = getAuth(app);
+      firebaseAuth = getAuth(app);
 
-    onIdTokenChanged(firebaseAuth, (u: User | null) => {
-      authStore.setUser(
-        u
-          ? {
-              email: u.email,
-              uid: u.uid,
-              displayName: u.displayName,
-              photoURL: u.photoURL,
-            }
-          : null,
-      );
+      onIdTokenChanged(firebaseAuth, (u: User | null) => {
+        authStore.setUser(
+          u
+            ? {
+                email: u.email,
+                uid: u.uid,
+                displayName: u.displayName,
+                photoURL: u.photoURL,
+              }
+            : null,
+        );
+        authStore.setReady(true);
+      });
+    } catch (err) {
+      // Bad config or SDK failure: degrade gracefully instead of leaving the
+      // auth gate stuck on "loading" forever (issues.md #7).
+      console.error("[firebase] initialization failed:", err);
+      firebaseAuth = null;
+      authStore.setConfigured(false);
       authStore.setReady(true);
-    });
+    }
   }
 
   return { provide: { firebaseAuth } };
