@@ -178,6 +178,29 @@ async function finalizeBuild(
     .set({ status: "paid", paidAt: new Date(), provider: "paystack" })
     .where(eq(schema.invoices.id, invoice.id));
 
+  const [project] = await db
+    .select()
+    .from(schema.projects)
+    .where(eq(schema.projects.invoiceId, invoice.id))
+    .limit(1);
+  if (project?.status === "awaiting_payment") {
+    await db
+      .update(schema.projects)
+      .set({
+        status: "brief_received",
+        progress: 10,
+        latestUpdate: "Payment received. Your brief is ready for review.",
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.projects.id, project.id));
+    await db.insert(schema.projectActivity).values({
+      projectId: project.id,
+      type: "payment",
+      title: "Payment received",
+      details: "The project is ready for studio review.",
+    });
+  }
+
   const [customer] = await db
     .select()
     .from(schema.customers)

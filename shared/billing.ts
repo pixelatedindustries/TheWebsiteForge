@@ -12,8 +12,9 @@
  *    amount before paying.
  *
  * TWO product shapes:
- *  - **One-off builds** (`buildPackages`) — charged normally via Paystack, NOT
- *    the wallet. Recorded as a one-off `invoices` row.
+ *  - **One-off builds** (`buildPackages`) — paid from available wallet credit
+ *    first, with any remainder charged through Paystack. Recorded as a one-off
+ *    `invoices` row.
  *  - **Recurring services** (`recurringServices`) — hosting + database, debited
  *    monthly from the customer's prepaid wallet. Care plans are intentionally
  *    removed; baseline upkeep is bundled into hosting (WebForgePlan2 §3.3).
@@ -44,7 +45,7 @@ export interface BuildPackage {
   blurb: string;
 }
 
-/** Build packages (one-off). Charged via Paystack → ZAR; never from the wallet. */
+/** Build packages (one-off). Wallet credit is applied before Paystack. */
 export const buildPackages: Record<string, BuildPackage> = {
   build_starter: {
     key: "build_starter",

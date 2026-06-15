@@ -410,8 +410,6 @@ onBeforeUnmount(() => {
 .tech-marquee {
   overflow-x: hidden;
   overflow-y: visible;
-  /* monochrome site: logos keep their tonal contrast, lose their hue */
-  filter: grayscale(1);
 }
 
 .tech-chip {
@@ -427,12 +425,15 @@ onBeforeUnmount(() => {
   border-radius: 9999px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   display: inline-flex;
+  filter: grayscale(1);
   gap: 0.65rem;
   padding: 0.55rem 1rem 0.55rem 0.65rem;
   transition:
-    border-color 0.25s ease,
-    background 0.25s ease,
-    transform 0.25s ease;
+    border-color 0.7s ease,
+    background 0.7s ease,
+    filter 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.8s ease;
 }
 
 .tech-chip:hover {
@@ -444,6 +445,10 @@ onBeforeUnmount(() => {
     ),
     rgba(255, 255, 255, 0.07);
   border-color: color-mix(in srgb, var(--tech) 45%, rgba(255, 255, 255, 0.12));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 8px 28px color-mix(in srgb, var(--tech) 18%, transparent);
+  filter: grayscale(0);
   transform: translateY(-2px);
 }
 

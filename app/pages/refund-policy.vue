@@ -7,7 +7,7 @@ useSeoMeta({
 });
 
 const effectiveDate = "6 June 2026";
-const contactEmail = "hello@thewebsiteforge.com";
+const contactEmail = "support@pixelatedindustries.com";
 
 const sections = [
   {
@@ -60,7 +60,15 @@ const sections = [
     ],
   },
   {
-    heading: "8. Your statutory rights",
+    heading: "8. Wallet credits and unused balances",
+    body: [
+      "Wallet top-ups are prepaid service credits, not a bank account or savings product. Credits do not earn interest and can only be used for services supplied by TheWebsiteForge.",
+      "Unused wallet credit may be refunded on request, less any non-refundable payment-provider charges, promotional credit, chargebacks, amounts already due, or services already supplied. We may require identity and payment verification before approving a wallet refund.",
+      "Approved wallet refunds are returned to the original payment method where reasonably possible. Processing times depend on the payment provider.",
+    ],
+  },
+  {
+    heading: "9. Your statutory rights",
     body: [
       "Nothing in this policy limits any rights you have under applicable consumer protection law that cannot be excluded. Where such law gives you a stronger right than this policy, that law applies.",
     ],
@@ -69,45 +77,11 @@ const sections = [
 </script>
 
 <template>
-  <div>
-    <section class="px-4 pt-36 pb-10 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-4xl text-center">
-        <SectionHeading
-          eyebrow="Legal"
-          title="Refund Policy"
-          subtitle="When refunds are and aren't available across builds, hosting, domains, and feature work."
-        />
-        <p class="mt-4 text-sm text-slate-500">Effective {{ effectiveDate }}</p>
-      </div>
-    </section>
-
-    <section class="px-4 pb-24 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-3xl space-y-10">
-        <div
-          v-for="section in sections"
-          :key="section.heading"
-          class="glass gradient-border rounded-2xl p-7"
-        >
-          <h2 class="font-display text-lg font-semibold text-white">
-            {{ section.heading }}
-          </h2>
-          <div class="mt-3 space-y-3">
-            <p
-              v-for="(p, i) in section.body"
-              :key="i"
-              class="text-sm leading-relaxed text-slate-400"
-            >
-              {{ p }}
-            </p>
-          </div>
-        </div>
-
-        <p class="text-center text-xs leading-relaxed text-slate-500">
-          This page is a starting template provided for convenience and is not
-          legal advice. Please have it reviewed by a qualified attorney before
-          relying on it.
-        </p>
-      </div>
-    </section>
-  </div>
+  <LegalDocument
+    title="Refund Policy"
+    subtitle="When refunds are and aren't available across builds, hosting, domains, and feature work."
+    :effective-date="effectiveDate"
+    document-code="TWF / REF / 03"
+    :sections="sections"
+  />
 </template>

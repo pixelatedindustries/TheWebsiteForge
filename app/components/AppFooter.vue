@@ -83,7 +83,7 @@ const columns = [
       <div
         class="mt-14 grid gap-5 border-t border-white/10 pt-6 text-sm text-slate-500 lg:grid-cols-[minmax(0,1fr)_minmax(32rem,1fr)] lg:gap-[clamp(8rem,18vw,22rem)]"
       >
-        <p>© {{ year }} TheWebsiteForge. All rights reserved.</p>
+        <p>© {{ year }} PixelatedIndustries. All rights reserved.</p>
         <div
           class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
         >
@@ -104,12 +104,6 @@ const columns = [
               Refund Policy
             </NuxtLink>
           </nav>
-          <p class="flex shrink-0 items-center gap-2">
-            <span
-              class="inline-block h-2 w-2 animate-pulse-glow rounded-full bg-brand-400"
-            />
-            Nuxt 4 · Tailwind v4
-          </p>
         </div>
       </div>
     </div>

@@ -10,6 +10,7 @@ const accessError = ref<string | null>(null);
 const nav = [
   { label: "Overview", to: "/admin" },
   { label: "Leads", to: "/admin/leads" },
+  { label: "Projects", to: "/admin/projects" },
   { label: "Customers", to: "/admin/customers" },
   { label: "Sites", to: "/admin/sites" },
   { label: "Domains", to: "/admin/domains" },

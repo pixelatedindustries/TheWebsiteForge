@@ -7,7 +7,7 @@ useSeoMeta({
 });
 
 const effectiveDate = "6 June 2026";
-const contactEmail = "hello@thewebsiteforge.com";
+const contactEmail = "support@pixelatedindustries.com";
 
 const sections = [
   {
@@ -36,8 +36,10 @@ const sections = [
     heading: "4. Payment",
     body: [
       "Build and feature work may require a deposit before work begins, with the balance due on completion or as set out in your quote. Recurring services are billed in advance for each billing period.",
-      "Payments are processed by third-party payment providers (such as Stripe, PayFast, Peach Payments, or PayPal). By paying, you also agree to the applicable provider's terms. We do not store full card details ourselves.",
+      "Payments are processed by third-party payment providers such as Paystack. By paying, you also agree to the applicable provider's terms. We do not store full card details ourselves.",
       "If a payment fails or is overdue, we may suspend the affected Services in accordance with Section 7 and our Hosting Agreement.",
+      "You may add prepaid credit to your TheWebsiteForge wallet. Available credit can be applied to website builds, recurring services, domains, and approved change work, with any remaining checkout amount paid through our payment provider.",
+      "Wallet credit is not a bank deposit, does not earn interest, and is subject to the wallet-refund terms in our Refund Policy.",
     ],
   },
   {
@@ -96,45 +98,11 @@ const sections = [
 </script>
 
 <template>
-  <div>
-    <section class="px-4 pt-36 pb-10 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-4xl text-center">
-        <SectionHeading
-          eyebrow="Legal"
-          title="Terms of Service"
-          subtitle="The terms that govern our website design, build, hosting, and related services."
-        />
-        <p class="mt-4 text-sm text-slate-500">Effective {{ effectiveDate }}</p>
-      </div>
-    </section>
-
-    <section class="px-4 pb-24 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-3xl space-y-10">
-        <div
-          v-for="section in sections"
-          :key="section.heading"
-          class="glass gradient-border rounded-2xl p-7"
-        >
-          <h2 class="font-display text-lg font-semibold text-white">
-            {{ section.heading }}
-          </h2>
-          <div class="mt-3 space-y-3">
-            <p
-              v-for="(p, i) in section.body"
-              :key="i"
-              class="text-sm leading-relaxed text-slate-400"
-            >
-              {{ p }}
-            </p>
-          </div>
-        </div>
-
-        <p class="text-center text-xs leading-relaxed text-slate-500">
-          This page is a starting template provided for convenience and is not
-          legal advice. Please have it reviewed by a qualified attorney before
-          relying on it.
-        </p>
-      </div>
-    </section>
-  </div>
+  <LegalDocument
+    title="Terms of Service"
+    subtitle="The terms that govern our website design, build, hosting, and related services."
+    :effective-date="effectiveDate"
+    document-code="TWF / TOS / 01"
+    :sections="sections"
+  />
 </template>

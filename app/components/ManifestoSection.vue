@@ -183,15 +183,12 @@ onMounted(() => {
         class="manifesto-dial pointer-events-none absolute top-1/2 right-[-15vw] z-[1] hidden aspect-square w-[min(62vw,900px)] -translate-y-1/2 rounded-full lg:block"
         aria-hidden="true"
       >
-        <div class="manifesto-dial-ring absolute inset-[8%] rounded-full" />
-        <div class="manifesto-dial-ring absolute inset-[22%] rounded-full" />
-        <span class="manifesto-dial-tick manifesto-dial-tick-a" />
-        <span class="manifesto-dial-tick manifesto-dial-tick-b" />
-        <span class="manifesto-dial-tick manifesto-dial-tick-c" />
-        <div
-          class="absolute inset-[39%] flex items-center justify-center rounded-full border border-white/15 font-mono text-[0.55rem] tracking-[0.35em] text-white/30"
-        >
-          TWF / 01
+        <div class="manifesto-dial-spinner absolute inset-0 rounded-full">
+          <div class="manifesto-dial-ring absolute inset-[8%] rounded-full" />
+          <div class="manifesto-dial-ring absolute inset-[22%] rounded-full" />
+          <span class="manifesto-dial-tick manifesto-dial-tick-a" />
+          <span class="manifesto-dial-tick manifesto-dial-tick-b" />
+          <span class="manifesto-dial-tick manifesto-dial-tick-c" />
         </div>
       </div>
 
@@ -350,6 +347,10 @@ onMounted(() => {
 }
 
 .manifesto-dial {
+  opacity: 0.36;
+}
+
+.manifesto-dial-spinner {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: repeating-conic-gradient(
     from 0deg,
@@ -362,7 +363,14 @@ onMounted(() => {
     #000 46.2% 50%,
     transparent 50.2%
   );
-  opacity: 0.36;
+  animation: manifesto-dial-spin 38s linear infinite;
+  will-change: transform;
+}
+
+@keyframes manifesto-dial-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .manifesto-dial-ring {
@@ -454,6 +462,10 @@ onMounted(() => {
   .manifesto-shutter,
   .manifesto-stage > p {
     display: none;
+  }
+
+  .manifesto-dial-spinner {
+    animation: none;
   }
 }
 </style>

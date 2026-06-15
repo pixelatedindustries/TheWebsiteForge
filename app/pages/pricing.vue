@@ -398,6 +398,66 @@ const comparison = [
       </div>
     </section>
 
+    <section class="border-y border-white/10 px-6 py-20 sm:px-10 lg:px-20">
+      <div
+        class="mx-auto grid max-w-[1600px] gap-12 lg:grid-cols-[0.42fr_1fr] lg:items-end"
+      >
+        <div>
+          <p
+            class="font-mono text-[0.58rem] uppercase tracking-[0.28em] text-white/35"
+          >
+            Credits / 04
+          </p>
+          <h2
+            class="mt-5 font-display text-[clamp(3.5rem,6vw,6rem)] font-medium leading-[0.88] tracking-[-0.075em]"
+          >
+            Fund once.<br />
+            <span class="font-serif font-light italic text-brand-300"
+              >Move faster.</span
+            >
+          </h2>
+        </div>
+        <div class="grid gap-8 md:grid-cols-3">
+          <div class="border-t border-white/12 pt-5">
+            <span class="font-mono text-[0.5rem] tracking-[0.2em] text-white/25"
+              >01</span
+            >
+            <h3 class="mt-4 font-display text-2xl tracking-[-0.05em]">
+              Instant approvals
+            </h3>
+            <p class="mt-3 text-sm leading-relaxed text-white/42">
+              Approved changes, domains, and services can begin without waiting
+              for another bank clearance.
+            </p>
+          </div>
+          <div class="border-t border-white/12 pt-5">
+            <span class="font-mono text-[0.5rem] tracking-[0.2em] text-white/25"
+              >02</span
+            >
+            <h3 class="mt-4 font-display text-2xl tracking-[-0.05em]">
+              Smart checkout
+            </h3>
+            <p class="mt-3 text-sm leading-relaxed text-white/42">
+              Available credit is used first. If it does not cover the full
+              cost, Paystack securely charges only the difference.
+            </p>
+          </div>
+          <div class="border-t border-white/12 pt-5">
+            <span class="font-mono text-[0.5rem] tracking-[0.2em] text-white/25"
+              >03</span
+            >
+            <h3 class="mt-4 font-display text-2xl tracking-[-0.05em]">
+              Clear runway
+            </h3>
+            <p class="mt-3 text-sm leading-relaxed text-white/42">
+              Your dashboard shows monthly burn and estimated runway. Low
+              balances receive a warning and seven-day grace period.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <FaqAccordion />
     <CtaSection
       title="Not sure which one fits?"

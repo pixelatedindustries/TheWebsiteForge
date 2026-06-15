@@ -37,3 +37,59 @@ export interface Site {
   name: string;
   status: string;
 }
+
+export interface ProjectAction {
+  id: string;
+  title: string;
+  details: string | null;
+  status: string;
+  dueAt: string | null;
+}
+
+export interface ProjectFile {
+  id: string;
+  kind: string;
+  name: string;
+  url: string;
+  createdAt: string;
+}
+
+export interface ProjectActivity {
+  id: string;
+  type: string;
+  title: string;
+  details: string | null;
+  createdAt: string;
+}
+
+export interface CustomerProject {
+  id: string;
+  name: string;
+  planKey: string;
+  status: string;
+  progress: number;
+  estimatedLaunchAt: string | null;
+  brief: Record<string, unknown>;
+  customerNotes: string | null;
+  latestUpdate: string | null;
+  actions: ProjectAction[];
+  files: ProjectFile[];
+  activity: ProjectActivity[];
+}
+
+export interface ChangeRequest {
+  id: string;
+  title: string;
+  details: string;
+  status: string;
+  quotedCents: number | null;
+  createdAt: string;
+}
+
+export interface UpcomingCost {
+  id: string;
+  label: string;
+  amountCents: number;
+  dueAt: string;
+  kind: string;
+}

@@ -14,6 +14,7 @@ export interface BuildCheckout {
   email?: string;
   name?: string;
   siteId?: string;
+  briefId?: string;
   useWalletFirst?: boolean;
 }
 
@@ -29,5 +30,6 @@ export interface CheckoutPayload {
   email?: string;
   name?: string;
   siteId?: string;
+  briefId?: string;
   useWalletFirst?: boolean;
 }

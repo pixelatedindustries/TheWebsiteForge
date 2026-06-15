@@ -113,6 +113,26 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  let checkoutBrief: typeof schema.checkoutBriefs.$inferSelect | null = null;
+  if (purpose === "build" && body?.briefId) {
+    const [foundBrief] = await db
+      .select()
+      .from(schema.checkoutBriefs)
+      .where(eq(schema.checkoutBriefs.id, body.briefId))
+      .limit(1);
+    checkoutBrief = foundBrief ?? null;
+    if (
+      !checkoutBrief ||
+      checkoutBrief.email !== email ||
+      checkoutBrief.planKey !== buildKey
+    ) {
+      throw createError({
+        statusCode: 422,
+        statusMessage: "That project brief does not match this checkout.",
+      });
+    }
+  }
+
   // If a siteId is supplied, it must belong to the resolved customer — never
   // trust a client-supplied siteId, or it could be attached to another
   // customer's invoice/wallet debit (horizontal privilege escalation).
@@ -218,6 +238,47 @@ export default defineEventHandler(async (event) => {
         providerInvoiceId: reference,
         paidAt: fullyCoveredByWallet ? now : null,
       });
+    }
+
+    const [invoice] = await db
+      .select()
+      .from(schema.invoices)
+      .where(eq(schema.invoices.providerInvoiceId, reference))
+      .limit(1);
+    if (invoice) {
+      const [project] = await db
+        .insert(schema.projects)
+        .values({
+          customerId: customer.id,
+          invoiceId: invoice.id,
+          siteId,
+          briefId: checkoutBrief?.id ?? null,
+          name: `${label}`,
+          planKey: buildKey ?? "build",
+          status: fullyCoveredByWallet ? "brief_received" : "awaiting_payment",
+          progress: fullyCoveredByWallet ? 10 : 5,
+          brief: checkoutBrief?.answers ?? {},
+          latestUpdate: fullyCoveredByWallet
+            ? "Payment received. Your brief is ready for review."
+            : "Your brief is saved. Complete payment to start the project.",
+        })
+        .onConflictDoNothing()
+        .returning({ id: schema.projects.id });
+
+      if (project) {
+        await db.insert(schema.projectActivity).values({
+          projectId: project.id,
+          type: "brief",
+          title: "Project brief submitted",
+          details: `${label} selected`,
+        });
+      }
+      if (checkoutBrief) {
+        await db
+          .update(schema.checkoutBriefs)
+          .set({ claimedAt: now })
+          .where(eq(schema.checkoutBriefs.id, checkoutBrief.id));
+      }
     }
 
     // Wallet-only build purchase: no external checkout needed.

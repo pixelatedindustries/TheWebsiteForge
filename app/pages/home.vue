@@ -4,6 +4,27 @@ useSeoMeta({
   description:
     "Premium, fast, beautifully animated websites we build and sell. Browse the showcase, see the proof, and pick a plan.",
 });
+
+const services = [
+  "Website Hosting",
+  "Domain Management",
+  "Website Creation",
+  "Digital Strategy",
+];
+const activeService = ref(0);
+let serviceTimer: ReturnType<typeof setInterval> | null = null;
+
+onMounted(() => {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  serviceTimer = setInterval(() => {
+    activeService.value = (activeService.value + 1) % services.length;
+  }, 2400);
+});
+
+onBeforeUnmount(() => {
+  if (serviceTimer) clearInterval(serviceTimer);
+});
 </script>
 
 <template>
@@ -62,10 +83,43 @@ useSeoMeta({
             v-reveal="{ delay: 0.85, duration: 1.4 }"
             class="mt-14 flex flex-col gap-10 sm:flex-row sm:items-end sm:justify-between"
           >
-            <p class="max-w-md text-lg leading-relaxed text-slate-400">
-              Refined, blisteringly fast websites — designed, animated, and
-              sold. Quiet power, beautifully made.
-            </p>
+            <div
+              class="service-shuffle max-w-xl"
+              aria-label="Our services: Website Hosting, Domain Management, Website Creation, Digital Strategy"
+            >
+              <span
+                class="font-mono text-[0.62rem] uppercase tracking-[0.3em] text-slate-500"
+              >
+                What we do
+              </span>
+              <div class="mt-3 flex items-baseline gap-4 overflow-hidden">
+                <span
+                  class="w-7 shrink-0 font-mono text-[0.62rem] tracking-[0.2em] text-slate-600"
+                >
+                  {{ String(activeService + 1).padStart(2, "0") }}
+                </span>
+                <Transition name="service-shuffle" mode="out-in">
+                  <p
+                    :key="services[activeService]"
+                    class="font-display text-[clamp(1.65rem,3vw,2.8rem)] font-medium leading-none tracking-[-0.045em] text-slate-300"
+                  >
+                    {{ services[activeService] }}
+                  </p>
+                </Transition>
+              </div>
+              <div class="mt-4 flex gap-1.5 pl-11" aria-hidden="true">
+                <span
+                  v-for="(_, index) in services"
+                  :key="index"
+                  class="h-px transition-all duration-700"
+                  :class="
+                    index === activeService
+                      ? 'w-8 bg-slate-300'
+                      : 'w-3 bg-slate-700'
+                  "
+                />
+              </div>
+            </div>
             <div class="flex shrink-0 items-center gap-3">
               <NuxtLink
                 to="/showcase"
@@ -132,5 +186,36 @@ useSeoMeta({
       transparent 55%,
       rgba(0, 0, 0, 0.55) 100%
     );
+}
+
+.service-shuffle {
+  min-height: 6.5rem;
+}
+
+.service-shuffle-enter-active,
+.service-shuffle-leave-active {
+  transition:
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.45s ease,
+    filter 0.65s ease;
+}
+
+.service-shuffle-enter-from {
+  transform: translateY(115%);
+  opacity: 0;
+  filter: blur(8px);
+}
+
+.service-shuffle-leave-to {
+  transform: translateY(-115%);
+  opacity: 0;
+  filter: blur(8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-shuffle-enter-active,
+  .service-shuffle-leave-active {
+    transition: none;
+  }
 }
 </style>

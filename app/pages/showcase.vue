@@ -89,65 +89,98 @@ const priceLabel = (price: number) =>
             class="showcase-project group"
             :class="index % 5 === 0 ? 'showcase-project-wide' : ''"
           >
-            <div
-              class="project-art relative overflow-hidden rounded-[1.5rem] border border-white/10"
-              :style="`--project-index:${index}`"
-            >
-              <ProjectCover
-                :project="project"
-                class="absolute inset-0 h-full w-full scale-[1.04] transition-transform duration-1000 ease-[cubic-bezier(.22,1,.36,1)] group-hover:scale-[1.1]"
-              />
-              <div class="project-art-grid absolute inset-0" />
+            <div class="project-visuals">
               <div
-                class="project-art-ring absolute rounded-full border border-white/20"
-              />
-              <div
-                class="project-art-frame absolute inset-[8%] rounded-xl border border-white/15"
+                class="project-art relative overflow-hidden rounded-[1.5rem] border border-white/10"
+                :style="`--project-index:${index}`"
               >
+                <ProjectCover
+                  :project="project"
+                  class="absolute inset-0 h-full w-full scale-[1.04] transition-transform duration-1000 ease-[cubic-bezier(.22,1,.36,1)] group-hover:scale-[1.1]"
+                />
+                <div class="project-art-grid absolute inset-0" />
                 <div
-                  class="absolute inset-x-0 top-0 flex h-8 items-center justify-between border-b border-white/10 px-3"
+                  class="project-art-ring absolute rounded-full border border-white/20"
+                />
+                <div
+                  class="project-art-frame absolute inset-[8%] rounded-xl border border-white/15"
                 >
-                  <span class="flex gap-1">
-                    <i
-                      v-for="dot in 3"
-                      :key="dot"
-                      class="h-1 w-1 rounded-full bg-white/35"
-                    />
-                  </span>
+                  <div
+                    class="absolute inset-x-0 top-0 flex h-8 items-center justify-between border-b border-white/10 px-3"
+                  >
+                    <span class="flex gap-1">
+                      <i
+                        v-for="dot in 3"
+                        :key="dot"
+                        class="h-1 w-1 rounded-full bg-white/35"
+                      />
+                    </span>
+                    <span
+                      class="font-mono text-[0.42rem] uppercase tracking-[0.18em] text-white/40"
+                      >{{ project.id }}.com</span
+                    >
+                  </div>
+                </div>
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-[#0e0d0c]/80 via-transparent to-transparent"
+                />
+                <div
+                  class="absolute inset-x-0 top-0 flex items-center justify-between p-5 font-mono text-[0.52rem] uppercase tracking-[0.25em] text-white/65"
+                >
+                  <span>{{ String(index + 1).padStart(2, "0") }}</span>
+                  <span>{{ project.status }}</span>
+                </div>
+                <div
+                  class="absolute right-0 bottom-0 left-0 flex items-end justify-between gap-5 p-6"
+                >
+                  <div>
+                    <p
+                      class="font-display text-[clamp(2rem,4vw,4.6rem)] font-medium leading-[0.9] tracking-[-0.065em]"
+                    >
+                      {{ project.name }}
+                    </p>
+                    <p
+                      class="mt-2 font-mono text-[0.52rem] uppercase tracking-[0.2em] text-white/45"
+                    >
+                      {{ project.category }} / {{ project.year }}
+                    </p>
+                  </div>
                   <span
-                    class="font-mono text-[0.42rem] uppercase tracking-[0.18em] text-white/40"
-                    >{{ project.id }}.com</span
+                    class="project-arrow grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/20 bg-black/10 text-lg backdrop-blur-md"
+                    >↗</span
                   >
                 </div>
               </div>
-              <div
-                class="absolute inset-0 bg-gradient-to-t from-[#0e0d0c]/80 via-transparent to-transparent"
-              />
-              <div
-                class="absolute inset-x-0 top-0 flex items-center justify-between p-5 font-mono text-[0.52rem] uppercase tracking-[0.25em] text-white/65"
-              >
-                <span>{{ String(index + 1).padStart(2, "0") }}</span>
-                <span>{{ project.status }}</span>
-              </div>
-              <div
-                class="absolute right-0 bottom-0 left-0 flex items-end justify-between gap-5 p-6"
-              >
-                <div>
-                  <p
-                    class="font-display text-[clamp(2rem,4vw,4.6rem)] font-medium leading-[0.9] tracking-[-0.065em]"
-                  >
-                    {{ project.name }}
-                  </p>
-                  <p
-                    class="mt-2 font-mono text-[0.52rem] uppercase tracking-[0.2em] text-white/45"
-                  >
-                    {{ project.category }} / {{ project.year }}
-                  </p>
+              <div class="project-mobile" aria-hidden="true">
+                <div class="project-mobile-shell">
+                  <div class="project-mobile-screen">
+                    <div
+                      class="project-mobile-wash"
+                      :style="{
+                        background: `linear-gradient(145deg, ${project.gradient[0]}, ${project.gradient[1]})`,
+                      }"
+                    />
+                    <div class="project-mobile-status">
+                      <span>9:41</span>
+                      <i />
+                    </div>
+                    <div class="project-mobile-nav">
+                      <span>{{ project.name.slice(0, 1) }}</span>
+                      <i />
+                    </div>
+                    <div class="project-mobile-content">
+                      <small>{{ project.category }}</small>
+                      <strong>{{ project.name }}</strong>
+                      <span />
+                      <span />
+                      <div>
+                        <i />
+                        <i />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <span
-                  class="project-arrow grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/20 bg-black/10 text-lg backdrop-blur-md"
-                  >↗</span
-                >
+                <span class="project-mobile-label">Mobile / responsive</span>
               </div>
             </div>
 
@@ -240,6 +273,17 @@ const priceLabel = (price: number) =>
   grid-column: span 2;
 }
 
+.project-visuals {
+  display: grid;
+  align-items: stretch;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) minmax(7rem, 24%);
+}
+
+.showcase-project-wide .project-visuals {
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, 18%);
+}
+
 .project-art {
   aspect-ratio: 4 / 3;
   background: #242321;
@@ -273,6 +317,187 @@ const priceLabel = (price: number) =>
   transform: translate(-1rem, 0.5rem) rotate(16deg);
 }
 
+.project-mobile {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: clamp(0.75rem, 2vw, 1.75rem);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(255, 255, 255, 0.08),
+      transparent 48%
+    ),
+    #171614;
+  transform: translateY(0);
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.project-mobile-shell {
+  width: min(100%, 10rem);
+  padding: 0.28rem;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 1.35rem;
+  background: rgba(8, 8, 8, 0.88);
+  box-shadow:
+    0 2rem 4rem rgba(0, 0, 0, 0.48),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+.project-mobile-screen {
+  position: relative;
+  aspect-ratio: 9 / 18.5;
+  overflow: hidden;
+  border-radius: 1.05rem;
+  background: #111;
+}
+
+.project-mobile-wash {
+  position: absolute;
+  inset: 0;
+  opacity: 0.78;
+}
+
+.project-mobile-wash::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.72));
+  content: "";
+}
+
+.project-mobile-status,
+.project-mobile-nav,
+.project-mobile-content {
+  position: relative;
+  z-index: 1;
+}
+
+.project-mobile-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.65rem 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.32rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.project-mobile-status i {
+  width: 0.85rem;
+  height: 0.2rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.project-mobile-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.35rem 0.55rem 0;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.project-mobile-nav span {
+  display: grid;
+  width: 1rem;
+  height: 1rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  font-size: 0.4rem;
+}
+
+.project-mobile-nav i,
+.project-mobile-nav i::before,
+.project-mobile-nav i::after {
+  display: block;
+  width: 0.9rem;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.66);
+  content: "";
+}
+
+.project-mobile-nav i::before {
+  transform: translateY(-0.22rem);
+}
+
+.project-mobile-nav i::after {
+  transform: translateY(0.18rem);
+}
+
+.project-mobile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+  padding: 1.1rem 0.65rem 0;
+}
+
+.project-mobile-content small {
+  font-family: var(--font-mono);
+  font-size: 0.28rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.project-mobile-content strong {
+  max-width: 80%;
+  font-family: var(--font-display);
+  font-size: clamp(0.65rem, 1.25vw, 1.15rem);
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+}
+
+.project-mobile-content > span {
+  width: 80%;
+  height: 0.18rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.project-mobile-content > span + span {
+  width: 58%;
+}
+
+.project-mobile-content div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+}
+
+.project-mobile-content div i {
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.3rem;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.project-mobile-label {
+  display: block;
+  margin-top: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.35rem;
+  letter-spacing: 0.18em;
+  text-align: center;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.showcase-project:hover .project-mobile {
+  transform: translateY(-0.6rem);
+}
+
 .project-arrow {
   transition:
     background-color 300ms ease,
@@ -298,6 +523,19 @@ const priceLabel = (price: number) =>
   .showcase-project-wide .project-art,
   .project-art {
     aspect-ratio: 4 / 5;
+  }
+
+  .project-visuals,
+  .showcase-project-wide .project-visuals {
+    grid-template-columns: 1fr;
+  }
+
+  .project-mobile {
+    min-height: 20rem;
+  }
+
+  .project-mobile-shell {
+    width: min(42%, 8rem);
   }
 }
 </style>

@@ -13,6 +13,7 @@ import {
   timestamp,
   date,
   serial,
+  jsonb,
   index,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
@@ -91,6 +92,25 @@ export const changeRequestStatus = pgEnum("change_request_status", [
   "done",
   "declined",
 ]);
+export const projectStatus = pgEnum("project_status", [
+  "awaiting_payment",
+  "brief_received",
+  "design",
+  "build",
+  "review",
+  "launch",
+  "live",
+  "paused",
+  "canceled",
+]);
+export const projectActionStatus = pgEnum("project_action_status", [
+  "open",
+  "completed",
+]);
+export const projectFileKind = pgEnum("project_file_kind", [
+  "customer_upload",
+  "deliverable",
+]);
 
 /* ----------------------------- tables ---------------------------- */
 
@@ -131,6 +151,22 @@ export const leads = pgTable(
       .notNull(),
   },
   (t) => [index("leads_customer_id_idx").on(t.customerId)],
+);
+
+/** Brief captured before authentication and claimed by checkout. */
+export const checkoutBriefs = pgTable(
+  "checkout_briefs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: text("email").notNull(),
+    planKey: text("plan_key").notNull(),
+    answers: jsonb("answers").$type<Record<string, unknown>>().notNull(),
+    claimedAt: timestamp("claimed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("checkout_briefs_email_idx").on(t.email)],
 );
 
 export const sites = pgTable(
@@ -245,6 +281,98 @@ export const invoices = pgTable(
     index("invoices_customer_id_idx").on(t.customerId),
     index("invoices_provider_invoice_id_idx").on(t.providerInvoiceId),
   ],
+);
+
+export const projects = pgTable(
+  "projects",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    customerId: uuid("customer_id")
+      .notNull()
+      .references(() => customers.id, { onDelete: "cascade" }),
+    invoiceId: uuid("invoice_id").references(() => invoices.id, {
+      onDelete: "set null",
+    }),
+    siteId: uuid("site_id").references(() => sites.id, {
+      onDelete: "set null",
+    }),
+    briefId: uuid("brief_id").references(() => checkoutBriefs.id, {
+      onDelete: "set null",
+    }),
+    name: text("name").notNull(),
+    planKey: text("plan_key").notNull(),
+    status: projectStatus("status").default("awaiting_payment").notNull(),
+    progress: integer("progress").default(5).notNull(),
+    estimatedLaunchAt: date("estimated_launch_at"),
+    brief: jsonb("brief").$type<Record<string, unknown>>().notNull(),
+    customerNotes: text("customer_notes"),
+    latestUpdate: text("latest_update"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("projects_customer_id_idx").on(t.customerId),
+    uniqueIndex("projects_invoice_id_uq")
+      .on(t.invoiceId)
+      .where(sql`${t.invoiceId} is not null`),
+  ],
+);
+
+export const projectActions = pgTable(
+  "project_actions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    details: text("details"),
+    status: projectActionStatus("status").default("open").notNull(),
+    dueAt: date("due_at"),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("project_actions_project_id_idx").on(t.projectId)],
+);
+
+export const projectFiles = pgTable(
+  "project_files",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    kind: projectFileKind("kind").notNull(),
+    name: text("name").notNull(),
+    url: text("url").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("project_files_project_id_idx").on(t.projectId)],
+);
+
+export const projectActivity = pgTable(
+  "project_activity",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    title: text("title").notNull(),
+    details: text("details"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("project_activity_project_id_idx").on(t.projectId)],
 );
 
 /**
@@ -390,6 +518,11 @@ export type Customer = typeof customers.$inferSelect;
 export type NewCustomer = typeof customers.$inferInsert;
 export type Lead = typeof leads.$inferSelect;
 export type NewLead = typeof leads.$inferInsert;
+export type CheckoutBrief = typeof checkoutBriefs.$inferSelect;
+export type Project = typeof projects.$inferSelect;
+export type ProjectAction = typeof projectActions.$inferSelect;
+export type ProjectFile = typeof projectFiles.$inferSelect;
+export type ProjectActivity = typeof projectActivity.$inferSelect;
 export type Site = typeof sites.$inferSelect;
 export type NewSite = typeof sites.$inferInsert;
 export type Domain = typeof domains.$inferSelect;

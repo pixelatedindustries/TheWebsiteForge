@@ -243,24 +243,60 @@ const metricKind = (index: number) =>
           Measured in launches, speed, commercial impact, and reach. These are
           the numbers behind the polish.
         </p>
+        <div class="stats-console mt-14 hidden lg:block">
+          <div class="stats-console-head">
+            <span>Studio telemetry</span>
+            <span class="stats-console-status">Live</span>
+          </div>
+          <div class="stats-console-wave" aria-hidden="true">
+            <span
+              v-for="bar in 24"
+              :key="bar"
+              :style="{
+                '--bar': bar,
+                height: `${18 + (bar % 7) * 8}%`,
+              }"
+            />
+          </div>
+          <div class="stats-console-foot">
+            <span>04 records</span>
+            <span>Verified output</span>
+          </div>
+        </div>
         <div
-          class="mt-16 hidden items-center gap-4 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-slate-600 lg:flex"
+          class="mt-10 hidden items-center gap-4 font-mono text-[0.6rem] uppercase tracking-[0.3em] text-slate-600 lg:flex"
         >
           <span class="inline-block h-2 w-2 rounded-full bg-[#d4cfc4]" />
           Live studio record
         </div>
       </div>
 
-      <ol class="grid border-b border-white/[0.1] sm:grid-cols-2">
+      <ol class="stats-records grid gap-3 sm:grid-cols-2">
         <li
           v-for="(stat, index) in items"
           :key="stat.label"
-          class="stat-card group relative min-h-[20rem] overflow-hidden border-t border-white/[0.1] p-7 sm:min-h-[24rem] sm:p-9"
-          :class="index % 2 === 1 ? 'sm:border-l' : ''"
+          class="stat-card group relative min-h-[20rem] overflow-hidden rounded-[1.5rem] border border-white/[0.1] p-7 sm:min-h-[25rem] sm:p-9"
         >
           <div
             class="stat-sheen pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
           />
+          <div class="stat-scan pointer-events-none absolute inset-x-0 top-0 h-px" />
+          <span
+            class="stat-ghost pointer-events-none absolute -right-[0.04em] -bottom-[0.18em] select-none font-display text-[clamp(12rem,22vw,22rem)] font-medium leading-none tracking-[-0.12em]"
+            aria-hidden="true"
+          >
+            {{ String(index + 1).padStart(2, "0") }}
+          </span>
+          <svg
+            class="stat-orbit pointer-events-none absolute top-1/2 left-1/2 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2"
+            viewBox="0 0 300 300"
+            fill="none"
+            aria-hidden="true"
+          >
+            <circle cx="150" cy="150" r="104" />
+            <circle cx="150" cy="150" r="74" stroke-dasharray="2 9" />
+            <circle class="stat-orbit-node" cx="150" cy="46" r="3.5" />
+          </svg>
 
           <div class="relative flex h-full flex-col justify-between">
             <div
@@ -272,7 +308,7 @@ const metricKind = (index: number) =>
 
             <div class="mt-20">
               <span
-                class="stat-value block font-display text-[clamp(4.75rem,10vw,10rem)] font-medium leading-[0.78] tracking-[-0.075em] text-[#ece9e2] transition-transform duration-700 ease-out group-hover:-translate-y-2"
+                class="stat-value block font-display text-[clamp(4.75rem,10vw,10rem)] font-medium leading-[0.78] tracking-[-0.075em] text-[#ece9e2]"
                 :data-value="stat.value"
               >
                 {{ stat.value }}
@@ -326,11 +362,168 @@ const metricKind = (index: number) =>
 }
 
 .stat-sheen {
-  background: radial-gradient(
-    circle at 25% 70%,
-    rgba(236, 233, 226, 0.08),
-    transparent 58%
-  );
+  background:
+    radial-gradient(
+      circle at 25% 70%,
+      rgba(236, 233, 226, 0.11),
+      transparent 58%
+    ),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035), transparent 60%);
+}
+
+.stats-console {
+  width: min(100%, 23rem);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.018);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.stats-console-head,
+.stats-console-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem;
+  color: rgba(148, 163, 184, 0.5);
+  font-family: monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.stats-console-head {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.stats-console-foot {
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.stats-console-status {
+  color: rgba(236, 233, 226, 0.7);
+}
+
+.stats-console-status::before {
+  display: inline-block;
+  width: 0.35rem;
+  height: 0.35rem;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  background: #ece9e2;
+  box-shadow: 0 0 0 5px rgba(236, 233, 226, 0.06);
+  content: "";
+}
+
+.stats-console-wave {
+  display: flex;
+  height: 5.5rem;
+  align-items: center;
+  gap: 0.26rem;
+  padding: 0 1rem;
+}
+
+.stats-console-wave span {
+  width: 2px;
+  background: linear-gradient(to top, rgba(236, 233, 226, 0.12), rgba(236, 233, 226, 0.72));
+  transform-origin: center;
+  animation: stats-wave 2.8s ease-in-out infinite alternate;
+  animation-delay: calc(var(--bar) * -90ms);
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.012);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+  transition:
+    border-color 1s ease,
+    background-color 1s ease,
+    transform 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 1.2s ease;
+}
+
+.stat-card:hover {
+  z-index: 2;
+  border-color: rgba(236, 233, 226, 0.24);
+  background-color: rgba(255, 255, 255, 0.026);
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.24);
+  transform: translateY(-0.45rem);
+}
+
+.stat-ghost {
+  color: rgba(255, 255, 255, 0.018);
+  transition:
+    color 1.4s ease,
+    transform 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stat-card:hover .stat-ghost {
+  color: rgba(255, 255, 255, 0.04);
+  transform: translate(-0.03em, -0.03em);
+}
+
+.stat-orbit {
+  stroke: rgba(236, 233, 226, 0.08);
+  stroke-width: 0.7;
+  transform-origin: center;
+  transition:
+    stroke 1.4s ease,
+    transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stat-orbit-node {
+  fill: rgba(236, 233, 226, 0.65);
+  stroke: none;
+}
+
+.stat-card:hover .stat-orbit {
+  stroke: rgba(236, 233, 226, 0.16);
+  transform: translate(-50%, -50%) rotate(22deg) scale(1.05);
+}
+
+.stat-value {
+  position: relative;
+  z-index: 1;
+  transition:
+    transform 1.4s cubic-bezier(0.16, 1, 0.3, 1),
+    text-shadow 1.4s ease;
+}
+
+.stat-card:hover .stat-value {
+  text-shadow: 0 18px 70px rgba(236, 233, 226, 0.09);
+  transform: translateY(-0.35rem);
+}
+
+.stat-scan {
+  z-index: 3;
+  background: linear-gradient(90deg, transparent, rgba(236, 233, 226, 0.38), transparent);
+  opacity: 0;
+  transform: translateY(0);
+}
+
+.stat-card:hover .stat-scan {
+  animation: stat-scan 2.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes stats-wave {
+  to {
+    transform: scaleY(0.35);
+    opacity: 0.35;
+  }
+}
+
+@keyframes stat-scan {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  20% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(25rem);
+  }
 }
 
 /* the JS aperture doesn't run under reduced motion — collapse the tall shell,
@@ -352,6 +545,15 @@ const metricKind = (index: number) =>
   .aperture-top,
   .aperture-bottom {
     display: none;
+  }
+
+  .stats-console-wave span,
+  .stat-card:hover .stat-scan {
+    animation: none;
+  }
+
+  .stat-card:hover {
+    transform: none;
   }
 }
 </style>

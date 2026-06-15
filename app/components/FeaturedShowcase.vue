@@ -13,14 +13,6 @@ const progress = ref<HTMLElement | null>(null);
 let mounted = false;
 let mm: gsap.MatchMedia | null = null;
 
-// cover = screenshot if we have one (gradient layered underneath as a fallback
-// if the image is missing), otherwise just the gradient
-const coverStyle = (p: (typeof projects)[number]) => ({
-  backgroundImage: p.image
-    ? `url("${p.image}"), linear-gradient(135deg, ${p.gradient[0]}, ${p.gradient[1]})`
-    : `linear-gradient(135deg, ${p.gradient[0]}, ${p.gradient[1]})`,
-});
-
 const isExternal = (url?: string) => !!url && /^https?:\/\//.test(url);
 const linkAttrs = (url?: string) =>
   isExternal(url)
@@ -65,29 +57,15 @@ onMounted(() => {
         });
 
         const skewTo = gsap.quickTo(tr, "skewX", {
-          duration: 0.5,
-          ease: "power3",
+          duration: 1.1,
+          ease: "power3.out",
         });
         const skewTick = () =>
-          skewTo(gsap.utils.clamp(-12, 12, scrollVelocity() * 0.3));
+          skewTo(gsap.utils.clamp(-5, 5, scrollVelocity() * 0.12));
         gsap.ticker.add(skewTick);
-
-        const imgs = gsap.utils.toArray<HTMLElement>(".work-img", tr);
-        const parTick = () => {
-          const vw = window.innerWidth || 1;
-          for (const img of imgs) {
-            const frame = img.parentElement;
-            if (!frame) continue;
-            const r = frame.getBoundingClientRect();
-            const off = (r.left + r.width / 2 - vw / 2) / vw;
-            gsap.set(img, { xPercent: gsap.utils.clamp(-10, 10, off * -12) });
-          }
-        };
-        gsap.ticker.add(parTick);
 
         return () => {
           gsap.ticker.remove(skewTick);
-          gsap.ticker.remove(parTick);
           tween.kill();
           gsap.set(tr, { willChange: "auto", skewX: 0 });
         };
@@ -149,17 +127,15 @@ onMounted(() => {
           v-bind="linkAttrs(project.url)"
           class="work-frame group relative block h-[68vh] w-[44vw] shrink-0 overflow-hidden rounded-[1.75rem] border border-white/10"
         >
-          <div
-            class="work-img absolute inset-y-0 -left-[15%] w-[130%] bg-cover bg-center grayscale transition-[filter] duration-700 ease-out group-hover:grayscale-0"
-            :style="coverStyle(project)"
-          />
+          <ProjectIdentityVisual :name="project.name" :index="i" />
           <div
             class="absolute inset-0 flex flex-col justify-between p-10"
             style="
               background: linear-gradient(
                 to top,
-                rgba(14, 13, 12, 0.78),
-                transparent 58%
+                rgba(14, 13, 12, 0.72),
+                transparent 32%,
+                rgba(14, 13, 12, 0.2)
               );
             "
           >
@@ -184,17 +160,17 @@ onMounted(() => {
                 </svg>
               </span>
             </div>
-            <div>
-              <h3
-                class="font-serif text-[clamp(1.75rem,3vw,3rem)] font-light leading-[1.05] tracking-[-0.01em] text-[#ece9e2]"
-              >
-                {{ project.name }}
-              </h3>
+            <div class="flex items-end justify-between gap-6">
               <p
-                class="mt-3 font-mono text-xs uppercase tracking-[0.25em] text-slate-400"
+                class="font-mono text-xs uppercase tracking-[0.25em] text-slate-400"
               >
                 {{ project.metric }} — {{ project.metricLabel }}
               </p>
+              <span
+                class="work-open-label font-mono text-[0.55rem] uppercase tracking-[0.28em] text-white/35"
+              >
+                Open project
+              </span>
             </div>
           </div>
         </a>
@@ -227,19 +203,17 @@ onMounted(() => {
         v-for="(project, i) in featured"
         :key="project.id"
         v-bind="linkAttrs(project.url)"
-        class="m-frame relative block aspect-[4/5] w-full overflow-hidden rounded-3xl border border-white/10"
+        class="m-frame group relative block aspect-[4/5] w-full overflow-hidden rounded-3xl border border-white/10"
       >
-        <div
-          class="absolute inset-0 bg-cover bg-center grayscale"
-          :style="coverStyle(project)"
-        />
+        <ProjectIdentityVisual :name="project.name" :index="i" />
         <div
           class="absolute inset-0 flex flex-col justify-between p-7"
           style="
             background: linear-gradient(
               to top,
-              rgba(14, 13, 12, 0.78),
-              transparent 58%
+              rgba(14, 13, 12, 0.72),
+              transparent 38%,
+              rgba(14, 13, 12, 0.2)
             );
           "
         >
@@ -263,13 +237,62 @@ onMounted(() => {
               </svg>
             </span>
           </div>
-          <h3
-            class="font-serif text-4xl font-light leading-[1.05] tracking-tight text-[#ece9e2]"
+          <p
+            class="font-mono text-[0.62rem] uppercase tracking-[0.24em] text-slate-400"
           >
-            {{ project.name }}
-          </h3>
+            {{ project.metric }} — {{ project.metricLabel }}
+          </p>
         </div>
       </a>
     </div>
   </section>
 </template>
+
+<style scoped>
+.work-frame,
+.m-frame {
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0);
+  transition:
+    transform 1.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 1.2s ease,
+    box-shadow 1.8s ease;
+}
+
+.work-frame > div:last-child,
+.m-frame > div:last-child {
+  transition: background-color 1.5s ease;
+}
+
+.work-frame:hover,
+.m-frame:hover {
+  transform: translateY(-0.45rem);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 36px 100px rgba(0, 0, 0, 0.34);
+}
+
+.work-open-label {
+  opacity: 0.55;
+  transform: translateY(0.35rem);
+  transition:
+    opacity 1.2s ease 0.12s,
+    transform 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.12s;
+}
+
+.work-frame:hover .work-open-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-frame,
+  .m-frame,
+  .work-open-label {
+    transition: none;
+  }
+
+  .work-frame:hover,
+  .m-frame:hover {
+    transform: none;
+  }
+}
+</style>

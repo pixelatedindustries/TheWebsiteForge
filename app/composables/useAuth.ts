@@ -18,7 +18,17 @@ export function useAuth() {
       await import("firebase/auth");
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
-    await signInWithPopup($firebaseAuth, provider);
+    const credential = await signInWithPopup($firebaseAuth, provider);
+    const signedInUser = credential.user;
+
+    // Keep flows triggered by the sign-in click moving immediately instead of
+    // waiting for the global auth listener to publish the same user.
+    authStore.setUser({
+      email: signedInUser.email,
+      uid: signedInUser.uid,
+      displayName: signedInUser.displayName,
+      photoURL: signedInUser.photoURL,
+    });
   }
 
   async function signOut(): Promise<void> {
