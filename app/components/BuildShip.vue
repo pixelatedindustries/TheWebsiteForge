@@ -1011,6 +1011,10 @@ onBeforeUnmount(() => kill?.());
 </template>
 
 <style scoped>
+/* monochrome site: the illustration keeps its tonal contrast, loses its hue */
+.build-ship {
+  filter: grayscale(1);
+}
 .build-ship svg {
   display: block;
   width: 100%;

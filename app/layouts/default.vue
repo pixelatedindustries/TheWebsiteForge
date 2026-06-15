@@ -32,20 +32,12 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="relative flex min-h-screen flex-col">
-    <!-- aurora is the /home backdrop; on the intro the black hole owns the canvas -->
-    <AuroraBackground v-if="!isIntro" />
+    <!-- premium ambient background — soft glowing lights behind frosted glass
+         (pure CSS, replaces the WebGL orb / aurora) -->
+    <AmbientGlow />
 
-    <!-- intro background: gravitationally-lensed black hole (vortex on Enter).
-         Solid dark bg so the container instantly covers everything from first
-         paint, even before Three.js finishes loading the canvas. -->
-    <ClientOnly>
-      <div
-        v-if="isIntro"
-        class="black-hole pointer-events-none fixed inset-0 z-0"
-      >
-        <BlackHole />
-      </div>
-    </ClientOnly>
+    <!-- ultra-fine film grain over the entire screen -->
+    <div class="grain-fixed" aria-hidden="true" />
 
     <ScrollProgress v-if="!isIntro" />
 
@@ -59,40 +51,16 @@ onBeforeUnmount(() => {
 
     <AppFooter v-if="!isIntro" />
 
-    <!-- black bridge: the vortex drains to black; this seals the blackness and
-         hides the page swap, then fades to reveal the settled /home -->
+    <!-- soft bridge: seals the screen and fades to reveal /home on Enter -->
     <div
       class="pointer-events-none fixed inset-0 z-80"
-      :style="{ opacity: swallow.cover, background: '#04070d' }"
+      :style="{ opacity: swallow.cover, background: '#0e0d0c' }"
       aria-hidden="true"
     />
   </div>
 </template>
 
 <style scoped>
-/* intro: an instant, painted-on poster of the black hole so the page looks
-   complete from the very first paint — long before the three.js bundle has even
-   downloaded. The radial glow + dark core sit where the shader draws the orb
-   (right-of-centre). Once the WebGL canvas mounts it fades in over the top of
-   this (see BlackHole.vue), so there's no blank/dark loading gap. */
-.black-hole {
-  background:
-    radial-gradient(
-      42vmax 42vmax at 70% 50%,
-      rgba(20, 90, 165, 0.3) 0%,
-      rgba(12, 52, 110, 0.16) 26%,
-      rgba(6, 20, 48, 0.06) 46%,
-      transparent 62%
-    ),
-    radial-gradient(
-      11vmax 11vmax at 70% 50%,
-      rgba(2, 4, 9, 0.92) 0%,
-      rgba(2, 4, 9, 0.55) 45%,
-      transparent 72%
-    ),
-    #04070d;
-}
-
 .chrome-enter-active {
   transition:
     opacity 0.5s ease 0.35s,

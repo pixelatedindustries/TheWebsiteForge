@@ -2,7 +2,7 @@
 /**
  * Full-screen flowing aurora — a domain-warped fbm-noise shader that animates
  * continuously, drifts toward the cursor, and shifts its palette with scroll
- * (green→cyan→indigo). Rendered at reduced resolution (it's soft, so it's cheap)
+ * (monochrome: gray→silver). Rendered at reduced resolution (it's soft, so it's cheap)
  * and pauses when the tab is hidden. Static first frame under reduced-motion.
  */
 const host = ref<HTMLDivElement | null>(null);
@@ -81,11 +81,11 @@ onMounted(async () => {
                       fbm(p + 3.5*q + vec2(8.3,2.8) - 0.4*t));
         float f = fbm(p + 3.5*r);
 
-        vec3 base = vec3(0.016, 0.027, 0.05);
-        vec3 emerald = vec3(0.06, 0.72, 0.55);
-        vec3 cyan    = vec3(0.18, 0.78, 0.95);
-        vec3 blue    = vec3(0.16, 0.36, 0.95);
-        vec3 indigo  = vec3(0.40, 0.30, 0.96);
+        vec3 base = vec3(0.02);
+        vec3 emerald = vec3(0.3);
+        vec3 cyan    = vec3(0.42);
+        vec3 blue    = vec3(0.2);
+        vec3 indigo  = vec3(0.24);
 
         vec3 hi = mix(emerald, cyan, smoothstep(0.0, 0.45, uScroll));
         hi = mix(hi, mix(blue, indigo, 0.45), smoothstep(0.45, 1.0, uScroll));

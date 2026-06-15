@@ -17,6 +17,21 @@ const { adminFetch } = useAuth();
 const domains = ref<Domain[]>([]);
 const pending = ref(true);
 const error = ref<string | null>(null);
+const expiringDomains = computed(
+  () =>
+    domains.value.filter(
+      (domain) =>
+        domain.daysToExpiry !== null &&
+        domain.daysToExpiry >= 0 &&
+        domain.daysToExpiry <= 30,
+    ).length,
+);
+const autoRenewDomains = computed(
+  () => domains.value.filter((domain) => domain.autoRenew).length,
+);
+const annualDomainCost = computed(() =>
+  domains.value.reduce((sum, domain) => sum + (domain.annualCostCents ?? 0), 0),
+);
 
 function expiryClass(days: number | null): string {
   if (days === null) return "text-slate-400";
@@ -45,9 +60,28 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
+  <div class="admin-page admin-page--domains">
     <h1 class="font-display text-2xl font-semibold text-white">Domains</h1>
     <p class="mt-1 text-sm text-slate-400">Registrations and renewal dates.</p>
+
+    <div v-if="!pending && !error" class="admin-summary">
+      <div class="admin-summary-card">
+        <span>Domains managed</span>
+        <strong>{{ domains.length }}</strong>
+      </div>
+      <div class="admin-summary-card">
+        <span>Auto-renewing</span>
+        <strong>{{ autoRenewDomains }}</strong>
+      </div>
+      <div class="admin-summary-card">
+        <span>Expiring in 30d</span>
+        <strong>{{ expiringDomains }}</strong>
+      </div>
+      <div class="admin-summary-card">
+        <span>Annual cost</span>
+        <strong>{{ formatCents(annualDomainCost) }}</strong>
+      </div>
+    </div>
 
     <p v-if="pending" class="mt-8 text-sm text-slate-500">Loading…</p>
     <p v-else-if="error" class="mt-8 text-sm text-rose-400">{{ error }}</p>

@@ -34,7 +34,7 @@ const priceLabel = computed(() =>
     <div class="relative overflow-hidden rounded-xl">
       <ProjectCover
         :project="project"
-        class="transition duration-500 group-hover:scale-[1.04]"
+        class="transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform group-hover:scale-[1.07]"
       />
       <span
         class="absolute right-3 top-3 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ring-1 backdrop-blur-md"

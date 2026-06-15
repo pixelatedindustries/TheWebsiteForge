@@ -128,12 +128,12 @@ const fmtDate = (s: string) =>
   });
 const statusClass = (s: string) =>
   ({
-    paid: "bg-emerald-500/15 text-emerald-300",
+    paid: "bg-white/15 text-white",
     open: "bg-brand-500/15 text-brand-300",
-    failed: "bg-rose-500/15 text-rose-300",
+    failed: "bg-white/5 text-slate-300 ring-1 ring-white/30",
     refunded: "bg-slate-500/15 text-slate-400",
-    live: "bg-emerald-500/15 text-emerald-300",
-    suspended: "bg-amber-500/15 text-amber-300",
+    live: "bg-white/15 text-white",
+    suspended: "bg-slate-500/20 text-slate-300",
     draft: "bg-slate-500/15 text-slate-400",
     offboarded: "bg-slate-500/15 text-slate-400",
   })[s] || "bg-slate-500/15 text-slate-400";
@@ -208,7 +208,7 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
           </button>
         </div>
 
-        <p v-if="loadError" class="mt-8 text-sm text-rose-400">
+        <p v-if="loadError" class="mt-8 text-sm text-white">
           {{ loadError }}
         </p>
         <p v-else-if="pending" class="mt-8 text-sm text-slate-500">
@@ -278,7 +278,7 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                     minTopupUsd
                   }}). Credit never expires.
                 </p>
-                <p v-if="topupError" class="mt-2 text-sm text-rose-400">
+                <p v-if="topupError" class="mt-2 text-sm text-white">
                   {{ topupError }}
                 </p>
               </div>
@@ -315,7 +315,7 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                       class="py-2.5 text-right font-medium"
                       :class="
                         t.amountCents >= 0
-                          ? 'text-emerald-300'
+                          ? 'text-white'
                           : 'text-slate-200'
                       "
                     >

@@ -13,54 +13,39 @@ withDefaults(
 </script>
 
 <template>
-  <section class="px-4 py-20 sm:px-6 lg:px-8">
-    <div
-      v-reveal="{ y: 50 }"
-      class="gradient-border glow-ring relative mx-auto max-w-5xl overflow-hidden rounded-4xl px-6 py-16 text-center sm:px-12"
+  <section class="px-6 py-48 sm:px-10 lg:px-24">
+    <p
+      v-reveal="{ y: 12, duration: 0.7 }"
+      class="mb-12 flex items-center gap-4 font-mono text-xs uppercase tracking-[0.4em] text-slate-500"
     >
-      <!-- internal glow (breathing) -->
-      <div
-        class="animate-pulse-glow absolute inset-0 -z-10"
-        style="
-          background:
-            radial-gradient(
-              60% 60% at 30% 20%,
-              rgba(20, 184, 138, 0.25),
-              transparent 70%
-            ),
-            radial-gradient(
-              60% 60% at 75% 80%,
-              rgba(31, 155, 240, 0.28),
-              transparent 70%
-            );
-        "
-      />
-      <div class="absolute inset-0 -z-10 glass-strong" />
-
-      <h2
-        class="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl"
-      >
-        {{ title }}
-      </h2>
-      <p class="mx-auto mt-4 max-w-xl text-base text-slate-300 sm:text-lg">
+      <span class="h-px w-12 bg-slate-700" />
+      Start
+    </p>
+    <h2
+      v-lines="{ delay: 0.05 }"
+      class="max-w-4xl font-serif text-[clamp(2.5rem,6vw,6rem)] font-light leading-[1.05] tracking-[-0.01em] text-[#ece9e2]"
+    >
+      {{ title }}
+    </h2>
+    <div
+      v-reveal="{ delay: 0.15, duration: 1.4 }"
+      class="mt-16 flex flex-col gap-10 sm:flex-row sm:items-end sm:justify-between"
+    >
+      <p class="max-w-md text-lg leading-relaxed text-slate-400">
         {{ subtitle }}
       </p>
-      <div
-        class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
-      >
+      <div class="flex shrink-0 items-center gap-3">
         <NuxtLink
-          v-magnetic="0.5"
           to="/contact"
-          class="btn-gradient inline-flex w-full items-center justify-center rounded-xl px-6 py-3.5 text-sm font-semibold text-white sm:w-auto"
+          class="btn-gradient inline-flex items-center px-8 py-4 text-xs font-medium uppercase tracking-[0.2em]"
         >
-          Get a free quote
+          Get a quote
         </NuxtLink>
         <NuxtLink
-          v-magnetic="0.35"
           to="/showcase"
-          class="glass inline-flex w-full items-center justify-center rounded-xl px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10 sm:w-auto"
+          class="btn-line inline-flex items-center px-8 py-4 text-xs font-medium uppercase tracking-[0.2em]"
         >
-          Browse the showcase
+          The Work
         </NuxtLink>
       </div>
     </div>

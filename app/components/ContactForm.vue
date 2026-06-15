@@ -354,7 +354,7 @@ function reset() {
                   placeholder="Jane Doe"
                   :class="inputClass"
                 />
-                <p v-if="fieldErrors.name" class="mt-1 text-xs text-rose-400">
+                <p v-if="fieldErrors.name" class="mt-1 text-xs text-white">
                   {{ fieldErrors.name }}
                 </p>
               </div>
@@ -368,7 +368,7 @@ function reset() {
                   placeholder="jane@company.com"
                   :class="inputClass"
                 />
-                <p v-if="fieldErrors.email" class="mt-1 text-xs text-rose-400">
+                <p v-if="fieldErrors.email" class="mt-1 text-xs text-white">
                   {{ fieldErrors.email }}
                 </p>
               </div>
@@ -422,7 +422,7 @@ function reset() {
               </div>
               <p
                 v-if="fieldErrors.businessType"
-                class="mt-1 text-xs text-rose-400"
+                class="mt-1 text-xs text-white"
               >
                 {{ fieldErrors.businessType }}
               </p>
@@ -448,7 +448,7 @@ function reset() {
                   {{ type }}
                 </button>
               </div>
-              <p v-if="fieldErrors.siteType" class="mt-1 text-xs text-rose-400">
+              <p v-if="fieldErrors.siteType" class="mt-1 text-xs text-white">
                 {{ fieldErrors.siteType }}
               </p>
             </div>
@@ -487,7 +487,7 @@ function reset() {
                   {{ budget }}
                 </button>
               </div>
-              <p v-if="fieldErrors.budget" class="mt-1 text-xs text-rose-400">
+              <p v-if="fieldErrors.budget" class="mt-1 text-xs text-white">
                 {{ fieldErrors.budget }}
               </p>
             </div>
@@ -512,7 +512,7 @@ function reset() {
                   {{ deadline }}
                 </button>
               </div>
-              <p v-if="fieldErrors.deadline" class="mt-1 text-xs text-rose-400">
+              <p v-if="fieldErrors.deadline" class="mt-1 text-xs text-white">
                 {{ fieldErrors.deadline }}
               </p>
             </div>
@@ -529,7 +529,7 @@ function reset() {
                 placeholder="What should this site help you do?"
                 :class="inputClass"
               />
-              <p v-if="fieldErrors.goals" class="mt-1 text-xs text-rose-400">
+              <p v-if="fieldErrors.goals" class="mt-1 text-xs text-white">
                 {{ fieldErrors.goals }}
               </p>
             </div>
@@ -544,7 +544,7 @@ function reset() {
                 placeholder="Home, about, services, contact, dashboard, product pages..."
                 :class="inputClass"
               />
-              <p v-if="fieldErrors.pages" class="mt-1 text-xs text-rose-400">
+              <p v-if="fieldErrors.pages" class="mt-1 text-xs text-white">
                 {{ fieldErrors.pages }}
               </p>
             </div>
@@ -569,7 +569,7 @@ function reset() {
                   {{ feature }}
                 </button>
               </div>
-              <p v-if="fieldErrors.features" class="mt-1 text-xs text-rose-400">
+              <p v-if="fieldErrors.features" class="mt-1 text-xs text-white">
                 {{ fieldErrors.features }}
               </p>
             </div>
@@ -604,7 +604,7 @@ function reset() {
 
       <p
         v-if="status === 'error' && serverMessage"
-        class="rounded-lg bg-rose-500/10 px-4 py-2.5 text-sm text-rose-300 ring-1 ring-rose-500/20"
+        class="rounded-lg bg-white/10 px-4 py-2.5 text-sm text-white ring-1 ring-white/20"
       >
         {{ serverMessage }}
       </p>
@@ -620,6 +620,7 @@ function reset() {
         </button>
         <button
           v-if="currentStep < steps.length - 1"
+          v-magnetic="0.3"
           type="button"
           class="btn-gradient inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-white"
           @click="goNext"
@@ -640,6 +641,7 @@ function reset() {
         </button>
         <button
           v-else
+          v-magnetic="0.3"
           type="submit"
           :disabled="status === 'loading'"
           class="btn-gradient inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70"

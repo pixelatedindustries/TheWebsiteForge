@@ -28,6 +28,15 @@ const sites = ref<Site[]>([]);
 const pending = ref(true);
 const error = ref<string | null>(null);
 const busy = ref<string | null>(null);
+const liveSites = computed(
+  () => sites.value.filter((site) => site.status === "live").length,
+);
+const buildingSites = computed(
+  () => sites.value.filter((site) => site.status === "building").length,
+);
+const suspendedSites = computed(
+  () => sites.value.filter((site) => site.status === "suspended").length,
+);
 
 async function load() {
   try {
@@ -65,9 +74,28 @@ onMounted(load);
 </script>
 
 <template>
-  <div>
+  <div class="admin-page admin-page--sites">
     <h1 class="font-display text-2xl font-semibold text-white">Sites</h1>
     <p class="mt-1 text-sm text-slate-400">Every site you build and host.</p>
+
+    <div v-if="!pending && !error" class="admin-summary">
+      <div class="admin-summary-card">
+        <span>Total sites</span>
+        <strong>{{ sites.length }}</strong>
+      </div>
+      <div class="admin-summary-card">
+        <span>Live</span>
+        <strong>{{ liveSites }}</strong>
+      </div>
+      <div class="admin-summary-card">
+        <span>In production</span>
+        <strong>{{ buildingSites }}</strong>
+      </div>
+      <div class="admin-summary-card">
+        <span>Suspended</span>
+        <strong>{{ suspendedSites }}</strong>
+      </div>
+    </div>
 
     <p v-if="pending" class="mt-8 text-sm text-slate-500">Loading…</p>
     <p v-else-if="error" class="mt-8 text-sm text-rose-400">{{ error }}</p>

@@ -28,6 +28,12 @@ const pending = ref(true);
 const error = ref<string | null>(null);
 const saving = ref<string | null>(null);
 const selectedLead = ref<Lead | null>(null);
+const leadCounts = computed(() =>
+  STATUSES.map((status) => ({
+    status,
+    count: leads.value.filter((lead) => lead.status === status).length,
+  })),
+);
 
 async function load() {
   try {
@@ -100,7 +106,7 @@ onMounted(load);
 </script>
 
 <template>
-  <div>
+  <div class="admin-page admin-page--leads">
     <h1 class="font-display text-2xl font-semibold text-white">Leads</h1>
     <p class="mt-1 text-sm text-slate-400">
       Enquiries from the contact form and other sources.
@@ -108,6 +114,17 @@ onMounted(load);
     <p v-if="convertMsg" class="mt-2 text-sm text-brand-300">
       {{ convertMsg }}
     </p>
+
+    <div v-if="!pending && !error" class="admin-summary">
+      <div
+        v-for="item in leadCounts"
+        :key="item.status"
+        class="admin-summary-card"
+      >
+        <span>{{ titleCase(item.status) }}</span>
+        <strong>{{ item.count }}</strong>
+      </div>
+    </div>
 
     <p v-if="pending" class="mt-8 text-sm text-slate-500">Loading…</p>
     <p v-else-if="error" class="mt-8 text-sm text-rose-400">{{ error }}</p>

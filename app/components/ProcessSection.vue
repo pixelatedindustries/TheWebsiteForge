@@ -5,33 +5,37 @@ const visualSteps = computed(() =>
   processSteps.map((step, index) => ({
     ...step,
     tone: [
-      "from-brand-400/30 via-cyan-300/15 to-transparent",
-      "from-accent-400/30 via-brand-300/15 to-transparent",
-      "from-sky-400/30 via-brand-400/15 to-transparent",
-      "from-emerald-300/30 via-accent-400/15 to-transparent",
+      "from-black/15 via-black/5 to-transparent",
+      "from-black/10 via-black/5 to-transparent",
+      "from-black/15 via-black/5 to-transparent",
+      "from-black/10 via-black/5 to-transparent",
     ][index],
     icon: ["radar", "prototype", "terminal", "rocket"][index],
   })),
 );
+
+// The light "chapter" has no reveal of its own — the parallax stacking slides
+// it up over the section below, and v-bgmorph scrubs the page dark→light, so the
+// transition is one smooth, elegant move.
 </script>
 
 <template>
-  <section class="relative overflow-hidden px-4 py-24 sm:px-6 lg:px-8">
-    <div
-      aria-hidden="true"
-      class="absolute inset-x-0 top-20 mx-auto h-80 max-w-5xl rounded-full bg-brand-500/10 blur-3xl"
-    />
-    <div
-      aria-hidden="true"
-      class="process-grid absolute inset-0 opacity-[0.18]"
-    />
-
-    <div class="relative mx-auto max-w-7xl">
-      <SectionHeading
-        eyebrow="How we work"
-        title="From idea to live in four steps"
-        subtitle="A tight, transparent process. You see progress every step, and there are no black boxes."
+  <section class="relative min-h-screen overflow-hidden">
+    <div class="absolute inset-0 flex items-center px-4 py-32 sm:px-6 lg:px-8">
+      <!-- white chapter fill -->
+      <div aria-hidden="true" class="light-panel absolute inset-0" />
+      <div
+        aria-hidden="true"
+        class="process-grid absolute inset-0 opacity-[0.5]"
       />
+
+      <div class="relative mx-auto w-full max-w-7xl">
+        <SectionHeading
+          tone="light"
+          eyebrow="How we work"
+          title="From idea to live in four steps"
+          subtitle="A tight, transparent process. You see progress every step, and there are no black boxes."
+        />
 
       <div class="relative mt-16">
         <div
@@ -44,7 +48,7 @@ const visualSteps = computed(() =>
             v-for="(step, index) in visualSteps"
             :key="step.step"
             v-tilt="{ max: 7 }"
-            class="process-card group relative min-h-[360px] overflow-hidden rounded-2xl border border-white/10 bg-slate-950/55 p-6 shadow-2xl shadow-black/30 backdrop-blur-xl transition duration-500 hover:-translate-y-2 hover:border-brand-300/50 hover:shadow-brand-500/20"
+            class="process-card group relative min-h-[360px] overflow-hidden rounded-2xl border border-black/10 bg-white/80 p-6 shadow-xl shadow-black/10 backdrop-blur-xl transition duration-500 hover:-translate-y-2 hover:border-black/30 hover:shadow-black/15"
             :style="{ animationDelay: `${index * 110}ms` }"
           >
             <div
@@ -54,36 +58,36 @@ const visualSteps = computed(() =>
             />
             <div
               aria-hidden="true"
-              class="absolute -right-16 -top-16 h-36 w-36 rounded-full border border-white/10 bg-white/[0.03] transition duration-500 group-hover:scale-125 group-hover:border-brand-300/30"
+              class="absolute -right-16 -top-16 h-36 w-36 rounded-full border border-black/10 bg-black/[0.03] transition duration-500 group-hover:scale-125 group-hover:border-black/25"
             />
             <div
               aria-hidden="true"
-              class="absolute bottom-0 left-0 h-28 w-full translate-y-10 bg-gradient-to-t from-brand-500/10 to-transparent opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100"
+              class="absolute bottom-0 left-0 h-28 w-full translate-y-10 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100"
             />
 
             <div class="relative flex items-start justify-between gap-4">
               <span
-                class="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 font-display text-xs font-bold tracking-[0.22em] text-brand-200 shadow-lg shadow-brand-500/10"
+                class="rounded-full border border-black/10 bg-black/[0.04] px-3 py-1 font-display text-xs font-bold tracking-[0.22em] text-black/70"
               >
                 {{ step.step }}
               </span>
               <span
-                class="process-pulse relative grid h-4 w-4 place-items-center rounded-full bg-brand-300"
+                class="process-pulse relative grid h-4 w-4 place-items-center rounded-full bg-black"
               >
-                <span class="h-1.5 w-1.5 rounded-full bg-slate-950" />
+                <span class="h-1.5 w-1.5 rounded-full bg-white" />
               </span>
             </div>
 
             <div class="relative mt-8 grid place-items-center">
               <div
-                class="process-orbit absolute h-36 w-36 rounded-full border border-dashed border-brand-300/30"
+                class="process-orbit absolute h-36 w-36 rounded-full border border-dashed border-black/25"
               />
               <div
-                class="relative grid h-28 w-28 place-items-center rounded-2xl border border-white/10 bg-slate-950/70 shadow-2xl shadow-brand-500/20 transition duration-500 group-hover:scale-105 group-hover:border-brand-300/40"
+                class="relative grid h-28 w-28 place-items-center rounded-2xl border border-black/10 bg-white shadow-xl shadow-black/10 transition duration-500 group-hover:scale-105 group-hover:border-black/30"
               >
                 <svg
                   v-if="step.icon === 'radar'"
-                  class="h-16 w-16 text-brand-200"
+                  class="h-16 w-16 text-black/80"
                   viewBox="0 0 80 80"
                   fill="none"
                 >
@@ -115,7 +119,7 @@ const visualSteps = computed(() =>
                 </svg>
                 <svg
                   v-else-if="step.icon === 'prototype'"
-                  class="h-16 w-16 text-cyan-200"
+                  class="h-16 w-16 text-black/80"
                   viewBox="0 0 80 80"
                   fill="none"
                 >
@@ -148,7 +152,7 @@ const visualSteps = computed(() =>
                 </svg>
                 <svg
                   v-else-if="step.icon === 'terminal'"
-                  class="h-16 w-16 text-sky-200"
+                  class="h-16 w-16 text-black/80"
                   viewBox="0 0 80 80"
                   fill="none"
                 >
@@ -192,7 +196,7 @@ const visualSteps = computed(() =>
                 </svg>
                 <svg
                   v-else
-                  class="h-16 w-16 text-emerald-200"
+                  class="h-16 w-16 text-black/80"
                   viewBox="0 0 80 80"
                   fill="none"
                 >
@@ -230,10 +234,10 @@ const visualSteps = computed(() =>
             </div>
 
             <div class="relative mt-9">
-              <h3 class="font-display text-xl font-semibold text-white">
+              <h3 class="font-display text-xl font-semibold text-black">
                 {{ step.title }}
               </h3>
-              <p class="mt-3 text-sm leading-relaxed text-slate-400">
+              <p class="mt-3 text-sm leading-relaxed text-black/60">
                 {{ step.description }}
               </p>
             </div>
@@ -241,20 +245,27 @@ const visualSteps = computed(() =>
             <div
               v-if="index < visualSteps.length - 1"
               aria-hidden="true"
-              class="absolute -right-3 top-24 hidden h-6 w-6 rotate-45 border-r border-t border-brand-300/40 bg-slate-950 lg:block"
+              class="absolute -right-3 top-24 hidden h-6 w-6 rotate-45 border-r border-t border-black/25 bg-white lg:block"
             />
           </li>
         </ol>
+        </div>
       </div>
     </div>
   </section>
 </template>
 
 <style scoped>
+/* the white chapter slab — clip-path is scrub-animated from an inset rounded
+   card to full-bleed as the section scrolls in (see script) */
+.light-panel {
+  background: #f5f5f5;
+}
+
 .process-grid {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    linear-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
   background-size: 72px 72px;
   mask-image: radial-gradient(circle at 50% 35%, black, transparent 72%);
 }
@@ -263,8 +274,8 @@ const visualSteps = computed(() =>
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(52, 216, 166, 0.75),
-    rgba(31, 155, 240, 0.75),
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0.25),
     transparent
   );
 }
@@ -316,7 +327,7 @@ const visualSteps = computed(() =>
 
 .process-pulse::before {
   animation: pulse-ring 1.9s ease-out infinite;
-  border: 1px solid rgba(52, 216, 166, 0.55);
+  border: 1px solid rgba(0, 0, 0, 0.4);
   border-radius: 999px;
   content: "";
   inset: -8px;

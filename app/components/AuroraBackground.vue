@@ -20,7 +20,7 @@
         background: radial-gradient(
           ellipse 95% 75% at 50% 0%,
           transparent,
-          rgba(4, 7, 13, 0.65) 82%
+          rgba(0, 0, 0, 0.65) 82%
         );
       "
     />
