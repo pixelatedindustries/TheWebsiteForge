@@ -6,12 +6,15 @@
  *   v-reveal               — fade/slide-in on scroll
  *   v-reveal:stagger       — stagger children in on scroll
  *   v-parallax="0.2"       — scrub-driven parallax (fraction of own height)
- *   v-magnetic="0.4"       — cursor-magnet hover (great on buttons)
+ *   v-magnetic             — retired (no-op); buttons are sharp/mechanical now
  *   v-tilt                 — 3D pointer tilt (great on cards)
  *   v-count                — count-up the numeric part of the element's text
  *   v-split="{ delay }"    — word/char rise-in reveal for headings
+ *   v-lines="{ delay }"    — masked line-by-line rise reveal (editorial feel)
  *   v-spotlight            — cursor-tracking glow over a card
  *   v-skew                 — scroll-velocity shear (the "alive" feel)
+ *   v-stack                — parallax-stacking recede as a section scrolls away
+ *   v-bgmorph              — smooth dark↔light page-colour scrub for a section
  *
  * The plugin is universal so the directives resolve during SSR, but every hook
  * body runs client-only and bails out under `prefers-reduced-motion`.
@@ -33,8 +36,12 @@ function runCleanup(el: HTMLElement) {
   cleanups.delete(el);
 }
 
-// latest Lenis scroll velocity, shared with the v-skew directive
+// latest Lenis scroll velocity, shared with the v-skew directive and any
+// component that wants to react to scroll speed (e.g. the logo marquee)
 const velocity = { value: 0 };
+export function scrollVelocity() {
+  return velocity.value;
+}
 
 // active Lenis instance + a helper for programmatic smooth scrolling (used by
 // the hero's "scroll to explore" progress button)
@@ -96,10 +103,10 @@ export default defineNuxtPlugin((nuxtApp) => {
         rect.bottom > -window.innerHeight * 0.1;
       const tween = gsap.from(el, {
         opacity: 0,
-        y: o.y ?? 60,
-        scale: o.scale ?? 0.94,
-        duration: o.duration ?? 1,
-        ease: o.ease ?? "power3.out",
+        y: o.y ?? 30,
+        scale: o.scale ?? 0.99,
+        duration: o.duration ?? 1.7,
+        ease: o.ease ?? "expo.inOut",
         delay: o.delay ?? 0,
         scrollTrigger: isInitiallyVisible
           ? undefined
@@ -124,11 +131,11 @@ export default defineNuxtPlugin((nuxtApp) => {
       rect.bottom > -window.innerHeight * 0.1;
     const tween = gsap.from(targets, {
       opacity: 0,
-      y: o.y ?? 56,
-      scale: o.scale ?? 0.95,
-      duration: o.duration ?? 0.9,
-      ease: o.ease ?? "power3.out",
-      stagger: o.stagger ?? 0.12,
+      y: o.y ?? 34,
+      scale: o.scale ?? 0.99,
+      duration: o.duration ?? 1.5,
+      ease: o.ease ?? "expo.inOut",
+      stagger: o.stagger ?? 0.16,
       scrollTrigger: isInitiallyVisible
         ? undefined
         : { trigger: el, start: o.start ?? "top 80%", once: true },
@@ -162,32 +169,11 @@ export default defineNuxtPlugin((nuxtApp) => {
     unmounted: runCleanup,
   };
 
-  // ── v-magnetic ────────────────────────────────────────────────────────────
-  const magnetic: Directive<HTMLElement, number | undefined> = {
-    mounted(el, binding) {
-      if (reduced || !window.matchMedia("(pointer: fine)").matches) return;
-      const strength = binding.value ?? 0.4;
-      const xTo = gsap.quickTo(el, "x", { duration: 0.6, ease: "power3" });
-      const yTo = gsap.quickTo(el, "y", { duration: 0.6, ease: "power3" });
-      const move = (e: PointerEvent) => {
-        const r = el.getBoundingClientRect();
-        xTo((e.clientX - (r.left + r.width / 2)) * strength);
-        yTo((e.clientY - (r.top + r.height / 2)) * strength);
-      };
-      const leave = () => {
-        xTo(0);
-        yTo(0);
-      };
-      el.addEventListener("pointermove", move);
-      el.addEventListener("pointerleave", leave);
-      onCleanup(el, () => {
-        el.removeEventListener("pointermove", move);
-        el.removeEventListener("pointerleave", leave);
-        gsap.set(el, { x: 0, y: 0 });
-      });
-    },
-    unmounted: runCleanup,
-  };
+  // ── v-magnetic (retired) ────────────────────────────────────────────────────
+  // The brutalist direction wants razor-sharp, mechanical buttons — no jelly,
+  // no pull. Kept registered as a no-op so existing usages don't warn; the
+  // button feel now lives entirely in the sharp .btn-gradient / .btn-line CSS.
+  const magnetic: Directive<HTMLElement, number | undefined> = {};
 
   // ── v-tilt ────────────────────────────────────────────────────────────────
   const tilt: Directive<HTMLElement, { max?: number } | undefined> = {
@@ -311,10 +297,10 @@ export default defineNuxtPlugin((nuxtApp) => {
       const tween = gsap.from(chars, {
         yPercent: 115,
         opacity: 0,
-        rotateZ: 5,
-        duration: 0.85,
-        ease: "power4.out",
-        stagger: o.stagger ?? 0.022,
+        rotateZ: 3,
+        duration: 1.1,
+        ease: "expo.inOut",
+        stagger: o.stagger ?? 0.02,
         delay: o.delay ?? 0,
         // Promote chars to their own layer only for the duration of the rise-in,
         // then release so they don't hold compositor memory (issues.md #9).
@@ -335,11 +321,75 @@ export default defineNuxtPlugin((nuxtApp) => {
     unmounted: runCleanup,
   };
 
+  // ── v-lines (masked line-by-line rise — text emerges from slits in the page) ─
+  const lines: Directive<HTMLElement, SplitOpts | undefined> = {
+    mounted(el, binding) {
+      if (reduced) return;
+      const text = (el.textContent ?? "").trim();
+      if (!text) return;
+      el.setAttribute("aria-label", text);
+      el.textContent = "";
+
+      // lay words out normally first so we can read the line breaks the
+      // browser actually produced, then regroup them into masked rows
+      const words: HTMLElement[] = [];
+      text.split(/\s+/).forEach((token) => {
+        const w = document.createElement("span");
+        w.textContent = token;
+        w.style.display = "inline-block";
+        el.appendChild(w);
+        el.appendChild(document.createTextNode(" "));
+        words.push(w);
+      });
+      const rows = new Map<number, HTMLElement[]>();
+      words.forEach((w) => {
+        const top = w.offsetTop;
+        rows.set(top, [...(rows.get(top) ?? []), w]);
+      });
+
+      el.textContent = "";
+      const inners: HTMLElement[] = [];
+      rows.forEach((rowWords) => {
+        const mask = document.createElement("span");
+        mask.setAttribute("aria-hidden", "true");
+        mask.style.cssText = "display:block;overflow:hidden;";
+        const inner = document.createElement("span");
+        inner.style.display = "block";
+        inner.textContent = rowWords.map((w) => w.textContent).join(" ");
+        mask.appendChild(inner);
+        el.appendChild(mask);
+        inners.push(inner);
+      });
+
+      const o = binding.value ?? {};
+      const rect = el.getBoundingClientRect();
+      const isInitiallyVisible =
+        rect.top < window.innerHeight * 0.92 &&
+        rect.bottom > -window.innerHeight * 0.1;
+      const tween = gsap.from(inners, {
+        yPercent: 112,
+        duration: 1.7,
+        ease: "expo.inOut",
+        stagger: o.stagger ?? 0.14,
+        delay: o.delay ?? 0,
+        scrollTrigger:
+          o.scroll === false || isInitiallyVisible
+            ? undefined
+            : { trigger: el, start: o.start ?? "top 86%", once: true },
+      });
+      onCleanup(el, () => {
+        tween.scrollTrigger?.kill();
+        tween.kill();
+      });
+    },
+    unmounted: runCleanup,
+  };
+
   // ── v-spotlight (cursor-tracking glow over cards) ───────────────────────────
   const spotlight: Directive<HTMLElement, string | undefined> = {
     mounted(el, binding) {
       if (reduced || !window.matchMedia("(pointer: fine)").matches) return;
-      const color = binding.value ?? "rgba(70,200,255,0.20)";
+      const color = binding.value ?? "rgba(255,255,255,0.16)";
       const overlay = document.createElement("div");
       overlay.style.cssText =
         "position:absolute;inset:0;border-radius:inherit;pointer-events:none;" +
@@ -386,13 +436,104 @@ export default defineNuxtPlugin((nuxtApp) => {
     unmounted: runCleanup,
   };
 
+  // ── v-stack (parallax stacking between sections) ────────────────────────────
+  // As a section scrolls up and out the top it recedes: drifts slower than the
+  // scroll (parallax), scales toward 0.95 and dims — while the next section
+  // (higher z-index, solid bg, soft top shadow) glides up over it. Driven from
+  // the section's LIVE position every frame, so it's perfectly reversible and
+  // immune to the stale start/end ScrollTrigger caches under pinned siblings.
+  // expo.inOut shapes the recede so the weight builds like a soft luxury glide.
+  let stackZ = 2;
+  const stackEase = gsap.parseEase("expo.inOut");
+  const stack: Directive<
+    HTMLElement,
+    { bg?: string; parallax?: number; dim?: number } | undefined
+  > = {
+    mounted(el, binding) {
+      if (reduced) return;
+      const o = binding.value ?? {};
+      const parallax = o.parallax ?? 70;
+      const dim = o.dim ?? 0.3;
+      el.style.position = "relative";
+      el.style.zIndex = String(stackZ++);
+      el.style.backgroundColor = o.bg ?? "#121110";
+      el.style.transformOrigin = "50% 0%";
+      el.style.willChange = "transform, filter";
+      // whisper-soft top shadow → the incoming section just barely casts over
+      el.style.boxShadow = "0 -40px 120px -60px rgba(0, 0, 0, 0.55)";
+
+      const update = () => {
+        const r = el.getBoundingClientRect();
+        const vh = window.innerHeight || 1;
+        // 0 while the section's top is at/below the viewport top; ramps to 1 as
+        // it scrolls up by ~75% of a viewport
+        const p = gsap.utils.clamp(0, 1, -r.top / (vh * 0.75));
+        const e = stackEase(p);
+        const ty = (e * parallax).toFixed(1);
+        const scale = (1 - e * 0.05).toFixed(3);
+        el.style.transform = `translate3d(0, ${ty}px, 0) scale(${scale})`;
+        el.style.filter = `brightness(${(1 - e * dim).toFixed(3)})`;
+      };
+      gsap.ticker.add(update);
+      update();
+      onCleanup(el, () => {
+        gsap.ticker.remove(update);
+        for (const prop of [
+          "transform",
+          "filter",
+          "boxShadow",
+          "zIndex",
+          "backgroundColor",
+          "willChange",
+          "transformOrigin",
+          "position",
+        ] as const) {
+          el.style[prop] = "";
+        }
+      });
+    },
+    unmounted: runCleanup,
+  };
+
+  // ── v-bgmorph (smooth dark↔light page-colour scrub) ─────────────────────────
+  // Incredibly subtle mood shift: scrubs the page background between two close
+  // charcoals as this section nears centre, then back — you barely register the
+  // colour change, you just feel the mood lift. expo.inOut shaping; reversible.
+  const bgmorph: Directive<HTMLElement, { from?: string; to?: string } | undefined> =
+    {
+      mounted(el, binding) {
+        if (reduced) return;
+        const from = binding.value?.from ?? "#0e0d0c";
+        const to = binding.value?.to ?? "#26231f";
+        const lerp = gsap.utils.interpolate(from, to);
+        const update = () => {
+          const r = el.getBoundingClientRect();
+          const vh = window.innerHeight || 1;
+          const center = r.top + r.height / 2;
+          const dist = Math.abs(center - vh / 2) / (vh * 0.9);
+          const p = stackEase(gsap.utils.clamp(0, 1, 1 - dist));
+          document.body.style.backgroundColor = lerp(p);
+        };
+        gsap.ticker.add(update);
+        update();
+        onCleanup(el, () => {
+          gsap.ticker.remove(update);
+          document.body.style.backgroundColor = "";
+        });
+      },
+      unmounted: runCleanup,
+    };
+
   const app = nuxtApp.vueApp;
   app.directive("reveal", reveal);
+  app.directive("stack", stack);
+  app.directive("bgmorph", bgmorph);
   app.directive("parallax", parallax);
   app.directive("magnetic", magnetic);
   app.directive("tilt", tilt);
   app.directive("count", count);
   app.directive("split", split);
+  app.directive("lines", lines);
   app.directive("spotlight", spotlight);
   app.directive("skew", skew);
 

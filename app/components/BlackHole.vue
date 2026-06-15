@@ -34,7 +34,7 @@ onMounted(async () => {
   const camera = new THREE.Camera();
   const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: false });
   renderer.setPixelRatio(cappedPixelRatio(1.5, tier));
-  renderer.setClearColor(0x04070d, 1);
+  renderer.setClearColor(0x000000, 1);
   el.appendChild(renderer.domElement);
   Object.assign(renderer.domElement.style, {
     width: "100%",
@@ -95,10 +95,10 @@ onMounted(async () => {
           fbm(p * 1.1 + vec2(4.1, 1.3) - uTime * 0.025)
         );
         float n = fbm(p * 1.2 + 2.1 * q);
-        vec3 deep    = vec3(0.02, 0.06, 0.20);
-        vec3 emerald = vec3(0.04, 0.46, 0.40);
-        vec3 cyan    = vec3(0.12, 0.58, 0.95);
-        vec3 blue    = vec3(0.08, 0.22, 0.80);
+        vec3 deep    = vec3(0.07);
+        vec3 emerald = vec3(0.32);
+        vec3 cyan    = vec3(0.55);
+        vec3 blue    = vec3(0.26);
         vec3 aur = mix(deep, emerald, smoothstep(0.12, 0.52, n));
         aur = mix(aur, cyan, smoothstep(0.48, 0.82, n));
         aur = mix(aur, blue, smoothstep(0.72, 1.0, n));
@@ -111,7 +111,7 @@ onMounted(async () => {
           if (s > 0.93){
             vec2 pos = (vec2(hash21(id + 1.7), hash21(id + 4.1)) - 0.5) * 0.7;
             float b = smoothstep(0.045, 0.0, length(f - pos)) * ((s - 0.93) / 0.07);
-            col += b * vec3(0.62, 0.78, 1.0) * 0.7;
+            col += b * vec3(0.78) * 0.7;
           }
         }
         // mid layer — twinkling stars, moderate parallax
@@ -122,7 +122,7 @@ onMounted(async () => {
             vec2 pos = (vec2(hash21(id + 1.7), hash21(id + 4.1)) - 0.5) * 0.7;
             float b = smoothstep(0.06, 0.0, length(f - pos)) * ((s - 0.93) / 0.07);
             b *= 0.6 + 0.4 * sin(uTime * 3.0 + s * 40.0);
-            col += b * vec3(0.85, 0.93, 1.0);
+            col += b * vec3(0.92);
           }
         }
         // near layer — sparse big glowing stars, strongest parallax (close)
@@ -133,7 +133,7 @@ onMounted(async () => {
             vec2 pos = (vec2(hash21(id + 2.1), hash21(id + 5.7)) - 0.5) * 0.6;
             float b = smoothstep(0.17, 0.0, length(f - pos)) * ((s - 0.965) / 0.035);
             b *= 0.7 + 0.3 * sin(uTime * 2.0 + s * 20.0);
-            col += b * b * vec3(0.78, 0.92, 1.0) * 1.4;
+            col += b * b * vec3(0.88) * 1.4;
           }
         }
         return col;
@@ -178,12 +178,12 @@ onMounted(async () => {
 
         // soft atmospheric halo hugging the horizon — breathes with the ambient audio
         float glow = exp(-max(r - rs, 0.0) * 5.2) * (0.42 + uPulse * 0.18) * (1.0 - smoothstep(0.4, 0.9, v));
-        col += glow * vec3(0.12, 0.46, 0.85);
+        col += glow * vec3(0.42);
 
         // a lone photon on a slightly tilted orbit (relativistic detail)
         float pa = uTime * 0.5;
         vec2 op = hole + rs * 1.7 * vec2(cos(pa), sin(pa) * 0.62);
-        col += exp(-dot(p - op, p - op) * 2200.0) * vec3(0.7, 0.9, 1.0) * 1.6 * (1.0 - smoothstep(0.3, 0.8, v));
+        col += exp(-dot(p - op, p - op) * 2200.0) * vec3(0.85) * 1.6 * (1.0 - smoothstep(0.3, 0.8, v));
 
         // a captured star streaking in + spaghettifying as it nears the hole
         if (uStarProg > 0.0) {
@@ -194,14 +194,14 @@ onMounted(async () => {
           float perp = dot(sd, vec2(-radd.y, radd.x));
           float stretch = mix(1.0, 7.0, uStarProg);
           float star = exp(-(along * along / (0.0004 * stretch) + perp * perp / 0.000016));
-          col += star * vec3(0.85, 0.93, 1.0) * (1.0 - uStarProg);
+          col += star * vec3(0.92) * (1.0 - uStarProg);
         }
 
         // event horizon — pure black core (size never changes)
         col *= 1.0 - smoothstep(rs, rs - 0.012, r);
 
         // scene birth: a soft central flash, then fade up from black
-        col += vec3(0.7, 0.85, 1.0) * (1.0 - smoothstep(0.0, 0.18, uBirth)) * 0.8 * exp(-r * 3.0);
+        col += vec3(0.82) * (1.0 - smoothstep(0.0, 0.18, uBirth)) * 0.8 * exp(-r * 3.0);
         col *= smoothstep(0.0, 0.25, uBirth);
 
         // vortex drains everything to black

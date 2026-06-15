@@ -43,9 +43,9 @@ onMounted(async () => {
 
   const uniforms = {
     uLight: { value: new THREE.Vector3(-0.45, 0.7, 0.55).normalize() },
-    uTop: { value: new THREE.Color("#bdeeff") }, // icy highlight
-    uBottom: { value: new THREE.Color("#0a1f38") }, // deep cool blue
-    uRim: { value: new THREE.Color("#a9e6ff") }, // bright icy rim
+    uTop: { value: new THREE.Color("#e9e9e9") }, // bright highlight
+    uBottom: { value: new THREE.Color("#1a1a1a") }, // deep neutral gray
+    uRim: { value: new THREE.Color("#dadada") }, // bright silver rim
   };
 
   const material = new THREE.ShaderMaterial({
@@ -63,12 +63,12 @@ onMounted(async () => {
       uniform vec3 uTop; uniform vec3 uBottom; uniform vec3 uRim;
       varying vec3 vViewPos;
 
-      // icy 'sky' each facet reflects
+      // silver 'sky' each facet reflects
       vec3 envIcy(vec3 d){
         float t = clamp(d.y * 0.5 + 0.5, 0.0, 1.0);
-        vec3 deep = vec3(0.03, 0.08, 0.20);
-        vec3 mid  = vec3(0.25, 0.66, 0.98);
-        vec3 ice  = vec3(0.90, 0.98, 1.0);
+        vec3 deep = vec3(0.08);
+        vec3 mid  = vec3(0.58);
+        vec3 ice  = vec3(0.97);
         return mix(mix(deep, mid, t), ice, smoothstep(0.55, 1.0, t));
       }
 
@@ -103,7 +103,7 @@ onMounted(async () => {
   // soft atmospheric glow halo ringing the sphere (brighter on the lit side)
   const haloMat = new THREE.ShaderMaterial({
     uniforms: {
-      uColor: { value: new THREE.Color("#74dbff") },
+      uColor: { value: new THREE.Color("#c6c6c6") },
       uLight: uniforms.uLight,
     },
     transparent: true,

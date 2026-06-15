@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { scrollVelocity } from "~/plugins/motion";
+
+const props = withDefaults(defineProps<{ parallax?: boolean }>(), {
+  parallax: false,
+});
+
 import type { TechStackItem } from "~/types/tech-stack";
 
 const techStack: TechStackItem[] = [
@@ -22,29 +30,99 @@ const techStack: TechStackItem[] = [
 
 // duplicated once so the -50% marquee loops seamlessly
 const row = [...techStack, ...techStack];
+
+// Scroll-velocity-reactive drift: the strip cruises at the old CSS pace, but
+// flicking the page whips it along (and scrolling up drags it backwards),
+// settling back to cruise speed. CSS animation stays as the reduced-motion /
+// pre-hydration fallback.
+const rowEl = ref<HTMLElement | null>(null);
+const sectionEl = ref<HTMLElement | null>(null);
+const wrap = ref<HTMLElement | null>(null);
+let tick: gsap.TickerCallback | null = null;
+let ro: ResizeObserver | null = null;
+let parallaxTween: gsap.core.Tween | null = null;
+
+onMounted(() => {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const el = rowEl.value;
+  if (!el) return;
+  el.classList.remove("animate-marquee");
+
+  let x = 0;
+  let half = el.scrollWidth / 2;
+  ro = new ResizeObserver(() => (half = el.scrollWidth / 2));
+  ro.observe(el);
+
+  tick = (_t, dt) => {
+    if (!half) return;
+    const cruise = half / 38; // px/s — matches the old 38s CSS loop
+    const boost = gsap.utils.clamp(
+      -cruise * 9,
+      cruise * 9,
+      scrollVelocity() * 26,
+    );
+    x -= ((cruise + boost) * dt) / 1000;
+    if (x <= -half) x += half;
+    if (x > 0) x -= half;
+    el.style.transform = `translate3d(${x}px,0,0)`;
+  };
+  gsap.ticker.add(tick);
+
+  // Opposing-direction scroll parallax: the whole strip glides RIGHT as the
+  // page scrolls down — a larger travel than the giant text's leftward drift,
+  // so it reads as the faster, nearer layer. Runs on an overscanned wrapper so
+  // the shift never exposes a bare edge.
+  if (props.parallax && wrap.value && sectionEl.value) {
+    parallaxTween = gsap.fromTo(
+      wrap.value,
+      { xPercent: -9 },
+      {
+        xPercent: 18,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionEl.value,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        },
+      },
+    );
+  }
+});
+
+onBeforeUnmount(() => {
+  if (tick) gsap.ticker.remove(tick);
+  ro?.disconnect();
+  parallaxTween?.scrollTrigger?.kill();
+  parallaxTween?.kill();
+});
 </script>
 
 <template>
-  <section class="pt-20 pb-10 lg:pt-28">
+  <section ref="sectionEl" class="overflow-hidden pt-20 pb-10 lg:pt-28">
     <p
       v-reveal="{ y: 12, duration: 0.6 }"
       class="mb-6 text-center text-xs font-semibold uppercase tracking-widest text-slate-500"
     >
       Tech stack we build with
     </p>
-    <div
-      class="tech-marquee relative"
-      style="
-        mask-image: linear-gradient(
-          to right,
-          transparent,
-          #000 12%,
-          #000 88%,
-          transparent
-        );
-      "
-    >
-      <div class="flex w-max animate-marquee items-center gap-4 py-2 pr-4">
+    <div ref="wrap" class="marquee-parallax">
+      <div
+        class="tech-marquee relative"
+        style="
+          mask-image: linear-gradient(
+            to right,
+            transparent,
+            #000 12%,
+            #000 88%,
+            transparent
+          );
+        "
+      >
+        <div
+          ref="rowEl"
+          class="flex w-max animate-marquee items-center gap-4 py-2 pr-4"
+        >
         <span
           v-for="(tech, i) in row"
           :key="`${tech.name}-${i}`"
@@ -315,15 +393,25 @@ const row = [...techStack, ...techStack];
             {{ tech.name }}
           </span>
         </span>
+        </div>
       </div>
     </div>
   </section>
 </template>
 
 <style scoped>
+/* wider than the viewport with negative margins so the scroll-parallax shift
+   (xPercent ±) never drags a bare edge into view */
+.marquee-parallax {
+  width: 128%;
+  margin-left: -14%;
+  will-change: transform;
+}
 .tech-marquee {
   overflow-x: hidden;
   overflow-y: visible;
+  /* monochrome site: logos keep their tonal contrast, lose their hue */
+  filter: grayscale(1);
 }
 
 .tech-chip {

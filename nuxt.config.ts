@@ -55,13 +55,22 @@ export default defineNuxtConfig({
 
   fonts: {
     families: [
-      { name: "Inter", provider: "google" },
-      { name: "Space Grotesk", provider: "google" },
+      // clean modern sans for body + display
+      { name: "Geist", provider: "google", weights: [300, 400, 500, 600, 700] },
+      // editorial monospaced labels
+      { name: "Geist Mono", provider: "google", weights: [400, 500] },
+      // high-contrast editorial serif for key headings
+      {
+        name: "Cormorant Garamond",
+        provider: "google",
+        weights: [300, 400, 500, 600],
+        styles: ["normal", "italic"],
+      },
     ],
   },
 
   app: {
-    pageTransition: false,
+    pageTransition: { name: "page", mode: "out-in" },
     head: {
       htmlAttrs: { lang: "en", class: "dark" },
       title: "TheWebsiteForge - Websites With Motion, Speed, and Bite",
@@ -74,7 +83,7 @@ export default defineNuxtConfig({
           content:
             "TheWebsiteForge builds premium, high-performance websites, animated brand systems, and polished digital launches.",
         },
-        { name: "theme-color", content: "#05070d" },
+        { name: "theme-color", content: "#0e0d0c" },
         {
           property: "og:title",
           content: "TheWebsiteForge - Websites With Motion, Speed, and Bite",

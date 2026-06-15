@@ -4,40 +4,18 @@ withDefaults(defineProps<{ size?: number }>(), { size: 34 });
 
 <template>
   <svg
-    :width="size"
+    :width="size * 0.72"
     :height="size"
-    viewBox="0 0 48 48"
+    viewBox="0 0 360 500"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    class="shrink-0"
+    class="brand-p-mark shrink-0"
     role="img"
     aria-label="TheWebsiteForge logo"
   >
-    <defs>
-      <linearGradient id="lumina-grad" x1="6" y1="6" x2="42" y2="42">
-        <stop stop-color="#34d8a6" />
-        <stop offset="0.55" stop-color="#1f9bf0" />
-        <stop offset="1" stop-color="#2563eb" />
-      </linearGradient>
-    </defs>
-    <rect
-      x="3"
-      y="3"
-      width="42"
-      height="42"
-      rx="13"
-      fill="url(#lumina-grad)"
-      fill-opacity="0.16"
-      stroke="url(#lumina-grad)"
-      stroke-width="1.5"
-    />
     <path
-      d="M24 11 L33 18 V30 L24 37 L15 30 V18 Z"
-      stroke="url(#lumina-grad)"
-      stroke-width="2.4"
-      stroke-linejoin="round"
-      fill="none"
+      d="M112 35H164L154 92H102L112 35ZM83 112H139L126 183C123 201 132 210 151 210H222C248 210 266 192 266 166C266 141 248 124 222 124H146L157 63H224C294 63 342 105 342 166C342 229 294 272 224 272H139L101 465H35L83 112Z"
+      fill="currentColor"
     />
-    <circle cx="24" cy="24" r="3.6" fill="url(#lumina-grad)" />
   </svg>
 </template>

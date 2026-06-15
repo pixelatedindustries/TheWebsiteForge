@@ -2,8 +2,9 @@
 import { projects } from "~~/shared/site";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { scrollVelocity } from "~/plugins/motion";
 
-const featured = projects.slice(0, 5);
+const featured = projects.slice(0, 4);
 
 const section = ref<HTMLElement | null>(null);
 const track = ref<HTMLElement | null>(null);
@@ -11,6 +12,20 @@ const progress = ref<HTMLElement | null>(null);
 
 let mounted = false;
 let mm: gsap.MatchMedia | null = null;
+
+// cover = screenshot if we have one (gradient layered underneath as a fallback
+// if the image is missing), otherwise just the gradient
+const coverStyle = (p: (typeof projects)[number]) => ({
+  backgroundImage: p.image
+    ? `url("${p.image}"), linear-gradient(135deg, ${p.gradient[0]}, ${p.gradient[1]})`
+    : `linear-gradient(135deg, ${p.gradient[0]}, ${p.gradient[1]})`,
+});
+
+const isExternal = (url?: string) => !!url && /^https?:\/\//.test(url);
+const linkAttrs = (url?: string) =>
+  isExternal(url)
+    ? { href: url, target: "_blank", rel: "noopener noreferrer" }
+    : { href: url || "/showcase" };
 
 onBeforeUnmount(() => {
   mounted = false;
@@ -22,7 +37,6 @@ onMounted(() => {
 
   const setup = () => {
     if (!mounted || mm) return;
-    // Desktop + motion-OK only: pin the section and scrub the cards horizontally.
     mm = gsap.matchMedia();
     mm.add(
       "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
@@ -32,14 +46,13 @@ onMounted(() => {
         if (!sec || !tr) return;
 
         const distance = () => Math.max(0, tr.scrollWidth - window.innerWidth);
-        // Promote to its own layer only while the pinned scroll is active.
         gsap.set(tr, { willChange: "transform" });
         const tween = gsap.to(tr, {
           x: () => -distance(),
           ease: "none",
           scrollTrigger: {
             trigger: sec,
-            start: "top top",
+            start: "center center",
             end: () => "+=" + distance(),
             pin: true,
             scrub: 1,
@@ -50,9 +63,33 @@ onMounted(() => {
               gsap.set(progress.value, { scaleX: self.progress }),
           },
         });
+
+        const skewTo = gsap.quickTo(tr, "skewX", {
+          duration: 0.5,
+          ease: "power3",
+        });
+        const skewTick = () =>
+          skewTo(gsap.utils.clamp(-12, 12, scrollVelocity() * 0.3));
+        gsap.ticker.add(skewTick);
+
+        const imgs = gsap.utils.toArray<HTMLElement>(".work-img", tr);
+        const parTick = () => {
+          const vw = window.innerWidth || 1;
+          for (const img of imgs) {
+            const frame = img.parentElement;
+            if (!frame) continue;
+            const r = frame.getBoundingClientRect();
+            const off = (r.left + r.width / 2 - vw / 2) / vw;
+            gsap.set(img, { xPercent: gsap.utils.clamp(-10, 10, off * -12) });
+          }
+        };
+        gsap.ticker.add(parTick);
+
         return () => {
+          gsap.ticker.remove(skewTick);
+          gsap.ticker.remove(parTick);
           tween.kill();
-          gsap.set(tr, { willChange: "auto" });
+          gsap.set(tr, { willChange: "auto", skewX: 0 });
         };
       },
     );
@@ -66,34 +103,38 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- ───────── Desktop: pinned horizontal scroll ───────── -->
-  <section ref="section" class="relative hidden h-screen lg:block">
-    <div class="flex h-full items-center overflow-hidden">
-      <div
-        ref="track"
-        class="flex h-full items-center gap-10 pr-[10vw] pl-[max(2rem,8vw)]"
-      >
-        <!-- intro panel -->
-        <div class="w-[36vw] shrink-0">
-          <SectionHeading
-            align="left"
-            eyebrow="Showcase × Proof"
-            title="Work that earns its keep"
-            subtitle="Each build ships with a real metric attached. Scroll across a few favourites — every one is buyable or buildable."
-          />
-          <NuxtLink
-            v-magnetic="0.4"
-            to="/showcase"
-            class="glass mt-6 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+  <section
+    ref="section"
+    class="relative hidden h-screen overflow-hidden lg:block"
+  >
+    <div class="flex h-full items-center">
+      <div ref="track" class="flex h-full items-center gap-8 pr-[12vw]">
+        <div
+          class="flex h-full w-[40vw] shrink-0 flex-col justify-center pr-[5vw] pl-[8vw]"
+        >
+          <p
+            class="mb-8 flex items-center gap-4 font-mono text-xs uppercase tracking-[0.4em] text-slate-500"
           >
-            View all work
+            <span class="h-px w-12 bg-slate-700" />
+            Selected work
+          </p>
+          <h2
+            class="font-serif text-[clamp(2.5rem,5.5vw,5rem)] font-light leading-[1.04] tracking-[-0.01em] text-[#ece9e2]"
+          >
+            The <span class="italic text-brand-300">work</span>
+          </h2>
+          <NuxtLink
+            to="/showcase"
+            class="btn-line mt-12 inline-flex w-fit items-center gap-3 px-7 py-3.5 text-xs font-medium uppercase tracking-[0.2em]"
+          >
+            View all
             <svg
-              width="16"
-              height="16"
+              width="14"
+              height="14"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="2.5"
+              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
             >
@@ -102,71 +143,133 @@ onMounted(() => {
           </NuxtLink>
         </div>
 
-        <!-- cards -->
-        <div
+        <a
           v-for="(project, i) in featured"
           :key="project.id"
-          v-tilt
-          class="w-[clamp(20rem,30vw,28rem)] shrink-0"
+          v-bind="linkAttrs(project.url)"
+          class="work-frame group relative block h-[68vh] w-[44vw] shrink-0 overflow-hidden rounded-[1.75rem] border border-white/10"
         >
-          <span
-            class="mb-3 block font-display text-sm font-semibold text-white/30"
+          <div
+            class="work-img absolute inset-y-0 -left-[15%] w-[130%] bg-cover bg-center grayscale transition-[filter] duration-700 ease-out group-hover:grayscale-0"
+            :style="coverStyle(project)"
+          />
+          <div
+            class="absolute inset-0 flex flex-col justify-between p-10"
+            style="
+              background: linear-gradient(
+                to top,
+                rgba(14, 13, 12, 0.78),
+                transparent 58%
+              );
+            "
           >
-            0{{ i + 1 }} — {{ project.category }}
-          </span>
-          <ShowcaseCard :project="project" :show-price="false" />
-        </div>
+            <div
+              class="flex items-center justify-between font-mono text-xs uppercase tracking-[0.3em] text-[#ece9e2]/70"
+            >
+              <span>0{{ i + 1 }}</span>
+              <span class="flex items-center gap-2">
+                {{ project.category }}
+                <svg
+                  class="opacity-50 transition duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M7 17 17 7M9 7h8v8" />
+                </svg>
+              </span>
+            </div>
+            <div>
+              <h3
+                class="font-serif text-[clamp(1.75rem,3vw,3rem)] font-light leading-[1.05] tracking-[-0.01em] text-[#ece9e2]"
+              >
+                {{ project.name }}
+              </h3>
+              <p
+                class="mt-3 font-mono text-xs uppercase tracking-[0.25em] text-slate-400"
+              >
+                {{ project.metric }} — {{ project.metricLabel }}
+              </p>
+            </div>
+          </div>
+        </a>
       </div>
     </div>
 
-    <!-- scrub progress bar -->
-    <div class="absolute inset-x-[8vw] bottom-10 h-px bg-white/10">
-      <div
-        ref="progress"
-        class="h-full origin-left scale-x-0 bg-gradient-to-r from-brand-400 to-accent-400"
-      />
+    <div class="absolute inset-x-[8vw] bottom-8 h-px bg-white/10">
+      <div ref="progress" class="h-full origin-left scale-x-0 bg-brand-300" />
     </div>
   </section>
 
-  <!-- ───────── Mobile / reduced-motion: classic grid ───────── -->
-  <section class="px-4 py-20 sm:px-6 lg:hidden">
-    <div class="mx-auto max-w-7xl">
-      <div class="flex flex-col items-end justify-between gap-6 sm:flex-row">
-        <SectionHeading
-          align="left"
-          eyebrow="Showcase × Proof"
-          title="Work that earns its keep"
-          subtitle="Each build ships with a real metric attached. These are a few of our favourites — every one is buyable or buildable."
-        />
-        <NuxtLink
-          v-reveal="{ y: 20 }"
-          to="/showcase"
-          class="glass inline-flex shrink-0 items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
-        >
-          View all work
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
-        </NuxtLink>
-      </div>
+  <section class="px-6 py-24 sm:px-10 lg:hidden">
+    <p
+      class="mb-8 flex items-center gap-4 font-mono text-xs uppercase tracking-[0.4em] text-slate-500"
+    >
+      <span class="h-px w-12 bg-slate-700" />
+      Selected work
+    </p>
+    <h2
+      class="font-serif text-[clamp(2.5rem,12vw,4rem)] font-light leading-[1.05] tracking-tight text-[#ece9e2]"
+    >
+      The <span class="italic text-brand-300">work</span>
+    </h2>
 
-      <div
-        v-reveal:stagger="{ selector: '.card', stagger: 0.14 }"
-        class="mt-12 grid gap-6 sm:grid-cols-2"
+    <div
+      v-reveal:stagger="{ selector: '.m-frame', stagger: 0.12 }"
+      class="mt-12 space-y-5"
+    >
+      <a
+        v-for="(project, i) in featured"
+        :key="project.id"
+        v-bind="linkAttrs(project.url)"
+        class="m-frame relative block aspect-[4/5] w-full overflow-hidden rounded-3xl border border-white/10"
       >
-        <div v-for="project in featured" :key="project.id" class="card">
-          <ShowcaseCard :project="project" :show-price="false" />
+        <div
+          class="absolute inset-0 bg-cover bg-center grayscale"
+          :style="coverStyle(project)"
+        />
+        <div
+          class="absolute inset-0 flex flex-col justify-between p-7"
+          style="
+            background: linear-gradient(
+              to top,
+              rgba(14, 13, 12, 0.78),
+              transparent 58%
+            );
+          "
+        >
+          <div
+            class="flex items-center justify-between font-mono text-[0.65rem] uppercase tracking-[0.3em] text-[#ece9e2]/70"
+          >
+            <span>0{{ i + 1 }}</span>
+            <span class="flex items-center gap-2">
+              {{ project.category }}
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M7 17 17 7M9 7h8v8" />
+              </svg>
+            </span>
+          </div>
+          <h3
+            class="font-serif text-4xl font-light leading-[1.05] tracking-tight text-[#ece9e2]"
+          >
+            {{ project.name }}
+          </h3>
         </div>
-      </div>
+      </a>
     </div>
   </section>
 </template>

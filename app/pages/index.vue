@@ -196,13 +196,13 @@ onMounted(async () => {
       t.y((dy / len) * infl * 30);
       t.sx(1 + infl * 0.18); // stretch toward the hole
       t.sk(-infl * 6);
-      // #7 chromatic light-splitting as the cursor nears
+      // #7 light-splitting ghost as the cursor nears (monochrome split)
       if (t.chroma) {
         const ca = infl * 6;
         t.el.style.textShadow =
           ca < 0.25
             ? ""
-            : `${ca.toFixed(2)}px 0 rgba(255,96,96,${(0.5 * infl).toFixed(3)}), ${(-ca).toFixed(2)}px 0 rgba(120,224,255,${(0.6 * infl).toFixed(3)})`;
+            : `${ca.toFixed(2)}px 0 rgba(255,255,255,${(0.5 * infl).toFixed(3)}), ${(-ca).toFixed(2)}px 0 rgba(150,150,150,${(0.6 * infl).toFixed(3)})`;
       }
     }
   };
@@ -318,8 +318,8 @@ async function enter() {
       style="
         background: linear-gradient(
           to right,
-          #04070d 20%,
-          rgba(4, 7, 13, 0.72) 46%,
+          rgba(14, 13, 12, 0.92) 20%,
+          rgba(14, 13, 12, 0.6) 46%,
           transparent 76%
         );
       "
@@ -439,9 +439,9 @@ async function enter() {
   letter-spacing: -0.01em;
   background-image: linear-gradient(
     100deg,
-    var(--color-brand-300),
-    var(--color-accent-400) 55%,
-    var(--color-accent-300)
+    #ffffff,
+    #c9c9c9 50%,
+    #ffffff
   );
   background-size: 200% auto;
   -webkit-background-clip: text;
@@ -452,17 +452,16 @@ async function enter() {
 .intro-enter {
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
-    0 0 0 1px rgba(52, 216, 166, 0.16),
-    0 16px 42px -18px rgba(56, 189, 248, 0.9);
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 16px 42px -18px rgba(0, 0, 0, 0.8);
 }
 .hum-toggle {
   border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(10, 16, 28, 0.4);
+  background: rgba(20, 20, 20, 0.5);
   backdrop-filter: blur(6px);
 }
 .hum-toggle[aria-pressed="true"] {
-  border-color: rgba(120, 224, 255, 0.45);
-  box-shadow: 0 0 18px -4px rgba(56, 189, 248, 0.6);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 @media (prefers-reduced-motion: reduce) {
   .source-word {

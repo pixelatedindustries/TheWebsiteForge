@@ -28,6 +28,10 @@ export interface Project {
   tags: string[];
   /** Tailwind-friendly gradient stops for the generated cover. */
   gradient: [string, string];
+  /** Live site URL (external opens in a new tab; internal routes navigate). */
+  url?: string;
+  /** Path to a cover screenshot under /public (falls back to the gradient). */
+  image?: string;
 }
 
 export interface PricingTier {
@@ -94,10 +98,13 @@ export interface Stat {
 
 /* ---------------------------------------------------------------- */
 
+/** Public support / contact email, shown sitewide. */
+export const supportEmail = "support@pixelatedindustries.com";
+
 export const projects: Project[] = [
   {
     id: "nimbus-analytics",
-    name: "Nimbus Analytics",
+    name: "YourWebsiteComments",
     category: "SaaS",
     blurb:
       "A real-time product analytics dashboard with live charts, cohort retention, and a self-serve onboarding flow.",
@@ -107,11 +114,13 @@ export const projects: Project[] = [
     status: "Featured",
     year: 2025,
     tags: ["Dashboard", "Charts", "Auth", "Billing"],
-    gradient: ["#34d8a6", "#1f9bf0"],
+    gradient: ["#d6d6d6", "#8f8f8f"],
+    url: "https://yourwebsitecomments.com/",
+    image: "/work/yourwebsitecomments.jpg",
   },
   {
     id: "verdant-market",
-    name: "Verdant Market",
+    name: "EbieForShort",
     category: "E-commerce",
     blurb:
       "A headless storefront for an organic grocer — instant search, one-tap checkout, and a subscription box flow.",
@@ -121,11 +130,13 @@ export const projects: Project[] = [
     status: "Sold",
     year: 2025,
     tags: ["Headless", "Stripe", "Search", "PWA"],
-    gradient: ["#6ce9bf", "#0a9472"],
+    gradient: ["#e0e0e0", "#5f5f5f"],
+    url: "https://ebievfx.pixelateddevs.com/",
+    image: "/work/ebieforshort.jpg",
   },
   {
     id: "harbor-legal",
-    name: "Harbor Legal",
+    name: "TheWebsiteForge",
     category: "Agency",
     blurb:
       "A trust-forward marketing site for a boutique law firm, with case studies, intake forms, and CMS-driven articles.",
@@ -135,25 +146,13 @@ export const projects: Project[] = [
     status: "Sold",
     year: 2024,
     tags: ["CMS", "Forms", "SEO", "Blog"],
-    gradient: ["#38bdf8", "#2563eb"],
-  },
-  {
-    id: "atlas-portfolio",
-    name: "Atlas Folio",
-    category: "Portfolio",
-    blurb:
-      "An award-style portfolio for a 3D artist with cinematic scroll, WebGL hero, and a password-gated client area.",
-    metric: "92",
-    metricLabel: "Awwwards score",
-    price: 4300,
-    status: "Available",
-    year: 2025,
-    tags: ["WebGL", "Motion", "Gallery"],
-    gradient: ["#7dd3fc", "#14b88a"],
+    gradient: ["#bdbdbd", "#6b6b6b"],
+    url: "/home",
+    image: "/work/thewebsiteforge.jpg",
   },
   {
     id: "pulse-fit",
-    name: "Pulse Fit",
+    name: "Assu-Med",
     category: "Web App",
     blurb:
       "A workout-tracking PWA with offline support, streaks, and a social leaderboard powered by edge functions.",
@@ -163,7 +162,9 @@ export const projects: Project[] = [
     status: "Available",
     year: 2025,
     tags: ["PWA", "Offline", "Realtime", "Edge"],
-    gradient: ["#34d8a6", "#38bdf8"],
+    gradient: ["#cccccc", "#999999"],
+    url: "https://www.assumed.co.za/",
+    image: "/work/assumed.jpg",
   },
   {
     id: "lumen-launch",
@@ -177,7 +178,7 @@ export const projects: Project[] = [
     status: "Available",
     year: 2026,
     tags: ["Waitlist", "A/B", "Analytics"],
-    gradient: ["#a4f4d6", "#1f9bf0"],
+    gradient: ["#ededed", "#8a8a8a"],
   },
   {
     id: "meridian-bank",
@@ -191,7 +192,7 @@ export const projects: Project[] = [
     status: "Sold",
     year: 2024,
     tags: ["Fintech", "Design System", "KYC"],
-    gradient: ["#14b88a", "#2563eb"],
+    gradient: ["#a8a8a8", "#5c5c5c"],
   },
   {
     id: "evergreen-stay",
@@ -205,7 +206,7 @@ export const projects: Project[] = [
     status: "Available",
     year: 2025,
     tags: ["Booking", "Calendar", "Maps"],
-    gradient: ["#6ce9bf", "#38bdf8"],
+    gradient: ["#dedede", "#a3a3a3"],
   },
   {
     id: "cobalt-crm",
@@ -219,7 +220,7 @@ export const projects: Project[] = [
     status: "Sold",
     year: 2025,
     tags: ["CRM", "Drag & Drop", "Command-K"],
-    gradient: ["#34d8a6", "#2563eb"],
+    gradient: ["#c7c7c7", "#616161"],
   },
   {
     id: "northwind-freight",
@@ -233,7 +234,7 @@ export const projects: Project[] = [
     status: "Available",
     year: 2024,
     tags: ["Maps", "RBAC", "Exports", "Realtime"],
-    gradient: ["#1f9bf0", "#0a765e"],
+    gradient: ["#9e9e9e", "#4f4f4f"],
   },
   {
     id: "saffron-table",
@@ -247,7 +248,7 @@ export const projects: Project[] = [
     status: "Sold",
     year: 2025,
     tags: ["Ordering", "QR", "Stripe", "Menu CMS"],
-    gradient: ["#a4f4d6", "#0a9472"],
+    gradient: ["#eaeaea", "#666666"],
   },
   {
     id: "orbit-docs",
@@ -261,7 +262,7 @@ export const projects: Project[] = [
     status: "Available",
     year: 2026,
     tags: ["Docs", "Search", "Versioning", "MDX"],
-    gradient: ["#7dd3fc", "#2563eb"],
+    gradient: ["#d3d3d3", "#6e6e6e"],
   },
   {
     id: "bloom-studio",
@@ -275,7 +276,7 @@ export const projects: Project[] = [
     status: "Featured",
     year: 2025,
     tags: ["WebGL", "Scrollytelling", "CMS"],
-    gradient: ["#6ce9bf", "#1f9bf0"],
+    gradient: ["#dbdbdb", "#8c8c8c"],
   },
   {
     id: "vanta-wear",
@@ -289,7 +290,7 @@ export const projects: Project[] = [
     status: "Available",
     year: 2025,
     tags: ["3D", "Quiz", "Lookbook", "Headless"],
-    gradient: ["#38bdf8", "#14b88a"],
+    gradient: ["#b5b5b5", "#787878"],
   },
   {
     id: "pinnacle-capital",
@@ -303,7 +304,7 @@ export const projects: Project[] = [
     status: "Sold",
     year: 2026,
     tags: ["Finance", "Gated", "Animation"],
-    gradient: ["#7dd3fc", "#2563eb"],
+    gradient: ["#d3d3d3", "#6e6e6e"],
   },
 ];
 
@@ -595,6 +596,10 @@ export const processSteps: ProcessStep[] = [
 ];
 
 export const faqs: Faq[] = [
+  {
+    q: "Why do you use credits?",
+    a: "Credits let us respond and begin work faster. Bank charges, payment clearances, and transfer delays can slow down small requests; credits keep your balance ready so approvals turn into action without waiting on another transaction.",
+  },
   {
     q: "Do you build custom sites or sell pre-made ones?",
     a: "Both. We craft bespoke sites for clients, and we also sell production-ready builds you can buy outright and relaunch under your brand.",

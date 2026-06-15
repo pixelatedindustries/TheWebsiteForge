@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { supportEmail } from "~~/shared/site";
+
 useSeoMeta({
   title: "Contact — Lumina Studio",
   description:
@@ -92,10 +94,10 @@ const highlights = [
             </svg>
             Prefer email?
             <a
-              href="mailto:dummy@mail.com"
+              :href="`mailto:${supportEmail}`"
               class="font-medium text-brand-300 underline-offset-4 hover:underline"
             >
-              dummy@mail.com
+              {{ supportEmail }}
             </a>
           </div>
         </div>

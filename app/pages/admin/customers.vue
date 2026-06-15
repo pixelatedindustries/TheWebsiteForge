@@ -11,6 +11,18 @@ const pending = ref(true);
 const error = ref<string | null>(null);
 
 const serviceOptions = Object.values(recurringServices);
+const totalMrr = computed(() =>
+  customers.value.reduce((sum, customer) => sum + customer.mrrCents, 0),
+);
+const totalWallet = computed(() =>
+  customers.value.reduce(
+    (sum, customer) => sum + customer.walletBalanceCents,
+    0,
+  ),
+);
+const totalSites = computed(() =>
+  customers.value.reduce((sum, customer) => sum + customer.siteCount, 0),
+);
 
 // --- manage panel state ---
 const selected = ref<Customer | null>(null);
@@ -154,12 +166,31 @@ onMounted(loadCustomers);
 </script>
 
 <template>
-  <div>
+  <div class="admin-page admin-page--customers">
     <h1 class="font-display text-2xl font-semibold text-white">Customers</h1>
     <p class="mt-1 text-sm text-slate-400">
       Everyone you build and host for. Manage wallets and recurring charges
       here.
     </p>
+
+    <div v-if="!pending && !error" class="admin-summary">
+      <div class="admin-summary-card">
+        <span>Total clients</span>
+        <strong>{{ customers.length }}</strong>
+      </div>
+      <div class="admin-summary-card">
+        <span>Sites managed</span>
+        <strong>{{ totalSites }}</strong>
+      </div>
+      <div class="admin-summary-card">
+        <span>Client MRR</span>
+        <strong>{{ formatUsdCents(totalMrr) }}</strong>
+      </div>
+      <div class="admin-summary-card">
+        <span>Wallet balance</span>
+        <strong>{{ formatUsdCents(totalWallet) }}</strong>
+      </div>
+    </div>
 
     <p v-if="pending" class="mt-8 text-sm text-slate-500">Loading…</p>
     <p v-else-if="error" class="mt-8 text-sm text-rose-400">{{ error }}</p>

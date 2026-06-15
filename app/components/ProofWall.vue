@@ -11,7 +11,7 @@ const websiteTypes: WebsiteType[] = [
     bestFor: "Software tools, subscriptions, dashboards, and B2B products.",
     pieces: ["Pricing", "Feature pages", "Auth flows", "Docs"],
     icon: "dashboard",
-    accent: "#34d8a6",
+    accent: "#e6e6e6",
   },
   {
     category: "E-commerce",
@@ -22,7 +22,7 @@ const websiteTypes: WebsiteType[] = [
       "Retail brands, drops, subscriptions, bookings, and catalog sites.",
     pieces: ["Product pages", "Cart", "Checkout", "Search"],
     icon: "cart",
-    accent: "#38bdf8",
+    accent: "#cfcfcf",
   },
   {
     category: "Agency",
@@ -33,7 +33,7 @@ const websiteTypes: WebsiteType[] = [
       "Studios, law firms, consultants, teams, and local service brands.",
     pieces: ["Services", "Case studies", "CMS", "Lead forms"],
     icon: "layers",
-    accent: "#7dd3fc",
+    accent: "#dcdcdc",
   },
   {
     category: "Portfolio",
@@ -44,7 +44,7 @@ const websiteTypes: WebsiteType[] = [
       "Designers, artists, photographers, creators, and personal brands.",
     pieces: ["Gallery", "Project pages", "Motion", "Media"],
     icon: "gallery",
-    accent: "#6ce9bf",
+    accent: "#c2c2c2",
   },
   {
     category: "Web App",
@@ -54,7 +54,7 @@ const websiteTypes: WebsiteType[] = [
     bestFor: "Dashboards, portals, internal tools, booking tools, and MVPs.",
     pieces: ["Dashboard", "Roles", "Realtime", "Exports"],
     icon: "app",
-    accent: "#1f9bf0",
+    accent: "#ababab",
   },
   {
     category: "Landing",
@@ -64,7 +64,7 @@ const websiteTypes: WebsiteType[] = [
     bestFor: "Launches, ads, waitlists, events, and simple offers.",
     pieces: ["Hero", "Benefits", "FAQ", "CTA"],
     icon: "target",
-    accent: "#a4f4d6",
+    accent: "#f0f0f0",
   },
 ];
 
@@ -92,7 +92,7 @@ const categoryCounts = computed(() =>
 </script>
 
 <template>
-  <section class="px-4 py-20 sm:px-6 lg:px-8">
+  <section class="px-4 py-36 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-7xl">
       <SectionHeading
         eyebrow="Build Range"
@@ -101,7 +101,7 @@ const categoryCounts = computed(() =>
       />
 
       <div
-        class="mt-12 grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(22rem,0.8fr)] lg:items-stretch"
+        class="mt-20 grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(22rem,0.8fr)] lg:items-stretch"
       >
         <div
           class="glass gradient-border relative min-h-[34rem] overflow-hidden rounded-2xl p-5 sm:p-7"
@@ -115,7 +115,7 @@ const categoryCounts = computed(() =>
               class="type-node group relative flex min-h-48 flex-col justify-between overflow-hidden rounded-xl border p-4 text-left transition duration-300 sm:p-5"
               :class="
                 activeCategory === type.category
-                  ? 'is-active border-brand-300/80 bg-brand-400/12 shadow-[0_0_52px_rgba(52,216,166,0.2)]'
+                  ? 'is-active border-white/40 bg-white/[0.07]'
                   : 'border-white/10 bg-white/[0.035] hover:border-white/30 hover:bg-white/[0.07]'
               "
               :style="`--node-index:${index};--accent:${type.accent}`"
@@ -331,12 +331,12 @@ const categoryCounts = computed(() =>
   background:
     radial-gradient(
       circle at 18% 22%,
-      rgba(52, 216, 166, 0.18),
+      rgba(255, 255, 255, 0.12),
       transparent 22%
     ),
     radial-gradient(
       circle at 82% 72%,
-      rgba(56, 189, 248, 0.16),
+      rgba(255, 255, 255, 0.1),
       transparent 24%
     ),
     linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
@@ -360,7 +360,7 @@ const categoryCounts = computed(() =>
     linear-gradient(
       135deg,
       color-mix(in srgb, var(--accent) 28%, transparent),
-      rgba(56, 189, 248, 0.08)
+      rgba(255, 255, 255, 0.06)
     );
   content: "";
   filter: blur(1px);
@@ -496,7 +496,7 @@ const categoryCounts = computed(() =>
 
 .node-index {
   color: color-mix(in srgb, var(--accent) 62%, white 20%);
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.22em;

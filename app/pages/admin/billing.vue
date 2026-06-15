@@ -22,6 +22,25 @@ const subscriptions = ref<Subscription[]>([]);
 const invoices = ref<Invoice[]>([]);
 const pending = ref(true);
 const error = ref<string | null>(null);
+const activeSubscriptions = computed(
+  () =>
+    subscriptions.value.filter(
+      (subscription) => subscription.status === "active",
+    ).length,
+);
+const recurringRevenue = computed(() =>
+  subscriptions.value
+    .filter((subscription) => subscription.status === "active")
+    .reduce((sum, subscription) => sum + subscription.amountCents, 0),
+);
+const openInvoices = computed(
+  () => invoices.value.filter((invoice) => invoice.status === "open").length,
+);
+const paidRevenue = computed(() =>
+  invoices.value
+    .filter((invoice) => invoice.status === "paid")
+    .reduce((sum, invoice) => sum + invoice.amountCents, 0),
+);
 
 onMounted(async () => {
   try {
@@ -47,11 +66,30 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
+  <div class="admin-page admin-page--billing">
     <h1 class="font-display text-2xl font-semibold text-white">Billing</h1>
     <p class="mt-1 text-sm text-slate-400">
       Subscriptions and invoices across all providers.
     </p>
+
+    <div v-if="!pending && !error" class="admin-summary">
+      <div class="admin-summary-card">
+        <span>Active subscriptions</span>
+        <strong>{{ activeSubscriptions }}</strong>
+      </div>
+      <div class="admin-summary-card">
+        <span>Recurring revenue</span>
+        <strong>{{ formatCents(recurringRevenue) }}</strong>
+      </div>
+      <div class="admin-summary-card">
+        <span>Open invoices</span>
+        <strong>{{ openInvoices }}</strong>
+      </div>
+      <div class="admin-summary-card">
+        <span>Paid revenue</span>
+        <strong>{{ formatCents(paidRevenue) }}</strong>
+      </div>
+    </div>
 
     <p v-if="pending" class="mt-8 text-sm text-slate-500">Loading…</p>
     <p v-else-if="error" class="mt-8 text-sm text-rose-400">{{ error }}</p>

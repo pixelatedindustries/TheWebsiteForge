@@ -97,7 +97,12 @@ watch(
         "
       >
         <NuxtLink to="/home" class="group flex items-center gap-2.5">
-          <LogoMark :size="32" />
+          <span
+            data-brand-mark-target
+            class="brand-mark-target inline-flex text-white"
+          >
+            <LogoMark :size="32" />
+          </span>
           <span class="text-lg font-semibold tracking-tight text-white">
             TheWebsite<span class="text-gradient">Forge</span>
           </span>
@@ -152,7 +157,7 @@ watch(
           <NuxtLink
             v-if="ready && user"
             to="/account"
-            class="glass inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-white/10"
+            class="glass inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10"
           >
             {{ formatUsdCents(balanceCents ?? 0) }}
           </NuxtLink>

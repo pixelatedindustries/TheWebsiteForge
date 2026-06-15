@@ -130,7 +130,7 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
           <div v-if="useWalletFirst" class="mt-3 space-y-1 text-xs">
             <p class="flex items-center justify-between text-slate-300">
               <span>Wallet applied</span>
-              <span class="font-semibold text-emerald-300"
+              <span class="font-semibold text-white"
                 >-{{ formatUsdCents(walletAppliedCents) }}</span
               >
             </p>
@@ -140,7 +140,7 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
                 formatUsdCents(chargeUsdCents)
               }}</span>
             </p>
-            <p v-if="chargeUsdCents === 0" class="text-emerald-300">
+            <p v-if="chargeUsdCents === 0" class="text-white">
               Your wallet fully covers this build. No Paystack charge will be
               needed.
             </p>
@@ -175,7 +175,7 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
           </div>
         </div>
 
-        <p v-if="error" class="mt-4 text-sm text-rose-400">{{ error }}</p>
+        <p v-if="error" class="mt-4 text-sm text-white">{{ error }}</p>
 
         <button
           type="button"
