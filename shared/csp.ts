@@ -31,6 +31,10 @@ export function buildContentSecurityPolicy(nonce?: string): string {
     "font-src 'self' https://fonts.gstatic.com data:",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     scriptSrc,
+    // WebGL/3D libraries (and Vite's dev HMR) spawn workers from blob: URLs.
+    // Without an explicit worker-src these fall back to the strict script-src
+    // and get blocked under the nonce policy.
+    "worker-src 'self' blob:",
     "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://api.paystack.co https://*.paystack.co",
     "frame-src https://checkout.paystack.com https://*.paystack.co https://*.firebaseapp.com https://*.web.app",
   ].join("; ");
