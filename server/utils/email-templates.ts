@@ -108,6 +108,29 @@ export function leadAlertEmail(input: {
   return { subject, html, text };
 }
 
+/**
+ * Alert sent to the admin inbox when a paid-package project brief is submitted
+ * at checkout, so the team can begin work immediately (launch req §4).
+ */
+export function briefAlertEmail(input: {
+  email: string;
+  planLabel: string;
+  message: string;
+}): EmailContent {
+  const subject = `New project brief: ${input.planLabel}`;
+  const html = layout(`
+    <h1 style="margin:0 0 14px 0;font-size:20px;color:${TEXT};">New project brief submitted</h1>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 16px 0;font-size:14px;">
+      <tr><td style="padding:4px 12px 4px 0;color:${MUTED};white-space:nowrap;">Package</td><td style="padding:4px 0;color:${TEXT};">${esc(input.planLabel)}</td></tr>
+      <tr><td style="padding:4px 12px 4px 0;color:${MUTED};white-space:nowrap;">Customer</td><td style="padding:4px 0;color:${TEXT};">${esc(input.email)}</td></tr>
+    </table>
+    <p style="margin:0 0 6px 0;color:${MUTED};">Brief</p>
+    <div style="background:#070a11;border:1px solid #1b2230;border-radius:10px;padding:14px;white-space:pre-wrap;color:${TEXT};">${esc(input.message)}</div>
+  `);
+  const text = `New project brief submitted\n\nPackage: ${input.planLabel}\nCustomer: ${input.email}\n\nBrief:\n${input.message}`;
+  return { subject, html, text };
+}
+
 /* ----------------------------- billing ----------------------------- */
 
 /** Receipt sent to a customer after a successful payment. */

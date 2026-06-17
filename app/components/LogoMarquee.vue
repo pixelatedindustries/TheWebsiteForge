@@ -109,15 +109,6 @@ onBeforeUnmount(() => {
     <div ref="wrap" class="marquee-parallax">
       <div
         class="tech-marquee relative"
-        style="
-          mask-image: linear-gradient(
-            to right,
-            transparent,
-            #000 12%,
-            #000 88%,
-            transparent
-          );
-        "
       >
         <div
           ref="rowEl"
@@ -410,6 +401,20 @@ onBeforeUnmount(() => {
 .tech-marquee {
   overflow-x: hidden;
   overflow-y: visible;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
 }
 
 .tech-chip {

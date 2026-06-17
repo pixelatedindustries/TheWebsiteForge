@@ -369,13 +369,13 @@ export const pricingTiers: PricingTier[] = [
     cta: "Get started",
   },
   {
-    id: "enterprise",
-    name: "Enterprise",
-    tagline: "A larger custom build with advanced features and systems.",
-    price: 999,
-    fixed: true,
+    id: "custom",
+    name: "Custom Quote",
+    tagline:
+      "A custom build scoped and priced around your exact requirements.",
+    price: 0,
+    fixed: false,
     period: "project",
-    planKey: "build_enterprise",
     features: [
       "Web apps, dashboards, stores, or portals",
       "Auth, payments, database, or API work",
@@ -385,7 +385,7 @@ export const pricingTiers: PricingTier[] = [
       "First month of managed hosting free",
       "Priority delivery + handover",
     ],
-    cta: "Get started",
+    cta: "Request a quote",
   },
 ];
 

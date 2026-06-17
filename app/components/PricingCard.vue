@@ -29,13 +29,7 @@ const priceLabel = computed(() =>
       v-if="tier.highlighted"
       aria-hidden="true"
       class="animate-pulse-glow pointer-events-none absolute -inset-px -z-10 rounded-2xl opacity-70 blur-xl"
-      style="
-        background: linear-gradient(
-          135deg,
-          var(--color-brand-500),
-          var(--color-accent-600)
-        );
-      "
+      style="background: linear-gradient(135deg, var(--color-brand-500), var(--color-accent-600));"
     />
     <span
       v-if="tier.highlighted"
@@ -53,7 +47,10 @@ const priceLabel = computed(() =>
       <span v-count class="font-display text-4xl font-bold text-white">{{
         priceLabel
       }}</span>
-      <span class="text-sm text-slate-500">/ {{ tier.period }}</span>
+      <span v-if="tier.fixed" class="text-sm text-slate-500"
+        >/ {{ tier.period }}</span
+      >
+      <span v-else class="text-sm text-slate-500">quote</span>
     </div>
 
     <ul class="mt-6 flex-1 space-y-3">

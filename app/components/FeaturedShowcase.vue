@@ -130,14 +130,7 @@ onMounted(() => {
           <ProjectIdentityVisual :name="project.name" :index="i" />
           <div
             class="absolute inset-0 flex flex-col justify-between p-10"
-            style="
-              background: linear-gradient(
-                to top,
-                rgba(14, 13, 12, 0.72),
-                transparent 32%,
-                rgba(14, 13, 12, 0.2)
-              );
-            "
+            style="background: linear-gradient(to top, rgba(14, 13, 12, 0.72), transparent 32%, rgba(14, 13, 12, 0.2));"
           >
             <div
               class="flex items-center justify-between font-mono text-xs uppercase tracking-[0.3em] text-[#ece9e2]/70"
@@ -208,14 +201,7 @@ onMounted(() => {
         <ProjectIdentityVisual :name="project.name" :index="i" />
         <div
           class="absolute inset-0 flex flex-col justify-between p-7"
-          style="
-            background: linear-gradient(
-              to top,
-              rgba(14, 13, 12, 0.72),
-              transparent 38%,
-              rgba(14, 13, 12, 0.2)
-            );
-          "
+          style="background: linear-gradient(to top, rgba(14, 13, 12, 0.72), transparent 38%, rgba(14, 13, 12, 0.2));"
         >
           <div
             class="flex items-center justify-between font-mono text-[0.65rem] uppercase tracking-[0.3em] text-[#ece9e2]/70"

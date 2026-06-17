@@ -352,6 +352,7 @@ onMounted(async () => {
     quad.geometry.dispose();
     material.dispose();
     renderer.dispose();
+    renderer.forceContextLoss();
     renderer.domElement.remove();
   };
 });

@@ -32,5 +32,22 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // Alert the business so the team can start work immediately. Never block the
+  // response on mail delivery — the brief is already safely stored above.
+  const admin = getMailAdmin();
+  if (admin) {
+    const pkg = getBuildPackage(planKey);
+    const summary =
+      typeof answers.summary === "string" && answers.summary.trim()
+        ? answers.summary
+        : JSON.stringify(answers, null, 2);
+    const alert = briefAlertEmail({
+      email,
+      planLabel: pkg?.label ?? planKey,
+      message: summary,
+    });
+    void sendEmail({ to: admin, replyTo: email, ...alert });
+  }
+
   return { id: brief.id };
 });

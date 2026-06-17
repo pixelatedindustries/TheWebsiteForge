@@ -31,6 +31,16 @@ export default defineEventHandler(async (event) => {
 
   // Resolve the buyer: prefer the signed-in customer, else the supplied email.
   const identity = await getOptionalCustomer(event);
+
+  // Every paid build order must be tied to an authenticated account so the
+  // brief, invoice, and project are owned by a real customer (launch req §3).
+  if (purpose === "build" && !identity) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Please sign in to complete your purchase.",
+    });
+  }
+
   const email = (identity?.email || body?.email || "").trim().toLowerCase();
   const name = identity?.name || body?.name?.trim() || email;
   if (!isValidEmail(email)) {

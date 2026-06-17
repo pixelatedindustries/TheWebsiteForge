@@ -221,6 +221,7 @@ onMounted(async () => {
     halo.geometry.dispose();
     (halo.material as { dispose(): void }).dispose();
     renderer.dispose();
+    renderer.forceContextLoss();
     renderer.domElement.remove();
   };
 });

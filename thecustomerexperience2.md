@@ -131,14 +131,18 @@ flowchart TD
 Here are the primary reasons why the Wallet model outshines the Generic approach for this specific business model:
 
 1. **Perfectly Handles Variable Costs:** Since you offer Managed Hosting (AWS/GCP) where the bill changes based on traffic/usage every month, traditional subscription billing via Paystack can be a nightmare to adjust dynamically. A wallet system effortlessly handles variable monthly deductions.
+
 2. **Reduces Friction for Micro-transactions:** Whether a client needs a $15 domain or a $50 ad-hoc button color change, they don't have to pull out their credit card and face Paystack every single time. It's a 1-click deduction from their balance.
 3. **Psychological Lock-in (Sunk Cost):** When users prepay and have a standing balance, they are much less likely to migrate their hosting away, because they already have "money in the bank" attached to your ecosystem.
 4. **Eliminates Payment Fatigue:** Clients hate getting bombarded with multiple tiny invoices (one for hosting, one for DB, one for a domain). Combining everything into a single "Burn Rate" and letting them top up chunks of money (e.g., pay $500 once and forget about it for half a year) creates a premium, hassle-free customer experience.
 5. **Fewer Processing Fees:** You pay transaction fees whenever Paystack processes a card. Having users top up $500 in one go incurs fewer percentage/flat-rate fees over time compared to processing $20 subscription charges over 25 separate months.
 
 ### Important Considerations / Questions for You
-* **Refund Policy:** If a user tops up $500, uses $100, and wants to leave, do you refund the remaining $400? You will need strict Terms of Service regarding wallet refunds.
+* **Refund Policy:** If a user tops up $500, uses $100, and wants to leave, do you refund the remaining $400? You will need strict Terms of Service regarding wallet refunds. 
+Answer: Money topped up into the users account will be non refundable and their should be a warning before purchasing stating that it's non refundable. Additionally we may do refunds but only at our own leasure.
 * **Accounting:** Revenue recognition becomes slightly more complex. From an accounting perspective, a Wallet Top-up is a *liability* until you actually provide the service and deduct it.
+
 * **SSO Placement:** Asking users to sign in *after* they configure their website details (but right before payment) typically results in higher conversion rates. Let them get invested in the process first!
+Answer: I agree lets implement this
 
 Do you have any specific concerns about implementing the wallet system (e.g., Paystack integration complexities), or any distinct constraints surrounding refunds and digital wallets you want to discuss?

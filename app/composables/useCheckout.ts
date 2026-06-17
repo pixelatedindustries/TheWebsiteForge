@@ -9,9 +9,9 @@ import type {
 
 /**
  * Client checkout helper. Calls /api/checkout/create and redirects the browser
- * to Paystack's hosted page (which redirects back to /checkout/success). Builds
- * may be bought signed-out (email supplied); top-ups require sign-in (the token
- * is attached so the server knows whose wallet to credit).
+ * to Paystack's hosted page (which redirects back to /checkout/success). Both
+ * builds and top-ups require sign-in — the token is attached so the server can
+ * tie the order/payment to the authenticated account.
  */
 export function useCheckout() {
   const { user, getToken } = useAuth();

@@ -105,11 +105,15 @@ const chargeUsdCents = computed(() => {
   return Math.max(0, pkg.value.amountUsdCents - walletAppliedCents.value);
 });
 
+// Prefill identity from the signed-in user. The wallet balance is refreshed
+// by useWalletBalance()'s own auth watcher, so we must NOT call refreshWallet()
+// here: refresh() reads and writes its `loading` ref, which would become a
+// tracked dependency of this effect and re-trigger it in an infinite loop
+// (spamming /api/account/wallet).
 watchEffect(() => {
   if (user.value) {
     name.value ||= user.value.displayName ?? "";
     email.value ||= user.value.email ?? "";
-    void refreshWallet();
   }
 });
 
@@ -118,6 +122,29 @@ const emailValid = computed(() =>
 );
 const canSubmit = computed(
   () => !!pkg.value && emailValid.value && !loading.value,
+);
+
+// Per-field brief validation. `briefAttempted` flips on the first save attempt
+// so incomplete fields highlight red live and clear as the user fills them.
+const briefAttempted = ref(false);
+const briefFieldErrors = computed(() => ({
+  businessType: briefAttempted.value && !brief.businessType,
+  siteType: briefAttempted.value && !brief.siteType,
+  pageCount: briefAttempted.value && !brief.pageCount,
+  deadline: briefAttempted.value && !brief.deadline,
+  goals: briefAttempted.value && brief.goals.trim().length < 10,
+  pages: briefAttempted.value && brief.pages.trim().length < 3,
+  features: briefAttempted.value && brief.features.length === 0,
+}));
+const briefIsComplete = computed(
+  () =>
+    !!brief.businessType &&
+    !!brief.siteType &&
+    !!brief.pageCount &&
+    !!brief.deadline &&
+    brief.goals.trim().length >= 10 &&
+    brief.pages.trim().length >= 3 &&
+    brief.features.length > 0,
 );
 
 function toggleFeature(feature: string) {
@@ -156,22 +183,29 @@ function openBrief() {
 }
 
 async function submitBrief() {
-  if (
-    !brief.businessType ||
-    !brief.siteType ||
-    !brief.pageCount ||
-    !brief.deadline ||
-    brief.goals.trim().length < 10 ||
-    brief.pages.trim().length < 3 ||
-    !brief.features.length
-  ) {
-    briefError.value = "Complete each required part before continuing.";
+  briefAttempted.value = true;
+  if (!briefIsComplete.value) {
+    briefError.value = "Complete each highlighted field before continuing.";
     return;
   }
 
   briefSaving.value = true;
   briefError.value = "";
   try {
+    // Authenticate right before we save the brief and take payment, so the
+    // order is always tied to a real account and the brief email matches the
+    // authenticated identity (launch req §3).
+    if (!user.value) {
+      await signInWithGoogle();
+      if (!user.value) {
+        briefError.value = "Please sign in to continue to payment.";
+        return;
+      }
+      name.value = user.value.displayName ?? name.value;
+      email.value = user.value.email ?? email.value;
+      await refreshWallet(true);
+    }
+
     const saved = await $fetch<{ id: string }>("/api/checkout/brief", {
       method: "POST",
       body: {
@@ -353,29 +387,31 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
 
         <p v-if="error" class="mt-4 text-sm text-white">{{ error }}</p>
 
-        <button
-          type="button"
-          :disabled="!canSubmit"
-          class="checkout-button mt-7 inline-flex w-full items-center justify-center rounded-full bg-[#ece9e2] px-5 py-4 text-sm font-semibold text-[#151412] disabled:cursor-not-allowed disabled:opacity-50"
-          @click="pay"
-        >
-          {{
-            loading
-              ? "Starting checkout…"
-              : !user
-                ? "Complete brief & continue"
-                : !briefSubmitted
-                  ? "Complete project brief"
-                  : chargeUsdCents === 0
-                    ? "Pay with wallet funds"
-                    : "Proceed to secure payment"
-          }}
-        </button>
-        <p class="mt-3 text-center text-xs text-slate-500">
-          Your details stay here while you sign in. Wallet credit is then
-          applied first, and Paystack securely charges only any remaining
-          amount.
-        </p>
+        <template v-if="!briefOpen">
+          <button
+            type="button"
+            :disabled="!canSubmit"
+            class="checkout-button mt-7 inline-flex w-full items-center justify-center rounded-full bg-[#ece9e2] px-5 py-4 text-sm font-semibold text-[#151412] disabled:cursor-not-allowed disabled:opacity-50"
+            @click="pay"
+          >
+            {{
+              loading
+                ? "Starting checkout…"
+                : !user
+                  ? "Complete brief & continue"
+                  : !briefSubmitted
+                    ? "Complete project brief"
+                    : chargeUsdCents === 0
+                      ? "Pay with wallet funds"
+                      : "Proceed to secure payment"
+            }}
+          </button>
+          <p class="mt-3 text-center text-xs text-slate-500">
+            Your details stay here while you sign in. Wallet credit is then
+            applied first, and Paystack securely charges only any remaining
+            amount.
+          </p>
+        </template>
       </div>
 
       <Transition name="brief-modal">
@@ -423,7 +459,10 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
                   <span>{{ dropdown.label }}</span>
                   <button
                     type="button"
-                    :class="{ 'is-open': openDropdown === dropdown.key }"
+                    :class="{
+                      'is-open': openDropdown === dropdown.key,
+                      'has-error': briefFieldErrors[dropdown.key],
+                    }"
                     @click="
                       openDropdown =
                         openDropdown === dropdown.key ? null : dropdown.key
@@ -457,6 +496,7 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
                 <button
                   type="button"
                   class="expand-field"
+                  :class="{ 'has-error': briefFieldErrors.goals }"
                   @click="expandedField = 'goals'"
                 >
                   <span>
@@ -470,6 +510,7 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
                 <button
                   type="button"
                   class="expand-field"
+                  :class="{ 'has-error': briefFieldErrors.pages }"
                   @click="expandedField = 'pages'"
                 >
                   <span>
@@ -482,7 +523,10 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
                 </button>
               </div>
 
-              <fieldset>
+              <fieldset
+                class="brief-fieldset"
+                :class="{ 'has-error': briefFieldErrors.features }"
+              >
                 <legend class="text-xs font-medium text-white/55">
                   Required features
                 </legend>
@@ -765,6 +809,21 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
   border-color: rgba(236, 233, 226, 0.42);
   background: rgba(236, 233, 226, 0.1);
   color: white;
+}
+
+/* Invalid-field highlighting after a failed save attempt */
+.custom-select > button.has-error,
+.expand-field.has-error {
+  border-color: rgba(248, 113, 113, 0.7);
+  background: rgba(248, 113, 113, 0.08);
+}
+
+.brief-fieldset.has-error legend {
+  color: rgba(248, 113, 113, 0.9);
+}
+
+.brief-fieldset.has-error .brief-chip {
+  border-color: rgba(248, 113, 113, 0.45);
 }
 
 .custom-select {

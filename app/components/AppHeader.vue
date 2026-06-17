@@ -126,20 +126,22 @@ watch(
         </ul>
 
         <div class="flex items-center gap-2">
-          <NuxtLink
-            v-if="ready && user && isAdmin"
-            to="/admin"
-            class="hidden rounded-lg border border-white/10 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-white/5 sm:inline-flex"
-          >
-            Admin
-          </NuxtLink>
-          <NuxtLink
-            v-if="ready && !user"
-            to="/account"
-            class="hidden rounded-lg px-3.5 py-2 text-sm font-medium text-slate-300 transition hover:text-white sm:block"
-          >
-            Sign in
-          </NuxtLink>
+          <ClientOnly>
+            <NuxtLink
+              v-if="ready && user && isAdmin"
+              to="/admin"
+              class="hidden rounded-lg border border-white/10 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-white/5 sm:inline-flex"
+            >
+              Admin
+            </NuxtLink>
+            <NuxtLink
+              v-if="ready && !user"
+              to="/account"
+              class="hidden rounded-lg px-3.5 py-2 text-sm font-medium text-slate-300 transition hover:text-white sm:block"
+            >
+              Sign in
+            </NuxtLink>
+          </ClientOnly>
           <NuxtLink
             to="/contact"
             class="hidden rounded-lg px-3.5 py-2 text-sm font-medium text-slate-300 transition hover:text-white sm:block"
@@ -154,15 +156,16 @@ watch(
             Get a quote
           </NuxtLink>
 
-          <NuxtLink
-            v-if="ready && user"
-            to="/account"
-            class="glass inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10"
-          >
-            {{ formatUsdCents(balanceCents ?? 0) }}
-          </NuxtLink>
+          <ClientOnly>
+            <NuxtLink
+              v-if="ready && user"
+              to="/account"
+              class="glass inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10"
+            >
+              {{ formatUsdCents(balanceCents ?? 0) }}
+            </NuxtLink>
 
-          <div v-if="ready && user" ref="accountMenu" class="relative">
+            <div v-if="ready && user" ref="accountMenu" class="relative">
             <button
               type="button"
               class="glass inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/10 text-sm font-semibold text-white transition hover:border-brand-300/50 hover:bg-white/10"
@@ -228,6 +231,7 @@ watch(
               </div>
             </Transition>
           </div>
+          </ClientOnly>
 
           <!-- mobile toggle -->
           <button

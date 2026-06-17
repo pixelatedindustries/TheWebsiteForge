@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { buildPackages, formatUsdCents } from "~~/shared/billing";
+
 definePageMeta({ layout: "admin" });
 useSeoMeta({ title: "Projects — Admin", robots: "noindex" });
 
@@ -6,18 +8,60 @@ interface Project {
   id: string;
   customerName: string;
   customerEmail: string;
+  customerCompany: string | null;
   name: string;
+  planKey: string;
   status: string;
   progress: number;
   estimatedLaunchAt: string | null;
   latestUpdate: string | null;
+  brief: Record<string, unknown> | null;
+  paymentStatus: string | null;
+  paymentAmountCents: number | null;
+  paymentCurrency: string | null;
   actions: Array<{ id: string; title: string; status: string }>;
+}
+
+const briefFieldLabels: Record<string, string> = {
+  businessType: "Business type",
+  siteType: "Site type",
+  pageCount: "Page count",
+  deadline: "Deadline",
+  goals: "Main goals",
+  pages: "Pages / sections",
+  features: "Features",
+  references: "References",
+};
+
+function packageLabel(planKey: string): string {
+  return buildPackages[planKey]?.label ?? planKey;
+}
+
+function briefEntries(
+  brief: Record<string, unknown> | null,
+): Array<{ label: string; value: string }> {
+  if (!brief) return [];
+  return Object.entries(briefFieldLabels)
+    .map(([key, label]) => {
+      const raw = brief[key];
+      const value = Array.isArray(raw) ? raw.join(", ") : String(raw ?? "");
+      return { label, value: value.trim() };
+    })
+    .filter((entry) => entry.value.length > 0);
+}
+
+function paymentTone(status: string | null): string {
+  if (status === "paid") return "text-emerald-400";
+  if (status === "failed") return "text-rose-400";
+  if (status === "refunded") return "text-amber-400";
+  return "text-zinc-400";
 }
 
 const { adminFetch } = useAuth();
 const projects = ref<Project[]>([]);
 const pending = ref(true);
 const busy = ref("");
+const expandedBrief = ref<string | null>(null);
 const selected = ref<Project | null>(null);
 const actionTitle = ref("");
 const actionDetails = ref("");
@@ -131,8 +175,29 @@ onMounted(load);
             <div>
               <p class="text-xs text-zinc-600">
                 {{ project.customerName }} · {{ project.customerEmail }}
+                <span v-if="project.customerCompany">
+                  · {{ project.customerCompany }}</span
+                >
               </p>
               <h2 class="mt-1 font-semibold text-white">{{ project.name }}</h2>
+              <div
+                class="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-medium"
+              >
+                <span
+                  class="rounded-full border border-white/10 px-2.5 py-1 text-zinc-300"
+                >
+                  {{ packageLabel(project.planKey) }}
+                </span>
+                <span
+                  class="rounded-full border border-white/10 px-2.5 py-1"
+                  :class="paymentTone(project.paymentStatus)"
+                >
+                  Payment: {{ project.paymentStatus ?? "—" }}
+                  <template v-if="project.paymentAmountCents != null">
+                    · {{ formatUsdCents(project.paymentAmountCents) }}
+                  </template>
+                </span>
+              </div>
             </div>
             <button
               class="rounded-full border border-white/10 px-3 py-1.5 text-xs text-zinc-400 hover:text-white"
@@ -140,6 +205,36 @@ onMounted(load);
             >
               Add action
             </button>
+          </div>
+
+          <div
+            v-if="briefEntries(project.brief).length"
+            class="mt-4 rounded-xl border border-white/[0.06] bg-black/20 p-4"
+          >
+            <button
+              type="button"
+              class="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-zinc-400 hover:text-white"
+              @click="
+                expandedBrief =
+                  expandedBrief === project.id ? null : project.id
+              "
+            >
+              <span>Project brief</span>
+              <span>{{ expandedBrief === project.id ? "Hide" : "View" }}</span>
+            </button>
+            <dl
+              v-if="expandedBrief === project.id"
+              class="mt-3 grid gap-2 text-sm"
+            >
+              <div
+                v-for="entry in briefEntries(project.brief)"
+                :key="entry.label"
+                class="grid grid-cols-[8rem_1fr] gap-3"
+              >
+                <dt class="text-zinc-500">{{ entry.label }}</dt>
+                <dd class="text-zinc-200">{{ entry.value }}</dd>
+              </div>
+            </dl>
           </div>
           <div class="mt-5 grid gap-3 md:grid-cols-[1fr_7rem_10rem]">
             <select

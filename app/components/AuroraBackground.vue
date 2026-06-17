@@ -16,13 +16,7 @@
     <!-- vignette to keep text legible -->
     <div
       class="absolute inset-0"
-      style="
-        background: radial-gradient(
-          ellipse 95% 75% at 50% 0%,
-          transparent,
-          rgba(0, 0, 0, 0.65) 82%
-        );
-      "
+      style="background: radial-gradient(ellipse 95% 75% at 50% 0%, transparent, rgba(0, 0, 0, 0.65) 82%);"
     />
   </div>
 </template>

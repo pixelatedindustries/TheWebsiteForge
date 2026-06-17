@@ -99,7 +99,7 @@ export class GlassShardScene {
   private readonly introColor: THREE.Color;
   private readonly pointLight: THREE.PointLight;
   private readonly cursorLight: THREE.PointLight;
-  private readonly clock = new THREE.Clock();
+  private readonly timer = new THREE.Timer();
   private readonly pointerTarget = new THREE.Vector2();
   private readonly pointer = new THREE.Vector2();
   private readonly pointerVelocity = new THREE.Vector2();
@@ -138,6 +138,7 @@ export class GlassShardScene {
   private resizeObserver: ResizeObserver | null = null;
   private intersectionObserver: IntersectionObserver | null = null;
   private environmentTarget: THREE.WebGLRenderTarget | null = null;
+  private maxDrawingBufferSize = 4096;
   private raf = 0;
   private onScreen = false;
   private pointerActive = false;
@@ -165,6 +166,17 @@ export class GlassShardScene {
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
+
+    // The drawing buffer (and the antialiased multisample renderbuffers that
+    // back it) cannot exceed the GPU's MAX_RENDERBUFFER_SIZE, which is often
+    // smaller than maxTextureSize. Cap by the smaller of the two so large /
+    // high-DPI viewports never overflow the renderbuffer limit.
+    const gl = this.renderer.getContext();
+    const maxRenderbufferSize = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) as number;
+    this.maxDrawingBufferSize = Math.min(
+      this.renderer.capabilities.maxTextureSize,
+      maxRenderbufferSize || this.renderer.capabilities.maxTextureSize,
+    );
 
     this.glassColor = new THREE.Color(this.options.glassColor);
     this.introColor = new THREE.Color(this.options.introColor);
@@ -434,6 +446,20 @@ export class GlassShardScene {
     const width = this.options.canvas.clientWidth;
     const height = this.options.canvas.clientHeight;
     if (!width || !height) return;
+    // Clamp the effective pixel ratio so the drawing buffer (and the internal,
+    // multisampled transmission render target three derives from it) never
+    // exceeds the GPU's max renderbuffer size. The ratio is allowed to fall
+    // BELOW 1 when the CSS viewport alone would overflow that limit — this
+    // happens on software-fallback contexts (small MAX_RENDERBUFFER_SIZE) that
+    // the browser hands out once other routes have exhausted the WebGL context
+    // budget, which is why direct loads work but client navigation didn't.
+    const largestEdge = Math.max(width, height);
+    const ratioForLimit = this.maxDrawingBufferSize / largestEdge;
+    const safePixelRatio = Math.max(
+      0.1,
+      Math.min(cappedPixelRatio(1.5), ratioForLimit),
+    );
+    this.renderer.setPixelRatio(safePixelRatio);
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
@@ -714,7 +740,14 @@ export class GlassShardScene {
 
   private render = () => {
     if (this.disposed) return;
-    this.applyScrollState(this.clock.getElapsedTime());
+    // Skip rendering when the canvas has no layout size (e.g. during a
+    // client-side route transition before the element is measured). Rendering
+    // into a zero-size framebuffer triggers "Attachment has zero size" errors.
+    if (!this.options.canvas.clientWidth || !this.options.canvas.clientHeight) {
+      return;
+    }
+    this.timer.update();
+    this.applyScrollState(this.timer.getElapsed());
     this.renderer.render(this.scene, this.camera);
   };
 
@@ -770,6 +803,10 @@ export class GlassShardScene {
     this.materials.forEach((material) => material.dispose());
     this.environmentTarget?.dispose();
     this.renderer.dispose();
+    // dispose() frees GPU resources but leaves the WebGL context alive until
+    // GC. Release it explicitly so navigating between WebGL routes doesn't
+    // exhaust the browser's context budget and force a software fallback.
+    this.renderer.forceContextLoss();
   }
 }
 

@@ -65,12 +65,6 @@ export const buildPackages: Record<string, BuildPackage> = {
     amountUsdCents: 69_900, // $699
     blurb: "A complete business website with deeper content and integrations.",
   },
-  build_enterprise: {
-    key: "build_enterprise",
-    label: "Enterprise",
-    amountUsdCents: 99_900, // $999
-    blurb: "A larger custom build with advanced features and systems.",
-  },
 };
 
 export function getBuildPackage(key: string): BuildPackage | undefined {
