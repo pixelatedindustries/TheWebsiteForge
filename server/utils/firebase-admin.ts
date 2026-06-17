@@ -33,6 +33,9 @@ function getAdminApp(): App {
   return app;
 }
 
-export function verifyIdToken(token: string): Promise<DecodedIdToken> {
-  return getAuth(getAdminApp()).verifyIdToken(token);
+export function verifyIdToken(
+  token: string,
+  checkRevoked = false,
+): Promise<DecodedIdToken> {
+  return getAuth(getAdminApp()).verifyIdToken(token, checkRevoked);
 }

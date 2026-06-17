@@ -14,8 +14,13 @@ const services = [
 const activeService = ref(0);
 let serviceTimer: ReturnType<typeof setInterval> | null = null;
 
+// Tier-aware shard budget: the full 144 transmissive shards on capable devices,
+// roughly half on low-end so even the static first frame stays cheap.
+const { isLowEnd } = useDeviceTier();
+const shardCount = computed(() => (isLowEnd.value ? 72 : 144));
+
 onMounted(() => {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (shouldReduceMotion()) return;
 
   serviceTimer = setInterval(() => {
     activeService.value = (activeService.value + 1) % services.length;
@@ -37,7 +42,7 @@ onBeforeUnmount(() => {
       :roughness="0.34"
       :transmission="0.7"
       :thickness="1.35"
-      :shard-count="144"
+      :shard-count="shardCount"
       :shard-size-min="0.16"
       :shard-size-max="0.32"
       intro-color="#ffffff"

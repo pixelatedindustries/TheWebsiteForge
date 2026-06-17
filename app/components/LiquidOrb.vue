@@ -20,7 +20,7 @@ onMounted(async () => {
   const THREE = await import("three");
   if (disposed || !host.value) return;
 
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduced = shouldReduceMotion();
   const tier = getDeviceTier();
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);

@@ -3,3 +3,4 @@ allowBuilds:
   "@parcel/watcher": false
   esbuild: false
   protobufjs: true
+  sharp: true

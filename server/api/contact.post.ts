@@ -20,9 +20,16 @@ export default defineEventHandler(async (event) => {
 
   const errors: Record<string, string> = {};
   if (name.length < 2) errors.name = "Please enter your name.";
+  if (name.length > 120) errors.name = "That name is too long.";
   if (!isValidEmail(email)) errors.email = "Please enter a valid email.";
   if (message.length < 10)
     errors.message = "Tell us a little more (at least 10 characters).";
+  if (message.length > 5000)
+    errors.message = "That message is too long (5000 characters max).";
+  if ((body?.company?.trim().length ?? 0) > 200)
+    errors.company = "That company name is too long.";
+  if ((body?.budget?.trim().length ?? 0) > 100)
+    errors.budget = "That budget value is too long.";
 
   if (Object.keys(errors).length) {
     throw createError({

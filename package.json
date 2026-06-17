@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@nuxt/fonts": "^0.14.0",
+    "@nuxt/image": "^2.0.0",
     "@paystack/inline-js": "^2.22.9",
     "@pinia/nuxt": "^0.11.3",
     "@vueuse/core": "^14.3.0",

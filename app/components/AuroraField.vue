@@ -20,7 +20,7 @@ onMounted(async () => {
   const THREE = await import("three");
   if (disposed || !host.value) return;
 
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduced = shouldReduceMotion();
   const tier = getDeviceTier();
   const OCTAVES = fbmOctaves(tier); // 2 on low-power devices, 4 otherwise
   const SCALE = tier === "low" ? 0.4 : 0.55; // internal render scale

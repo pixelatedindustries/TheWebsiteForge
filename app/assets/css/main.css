@@ -333,3 +333,16 @@
     transition-delay: 0ms !important;
   }
 }
+
+/* Low-end devices (set by the device-tier.client plugin): neutralise looping
+   decorative CSS animations site-wide so weak GPUs/CPUs aren't pinned by
+   always-on background motion. Elements snap to their final keyframe (visible)
+   state, so layouts and visuals are preserved — only the per-frame churn is
+   removed. Short hover/focus transitions are kept for UI feedback. */
+html.tier-low *,
+html.tier-low *::before,
+html.tier-low *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  animation-delay: 0ms !important;
+}

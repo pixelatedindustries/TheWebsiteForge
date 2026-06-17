@@ -27,7 +27,7 @@ onMounted(async () => {
   const THREE = await import("three");
   if (disposed || !host.value) return;
 
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduced = shouldReduceMotion();
   const tier = getDeviceTier();
   const OCTAVES = fbmOctaves(tier); // 2 on low-power devices, 4 otherwise
   const scene = new THREE.Scene();
@@ -328,23 +328,42 @@ onMounted(async () => {
     render();
     raf = requestAnimationFrame(loop);
   };
+  const play = () => {
+    if (!raf && !reduced) loop();
+  };
   const pause = () => {
     if (raf) {
       cancelAnimationFrame(raf);
       raf = 0;
     }
   };
+  let onScreen = true;
   const onVisibility = () => {
-    if (document.hidden) pause();
-    else if (!raf && !reduced) loop();
+    if (document.hidden || !onScreen) pause();
+    else play();
   };
   document.addEventListener("visibilitychange", onVisibility);
+
+  // Pause the render loop while the canvas is scrolled out of view, not just
+  // when the tab is hidden — the full-screen raymarched shader is the single
+  // most expensive always-on cost, so this is the biggest GPU win.
+  const io = new IntersectionObserver(
+    ([entry]) => {
+      onScreen = entry?.isIntersecting ?? true;
+      if (reduced) return;
+      if (onScreen && !document.hidden) play();
+      else pause();
+    },
+    { threshold: 0.01 },
+  );
+  io.observe(el);
 
   if (reduced) render();
   else loop();
 
   cleanup = () => {
     pause();
+    io.disconnect();
     window.removeEventListener("resize", resize);
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("wheel", onWheel);

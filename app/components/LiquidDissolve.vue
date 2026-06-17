@@ -26,10 +26,11 @@ onMounted(async () => {
   const THREE = await import("three"); // already cached (the orb uses it)
   if (disposed || !host.value) return;
 
+  const reduced = shouldReduceMotion();
   const scene = new THREE.Scene();
   const camera = new THREE.Camera();
   const renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.setPixelRatio(cappedPixelRatio(1.5));
   renderer.setClearColor(0x000000, 0);
   el.appendChild(renderer.domElement);
   Object.assign(renderer.domElement.style, {
@@ -137,7 +138,14 @@ onMounted(async () => {
       if (active) {
         el.style.opacity = "1";
         resize();
-        if (!raf) loop();
+        // Low-end / reduced-motion: paint a single covered frame instead of
+        // running the per-frame shader loop — the swap is still hidden, just
+        // without the animated dissolve.
+        if (reduced) {
+          render();
+        } else if (!raf) {
+          loop();
+        }
       } else {
         stop();
         el.style.opacity = "0";

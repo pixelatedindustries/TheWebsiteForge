@@ -8,16 +8,29 @@ export interface AdminIdentity {
 }
 
 /** Parsed, lower-cased ADMIN_EMAILS allowlist from the environment. */
+let cachedAllowlist: { raw: string; set: Set<string> } | null = null;
 export function getAdminEmails(): string[] {
-  return (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
+  const raw = process.env.ADMIN_EMAILS ?? "";
+  // Cache the parsed Set keyed on the raw env string (env is fixed at boot, but
+  // keying on `raw` keeps this correct if it's ever changed at runtime in dev).
+  if (!cachedAllowlist || cachedAllowlist.raw !== raw) {
+    cachedAllowlist = {
+      raw,
+      set: new Set(
+        raw
+          .split(",")
+          .map((e) => e.trim().toLowerCase())
+          .filter(Boolean),
+      ),
+    };
+  }
+  return [...cachedAllowlist.set];
 }
 
 export function isAdminEmail(email?: string | null): boolean {
   if (!email) return false;
-  return getAdminEmails().includes(email.toLowerCase());
+  getAdminEmails(); // ensure cache is populated/refreshed
+  return cachedAllowlist!.set.has(email.toLowerCase());
 }
 
 /**
@@ -37,7 +50,9 @@ export async function requireAdmin(event: H3Event): Promise<AdminIdentity> {
 
   let decoded;
   try {
-    decoded = await verifyIdToken(token);
+    // checkRevoked=true (S4): an admin whose session was revoked or whose
+    // account was disabled loses access immediately, not after token expiry.
+    decoded = await verifyIdToken(token, true);
   } catch {
     throw createError({
       statusCode: 401,

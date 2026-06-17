@@ -3,7 +3,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { ConvexGeometry } from "three/addons/geometries/ConvexGeometry.js";
-import { cappedPixelRatio, getDeviceTier } from "~/utils/deviceTier";
+import {
+  cappedPixelRatio,
+  getDeviceTier,
+  shouldReduceMotion,
+} from "~/utils/deviceTier";
 
 export interface GlassShardSceneOptions {
   canvas: HTMLCanvasElement;
@@ -120,9 +124,7 @@ export class GlassShardScene {
   private readonly hoverForce = new THREE.Vector3();
   private readonly hoverContact = new THREE.Vector3();
   private readonly hoverWorld = new THREE.Vector3();
-  private readonly reducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
+  private readonly reducedMotion = shouldReduceMotion();
   private readonly scrollState = {
     assembly: 0,
     cameraX: 0.8,

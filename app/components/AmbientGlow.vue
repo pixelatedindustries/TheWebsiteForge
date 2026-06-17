@@ -5,10 +5,22 @@
  * reads like soft glowing lights moving behind frosted glass. Pure CSS, fixed,
  * sits at the very back. Drift pauses under reduced-motion.
  */
+// Pause the drift animations while the tab is backgrounded — a pure-CSS battery
+// win on laptops (no work happens behind a hidden tab).
+const hidden = ref(false);
+const onVisibility = () => {
+  hidden.value = document.hidden;
+};
+onMounted(() => {
+  document.addEventListener("visibilitychange", onVisibility);
+});
+onBeforeUnmount(() => {
+  document.removeEventListener("visibilitychange", onVisibility);
+});
 </script>
 
 <template>
-  <div class="ambient" aria-hidden="true">
+  <div class="ambient" :class="{ paused: hidden }" aria-hidden="true">
     <span class="orb orb-1" />
     <span class="orb orb-2" />
     <span class="orb orb-3" />
@@ -98,4 +110,6 @@
     animation: none;
   }
 }
-</style>
+.ambient.paused .orb {
+  animation-play-state: paused;
+}</style>

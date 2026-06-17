@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
+import { buildContentSecurityPolicy } from "./shared/csp";
 
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
@@ -10,6 +11,7 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "@vueuse/motion/nuxt",
     "@nuxt/fonts",
+    "@nuxt/image",
   ],
 
   css: ["~/assets/css/main.css"],
@@ -55,18 +57,34 @@ export default defineNuxtConfig({
 
   fonts: {
     families: [
-      // clean modern sans for body + display
-      { name: "Geist", provider: "google", weights: [300, 400, 500, 600, 700] },
+      // clean modern sans for body + display (300/font-light is only ever used
+      // on the serif, so Geist ships 400→700 only)
+      { name: "Geist", provider: "google", weights: [400, 500, 600, 700] },
       // editorial monospaced labels
       { name: "Geist Mono", provider: "google", weights: [400, 500] },
-      // high-contrast editorial serif for key headings
+      // high-contrast editorial serif — only ever rendered at font-light (300),
+      // normal + italic, so we ship just that one weight
       {
         name: "Cormorant Garamond",
         provider: "google",
-        weights: [300, 400, 500, 600],
+        weights: [300],
         styles: ["normal", "italic"],
       },
     ],
+  },
+
+  // Image optimization pipeline (IPX + sharp). Any raster art rendered through
+  // <NuxtImg>/<NuxtPicture> is auto-served as WebP/AVIF with responsive sizes.
+  image: {
+    format: ["avif", "webp"],
+    quality: 72,
+    screens: {
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      xxl: 1536,
+    },
   },
 
   app: {
@@ -114,8 +132,9 @@ export default defineNuxtConfig({
 
   // Baseline security headers applied to every response (defense-in-depth).
   // The CSP allowlists the third parties this app actually loads: Google Fonts,
-  // Firebase Auth, and Paystack's hosted/inline checkout. Tighten further once
-  // the exact set of endpoints is confirmed against the live flows.
+  // Firebase Auth, and Paystack's hosted/inline checkout. HTML documents get a
+  // stricter, nonce-based script-src (no 'unsafe-inline') via the `csp-nonce`
+  // Nitro plugin, which overrides this baseline header per request.
   routeRules: {
     "/**": {
       headers: {
@@ -126,20 +145,17 @@ export default defineNuxtConfig({
           "max-age=63072000; includeSubDomains; preload",
         "Permissions-Policy":
           "camera=(), microphone=(), geolocation=(), interest-cohort=()",
-        "Content-Security-Policy": [
-          "default-src 'self'",
-          "base-uri 'self'",
-          "object-src 'none'",
-          "frame-ancestors 'none'",
-          "form-action 'self' https://checkout.paystack.com",
-          "img-src 'self' data: https:",
-          "font-src 'self' https://fonts.gstatic.com data:",
-          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-          "script-src 'self' 'unsafe-inline' https://js.paystack.co https://checkout.paystack.com https://apis.google.com",
-          "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://api.paystack.co https://*.paystack.co",
-          "frame-src https://checkout.paystack.com https://*.paystack.co https://*.firebaseapp.com https://*.web.app",
-        ].join("; "),
+        "Content-Security-Policy": buildContentSecurityPolicy(),
       },
     },
+    // Static marketing/legal routes are content-only (data comes from the
+    // compiled-in shared/site.ts), so prerender them for instant TTFB. Auth-gated
+    // header bits are <ClientOnly>, so the static HTML hydrates correctly.
+    "/about": { prerender: true },
+    "/pricing": { prerender: true },
+    "/showcase": { prerender: true },
+    "/terms": { prerender: true },
+    "/refund-policy": { prerender: true },
+    "/hosting-agreement": { prerender: true },
   },
 });

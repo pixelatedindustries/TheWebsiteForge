@@ -23,6 +23,7 @@ import type { Directive, DirectiveBinding } from "vue";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { RevealOpts, SplitOpts } from "~/types/motion";
+import { shouldReduceMotion } from "~/utils/deviceTier";
 
 // per-element teardown bag (keeps `el` free of ad-hoc props for TS' sake)
 const cleanups = new WeakMap<HTMLElement, Array<() => void>>();
@@ -41,6 +42,26 @@ function runCleanup(el: HTMLElement) {
 const velocity = { value: 0 };
 export function scrollVelocity() {
   return velocity.value;
+}
+
+// Single shared per-frame loop. The v-skew / v-stack / v-bgmorph directives each
+// used to register their own `gsap.ticker` callback (N function calls/frame).
+// Consolidating them into one registry means a single ticker call per frame
+// that iterates the active elements, regardless of how many opt in.
+const frameCallbacks = new Set<() => void>();
+let frameTickerAdded = false;
+function runFrameCallbacks() {
+  for (const fn of frameCallbacks) fn();
+}
+function addFrameCallback(fn: () => void) {
+  frameCallbacks.add(fn);
+  if (!frameTickerAdded) {
+    gsap.ticker.add(runFrameCallbacks);
+    frameTickerAdded = true;
+  }
+}
+function removeFrameCallback(fn: () => void) {
+  frameCallbacks.delete(fn);
 }
 
 // active Lenis instance + a helper for programmatic smooth scrolling (used by
@@ -69,9 +90,11 @@ export function smoothScrollTo(
 }
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const reduced =
-    import.meta.client &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Disable expensive scroll/ticker-driven motion when the user asks for reduced
+  // motion OR the device is low-end. Reveal directives use `gsap.from()`, so an
+  // early return leaves elements at their natural visible state — content is
+  // never hidden, only the animation is skipped.
+  const reduced = import.meta.client && shouldReduceMotion();
 
   if (import.meta.client) {
     gsap.registerPlugin(ScrollTrigger);
@@ -425,11 +448,12 @@ export default defineNuxtPlugin((nuxtApp) => {
         duration: 0.5,
         ease: "power3",
       });
-      const tick = () =>
+      const tick = () => {
         skewTo(gsap.utils.clamp(-6, 6, velocity.value * factor));
-      gsap.ticker.add(tick);
+      };
+      addFrameCallback(tick);
       onCleanup(el, () => {
-        gsap.ticker.remove(tick);
+        removeFrameCallback(tick);
         gsap.set(el, { skewY: 0 });
       });
     },
@@ -474,10 +498,10 @@ export default defineNuxtPlugin((nuxtApp) => {
         el.style.transform = `translate3d(0, ${ty}px, 0) scale(${scale})`;
         el.style.filter = `brightness(${(1 - e * dim).toFixed(3)})`;
       };
-      gsap.ticker.add(update);
+      addFrameCallback(update);
       update();
       onCleanup(el, () => {
-        gsap.ticker.remove(update);
+        removeFrameCallback(update);
         for (const prop of [
           "transform",
           "filter",
@@ -514,10 +538,10 @@ export default defineNuxtPlugin((nuxtApp) => {
           const p = stackEase(gsap.utils.clamp(0, 1, 1 - dist));
           document.body.style.backgroundColor = lerp(p);
         };
-        gsap.ticker.add(update);
+        addFrameCallback(update);
         update();
         onCleanup(el, () => {
-          gsap.ticker.remove(update);
+          removeFrameCallback(update);
           document.body.style.backgroundColor = "";
         });
       },
