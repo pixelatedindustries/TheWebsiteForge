@@ -6,6 +6,12 @@ useSeoMeta({
     "How refunds work at TheWebsiteForge across one-time builds, recurring hosting, domains, and feature work.",
 });
 
+defineOgImageComponent("Forge", {
+  title: "Refund Policy",
+  description:
+    "How refunds work across builds, recurring hosting, domains, and feature work.",
+});
+
 const effectiveDate = "6 June 2026";
 const contactEmail = "support@pixelatedindustries.com";
 

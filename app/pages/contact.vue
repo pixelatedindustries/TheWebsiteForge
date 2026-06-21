@@ -2,9 +2,15 @@
 import { supportEmail } from "~~/shared/site";
 
 useSeoMeta({
-  title: "Contact — Lumina Studio",
+  title: "Contact — TheWebsiteForge",
   description:
-    "Start a project with Lumina Studio. Tell us what you're building and we'll reply within one business day.",
+    "Start a project with TheWebsiteForge. Tell us what you're building and we'll reply within one business day.",
+});
+
+defineOgImageComponent("Forge", {
+  title: "Contact",
+  description:
+    "Tell us what you're building — we reply within one business day.",
 });
 
 const highlights = [

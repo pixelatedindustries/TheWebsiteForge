@@ -6,6 +6,12 @@ useSeoMeta({
     "How TheWebsiteForge hosts, maintains, suspends, and offboards websites, plus domain management and included changes.",
 });
 
+defineOgImageComponent("Forge", {
+  title: "Hosting Agreement",
+  description:
+    "How we host, maintain, and offboard websites, plus domain management.",
+});
+
 const effectiveDate = "6 June 2026";
 const contactEmail = "support@pixelatedindustries.com";
 

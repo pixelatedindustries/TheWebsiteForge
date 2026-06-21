@@ -13,6 +13,14 @@ useSeoMeta({
     "Clear pricing for websites, hosting, databases, care plans, and domains.",
 });
 
+// Per-page social card: the wordmark is already in the template, so the big
+// title is the page topic.
+defineOgImageComponent("Forge", {
+  title: "Pricing",
+  description:
+    "Clear pricing for websites, hosting, databases, care plans, and domains.",
+});
+
 const dollars = (value: number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",

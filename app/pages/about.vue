@@ -8,6 +8,12 @@ useSeoMeta({
     "TheWebsiteForge designs, builds, launches, and supports high-performance websites without lock-in or unnecessary friction.",
 });
 
+defineOgImageComponent("Forge", {
+  title: "About",
+  description:
+    "We design, build, launch, and support high-performance websites — without lock-in.",
+});
+
 const root = ref<HTMLElement | null>(null);
 let context: gsap.Context | null = null;
 

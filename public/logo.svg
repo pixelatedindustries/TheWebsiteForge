@@ -1,0 +1,9 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TheWebsiteForge logo">
+  <rect width="512" height="512" rx="96" fill="#0e0d0c" />
+  <g transform="translate(148 106) scale(0.6)">
+    <path
+      d="M112 35H164L154 92H102L112 35ZM83 112H139L126 183C123 201 132 210 151 210H222C248 210 266 192 266 166C266 141 248 124 222 124H146L157 63H224C294 63 342 105 342 166C342 229 294 272 224 272H139L101 465H35L83 112Z"
+      fill="#ffffff"
+    />
+  </g>
+</svg>

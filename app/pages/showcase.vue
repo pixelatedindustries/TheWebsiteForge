@@ -11,6 +11,11 @@ useSeoMeta({
     "Explore websites and digital products built by TheWebsiteForge.",
 });
 
+defineOgImageComponent("Forge", {
+  title: "Showcase",
+  description: "Explore websites and digital products built by TheWebsiteForge.",
+});
+
 type Filter = "All" | ProjectCategory;
 const filters: Filter[] = ["All", ...projectCategories];
 const active = ref<Filter>("All");

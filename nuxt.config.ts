@@ -13,6 +13,9 @@ export default defineNuxtConfig({
     "@vueuse/motion/nuxt",
     "@nuxt/fonts",
     "@nuxt/image",
+    // SEO suite: sitemap, robots, schema.org, OG images, canonicals & OG
+    // defaults — all driven by the `site` config below.
+    "@nuxtjs/seo",
   ],
 
   // Use the project's Prettier for formatting; ESLint focuses on correctness so
@@ -21,6 +24,29 @@ export default defineNuxtConfig({
     config: {
       stylistic: false,
     },
+  },
+
+  // Single source of truth for the SEO suite (sitemap, robots, schema.org, OG).
+  // `url` is read from NUXT_PUBLIC_SITE_URL in prod; the fallback keeps absolute
+  // URLs (canonicals, sitemap, og:image) correct when the env var is unset.
+  site: {
+    url:
+      process.env.NUXT_PUBLIC_SITE_URL ||
+      "https://websiteforge.pixelatedindustries.com",
+    name: "TheWebsiteForge",
+    description:
+      "TheWebsiteForge builds premium, high-performance websites, animated brand systems, and polished digital launches.",
+    defaultLocale: "en",
+  },
+
+  // OG image generation uses Satori (no headless browser); nuxt-og-image v6
+  // sources fonts from the @nuxt/fonts module above, so Geist is used
+  // automatically in generated cards — no extra font config needed.
+
+  // Keep the public surface in the sitemap; private/auth/transactional routes
+  // are excluded automatically via the `robots: false` route rules below.
+  sitemap: {
+    autoLastmod: true,
   },
 
   css: ["~/assets/css/main.css"],
@@ -111,16 +137,8 @@ export default defineNuxtConfig({
             "TheWebsiteForge builds premium, high-performance websites, animated brand systems, and polished digital launches.",
         },
         { name: "theme-color", content: "#0e0d0c" },
-        {
-          property: "og:title",
-          content: "TheWebsiteForge - Websites With Motion, Speed, and Bite",
-        },
-        {
-          property: "og:description",
-          content:
-            "Premium websites with motion, performance, proof, and transparent pricing.",
-        },
-        { property: "og:type", content: "website" },
+        // og:title / og:description / og:type / og:url / twitter:* are derived
+        // automatically by @nuxtjs/seo from the per-page useSeoMeta + site config.
       ],
       link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
     },
@@ -166,5 +184,12 @@ export default defineNuxtConfig({
     "/terms": { prerender: true },
     "/refund-policy": { prerender: true },
     "/hosting-agreement": { prerender: true },
+    // Auth-gated, transactional, and API routes must never be indexed or appear
+    // in the sitemap. `robots: false` adds <meta robots noindex>, the
+    // X-Robots-Tag header, a robots.txt Disallow, and sitemap exclusion.
+    "/admin/**": { robots: false },
+    "/account/**": { robots: false },
+    "/checkout/**": { robots: false },
+    "/api/**": { robots: false },
   },
 });

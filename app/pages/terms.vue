@@ -6,6 +6,12 @@ useSeoMeta({
     "The terms that govern your use of TheWebsiteForge's website design, build, and hosting services.",
 });
 
+defineOgImageComponent("Forge", {
+  title: "Terms of Service",
+  description:
+    "The terms governing TheWebsiteForge's design, build, and hosting services.",
+});
+
 const effectiveDate = "6 June 2026";
 const contactEmail = "support@pixelatedindustries.com";
 
