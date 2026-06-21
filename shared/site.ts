@@ -371,8 +371,7 @@ export const pricingTiers: PricingTier[] = [
   {
     id: "custom",
     name: "Custom Quote",
-    tagline:
-      "A custom build scoped and priced around your exact requirements.",
+    tagline: "A custom build scoped and priced around your exact requirements.",
     price: 0,
     fixed: false,
     period: "project",

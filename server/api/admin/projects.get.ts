@@ -43,9 +43,7 @@ export default defineEventHandler(async (event) => {
   const customerById = new Map(
     customers.map((customer) => [customer.id, customer]),
   );
-  const invoiceById = new Map(
-    invoices.map((invoice) => [invoice.id, invoice]),
-  );
+  const invoiceById = new Map(invoices.map((invoice) => [invoice.id, invoice]));
 
   return {
     projects: projects.map((project) => {

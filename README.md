@@ -29,20 +29,20 @@ contact routes.
 
 ## Pages
 
-| Route | Purpose |
-| --- | --- |
-| `/` | Main sales page with hero, stats, featured showcase, process, pricing, proof, and CTA |
-| `/showcase` | Filterable catalogue of available, sold, and featured website builds |
-| `/pricing` | Pricing tiers, comparison content, FAQ, and conversion CTA |
-| `/about` | Brand story, values, process, stats, testimonials, and CTA |
-| `/contact` | Lead-focused contact page with a backend-backed form |
+| Route       | Purpose                                                                               |
+| ----------- | ------------------------------------------------------------------------------------- |
+| `/`         | Main sales page with hero, stats, featured showcase, process, pricing, proof, and CTA |
+| `/showcase` | Filterable catalogue of available, sold, and featured website builds                  |
+| `/pricing`  | Pricing tiers, comparison content, FAQ, and conversion CTA                            |
+| `/about`    | Brand story, values, process, stats, testimonials, and CTA                            |
+| `/contact`  | Lead-focused contact page with a backend-backed form                                  |
 
 ## API Routes
 
-| Endpoint | Purpose |
-| --- | --- |
+| Endpoint            | Purpose                                                                      |
+| ------------------- | ---------------------------------------------------------------------------- |
 | `GET /api/projects` | Returns project catalogue data; supports `?category=` and `?status=` filters |
-| `GET /api/stats` | Returns headline stats and figures derived from the project catalogue |
+| `GET /api/stats`    | Returns headline stats and figures derived from the project catalogue        |
 | `POST /api/contact` | Validates lead details, checks the honeypot field, and stores the submission |
 
 Lead submissions are stored with Nitro storage at `./.data/leads`, configured in

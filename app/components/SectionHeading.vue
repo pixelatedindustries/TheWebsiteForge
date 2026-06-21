@@ -21,7 +21,9 @@ withDefaults(
 </script>
 
 <template>
-  <div :class="align === 'center' ? 'mx-auto max-w-4xl text-center' : 'max-w-5xl'">
+  <div
+    :class="align === 'center' ? 'mx-auto max-w-4xl text-center' : 'max-w-5xl'"
+  >
     <div
       v-if="eyebrow || index"
       v-reveal="{ y: 12, duration: 0.6 }"

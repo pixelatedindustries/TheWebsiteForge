@@ -174,7 +174,9 @@ export class GlassShardScene {
     // smaller than maxTextureSize. Cap by the smaller of the two so large /
     // high-DPI viewports never overflow the renderbuffer limit.
     const gl = this.renderer.getContext();
-    const maxRenderbufferSize = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) as number;
+    const maxRenderbufferSize = gl.getParameter(
+      gl.MAX_RENDERBUFFER_SIZE,
+    ) as number;
     this.maxDrawingBufferSize = Math.min(
       this.renderer.capabilities.maxTextureSize,
       maxRenderbufferSize || this.renderer.capabilities.maxTextureSize,

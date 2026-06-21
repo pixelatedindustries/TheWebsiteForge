@@ -58,12 +58,15 @@ export class MagneticButton {
 
   /** Wrap the button's contents so the label can move independently. */
   private wrapInner(): HTMLElement {
-    const existing = this.el.querySelector<HTMLElement>("[data-magnetic-inner]");
+    const existing = this.el.querySelector<HTMLElement>(
+      "[data-magnetic-inner]",
+    );
     if (existing) return existing;
     const span = document.createElement("span");
     span.setAttribute("data-magnetic-inner", "");
     const cs = getComputedStyle(this.el);
-    const gap = cs.columnGap && cs.columnGap !== "normal" ? cs.columnGap : "0px";
+    const gap =
+      cs.columnGap && cs.columnGap !== "normal" ? cs.columnGap : "0px";
     span.style.cssText = `display:inline-flex;align-items:center;justify-content:center;gap:${gap};will-change:transform;`;
     while (this.el.firstChild) span.appendChild(this.el.firstChild);
     this.el.appendChild(span);

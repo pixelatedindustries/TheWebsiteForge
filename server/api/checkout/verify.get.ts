@@ -49,9 +49,7 @@ export default defineEventHandler(async (event) => {
       // Only disclose the transaction kind once payment is confirmed, so an
       // attacker can't probe references to learn whether/what they map to.
       kind:
-        result.ok && result.status === "success"
-          ? (result.kind ?? null)
-          : null,
+        result.ok && result.status === "success" ? (result.kind ?? null) : null,
       paid: result.ok && result.status === "success",
       balanceAfterCents: result.balanceAfterCents ?? null,
     };

@@ -166,71 +166,71 @@ watch(
             </NuxtLink>
 
             <div v-if="ready && user" ref="accountMenu" class="relative">
-            <button
-              type="button"
-              class="glass inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/10 text-sm font-semibold text-white transition hover:border-brand-300/50 hover:bg-white/10"
-              :aria-expanded="accountOpen"
-              aria-haspopup="menu"
-              aria-label="Open account menu"
-              @click="accountOpen = !accountOpen"
-            >
-              <img
-                v-if="user.photoURL"
-                :src="user.photoURL"
-                :alt="accountName"
-                loading="lazy"
-                decoding="async"
-                referrerpolicy="no-referrer"
-                class="h-full w-full object-cover"
+              <button
+                type="button"
+                class="glass inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-white/10 text-sm font-semibold text-white transition hover:border-brand-300/50 hover:bg-white/10"
+                :aria-expanded="accountOpen"
+                aria-haspopup="menu"
+                aria-label="Open account menu"
+                @click="accountOpen = !accountOpen"
               >
-              <span v-else>{{ avatarInitials }}</span>
-            </button>
+                <img
+                  v-if="user.photoURL"
+                  :src="user.photoURL"
+                  :alt="accountName"
+                  loading="lazy"
+                  decoding="async"
+                  referrerpolicy="no-referrer"
+                  class="h-full w-full object-cover"
+                />
+                <span v-else>{{ avatarInitials }}</span>
+              </button>
 
-            <Transition
-              enter-active-class="transition duration-150 ease-out"
-              enter-from-class="opacity-0 translate-y-1"
-              leave-active-class="transition duration-100 ease-in"
-              leave-to-class="opacity-0 translate-y-1"
-            >
-              <div
-                v-if="accountOpen"
-                class="glass-strong absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border border-white/10 p-2 text-left shadow-2xl shadow-black/40"
-                role="menu"
+              <Transition
+                enter-active-class="transition duration-150 ease-out"
+                enter-from-class="opacity-0 translate-y-1"
+                leave-active-class="transition duration-100 ease-in"
+                leave-to-class="opacity-0 translate-y-1"
               >
-                <div class="px-3 py-2.5">
-                  <p class="truncate text-sm font-semibold text-white">
-                    {{ accountName }}
-                  </p>
-                  <p class="truncate text-xs text-slate-400">
-                    {{ user.email }}
-                  </p>
+                <div
+                  v-if="accountOpen"
+                  class="glass-strong absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border border-white/10 p-2 text-left shadow-2xl shadow-black/40"
+                  role="menu"
+                >
+                  <div class="px-3 py-2.5">
+                    <p class="truncate text-sm font-semibold text-white">
+                      {{ accountName }}
+                    </p>
+                    <p class="truncate text-xs text-slate-400">
+                      {{ user.email }}
+                    </p>
+                  </div>
+                  <NuxtLink
+                    to="/account"
+                    class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white"
+                    role="menuitem"
+                  >
+                    My account
+                  </NuxtLink>
+                  <NuxtLink
+                    v-if="isAdmin"
+                    to="/admin"
+                    class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white sm:hidden"
+                    role="menuitem"
+                  >
+                    Admin
+                  </NuxtLink>
+                  <button
+                    type="button"
+                    class="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white"
+                    role="menuitem"
+                    @click="handleSignOut"
+                  >
+                    Sign out
+                  </button>
                 </div>
-                <NuxtLink
-                  to="/account"
-                  class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white"
-                  role="menuitem"
-                >
-                  My account
-                </NuxtLink>
-                <NuxtLink
-                  v-if="isAdmin"
-                  to="/admin"
-                  class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white sm:hidden"
-                  role="menuitem"
-                >
-                  Admin
-                </NuxtLink>
-                <button
-                  type="button"
-                  class="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-200 transition hover:bg-white/5 hover:text-white"
-                  role="menuitem"
-                  @click="handleSignOut"
-                >
-                  Sign out
-                </button>
-              </div>
-            </Transition>
-          </div>
+              </Transition>
+            </div>
           </ClientOnly>
 
           <!-- mobile toggle -->

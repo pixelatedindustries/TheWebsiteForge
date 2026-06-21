@@ -29,7 +29,13 @@ const priceLabel = computed(() =>
       v-if="tier.highlighted"
       aria-hidden="true"
       class="animate-pulse-glow pointer-events-none absolute -inset-px -z-10 rounded-2xl opacity-70 blur-xl"
-      style="background: linear-gradient(135deg, var(--color-brand-500), var(--color-accent-600));"
+      style="
+        background: linear-gradient(
+          135deg,
+          var(--color-brand-500),
+          var(--color-accent-600)
+        );
+      "
     />
     <span
       v-if="tier.highlighted"

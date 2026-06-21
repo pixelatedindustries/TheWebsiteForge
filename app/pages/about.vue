@@ -666,7 +666,9 @@ onBeforeUnmount(() => context?.revert());
             >Or don't.</span
           >
         </h2>
-        <p class="mx-auto mt-10 max-w-xl text-base leading-relaxed text-white/48">
+        <p
+          class="mx-auto mt-10 max-w-xl text-base leading-relaxed text-white/48"
+        >
           We can manage hosting, domains, databases, and ongoing work. You can
           also take the repository and run everything yourself. You own it
           either way.

@@ -112,4 +112,5 @@ onBeforeUnmount(() => {
 }
 .ambient.paused .orb {
   animation-play-state: paused;
-}</style>
+}
+</style>

@@ -21,10 +21,7 @@ export default defineNitroPlugin((nitro) => {
     // Add the nonce to every script tag that doesn't already have one.
     const stamp = (sections: string[]) =>
       sections.map((tag) =>
-        tag.replace(
-          /<script(?![^>]*\snonce=)/g,
-          `<script nonce="${nonce}"`,
-        ),
+        tag.replace(/<script(?![^>]*\snonce=)/g, `<script nonce="${nonce}"`),
       );
     html.head = stamp(html.head);
     html.bodyPrepend = stamp(html.bodyPrepend);

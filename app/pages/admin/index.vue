@@ -149,7 +149,7 @@ const revenueAreaPath = computed(() =>
               <h2 class="panel-title">Revenue trajectory</h2>
             </div>
             <p class="text-right text-xs leading-5 text-zinc-600">
-              Last six<br >months
+              Last six<br />months
             </p>
           </div>
           <div class="chart-stage mt-8">

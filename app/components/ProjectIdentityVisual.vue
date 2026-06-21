@@ -19,7 +19,12 @@ defineProps<{
         <circle cx="400" cy="400" r="260" />
         <circle cx="400" cy="400" r="205" stroke-dasharray="2 12" />
         <circle cx="400" cy="140" r="7" class="identity-node" />
-        <circle cx="195" cy="400" r="4" class="identity-node identity-node-dim" />
+        <circle
+          cx="195"
+          cy="400"
+          r="4"
+          class="identity-node identity-node-dim"
+        />
       </g>
 
       <g v-if="index % 4 === 0" class="identity-mark">
@@ -58,7 +63,11 @@ defineProps<{
 .identity-visual {
   container-type: inline-size;
   background:
-    radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.075), transparent 34%),
+    radial-gradient(
+      circle at 50% 48%,
+      rgba(255, 255, 255, 0.075),
+      transparent 34%
+    ),
     linear-gradient(145deg, #171614, #080808 72%);
 }
 
@@ -104,7 +113,12 @@ defineProps<{
 }
 
 .identity-scan {
-  background: linear-gradient(90deg, transparent, rgba(236, 233, 226, 0.4), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(236, 233, 226, 0.4),
+    transparent
+  );
   box-shadow: 0 0 25px rgba(236, 233, 226, 0.15);
   opacity: 0.35;
   animation: identity-scan 7s ease-in-out infinite;

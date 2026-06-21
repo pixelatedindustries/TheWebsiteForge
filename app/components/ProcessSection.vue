@@ -37,218 +37,218 @@ const visualSteps = computed(() =>
           subtitle="A tight, transparent process. You see progress every step, and there are no black boxes."
         />
 
-      <div class="relative mt-16">
-        <div
-          aria-hidden="true"
-          class="process-rail absolute left-6 right-6 top-24 hidden h-px lg:block"
-        />
+        <div class="relative mt-16">
+          <div
+            aria-hidden="true"
+            class="process-rail absolute left-6 right-6 top-24 hidden h-px lg:block"
+          />
 
-        <ol class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <li
-            v-for="(step, index) in visualSteps"
-            :key="step.step"
-            v-tilt="{ max: 7 }"
-            class="process-card group relative min-h-[360px] overflow-hidden rounded-2xl border border-black/10 bg-white/80 p-6 shadow-xl shadow-black/10 backdrop-blur-xl transition duration-500 hover:-translate-y-2 hover:border-black/30 hover:shadow-black/15"
-            :style="{ animationDelay: `${index * 110}ms` }"
-          >
-            <div
-              aria-hidden="true"
-              class="absolute inset-x-0 top-0 h-32 bg-gradient-to-b opacity-80 transition duration-500 group-hover:opacity-100"
-              :class="step.tone"
-            />
-            <div
-              aria-hidden="true"
-              class="absolute -right-16 -top-16 h-36 w-36 rounded-full border border-black/10 bg-black/[0.03] transition duration-500 group-hover:scale-125 group-hover:border-black/25"
-            />
-            <div
-              aria-hidden="true"
-              class="absolute bottom-0 left-0 h-28 w-full translate-y-10 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100"
-            />
-
-            <div class="relative flex items-start justify-between gap-4">
-              <span
-                class="rounded-full border border-black/10 bg-black/[0.04] px-3 py-1 font-display text-xs font-bold tracking-[0.22em] text-black/70"
-              >
-                {{ step.step }}
-              </span>
-              <span
-                class="process-pulse relative grid h-4 w-4 place-items-center rounded-full bg-black"
-              >
-                <span class="h-1.5 w-1.5 rounded-full bg-white" />
-              </span>
-            </div>
-
-            <div class="relative mt-8 grid place-items-center">
+          <ol class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <li
+              v-for="(step, index) in visualSteps"
+              :key="step.step"
+              v-tilt="{ max: 7 }"
+              class="process-card group relative min-h-[360px] overflow-hidden rounded-2xl border border-black/10 bg-white/80 p-6 shadow-xl shadow-black/10 backdrop-blur-xl transition duration-500 hover:-translate-y-2 hover:border-black/30 hover:shadow-black/15"
+              :style="{ animationDelay: `${index * 110}ms` }"
+            >
               <div
-                class="process-orbit absolute h-36 w-36 rounded-full border border-dashed border-black/25"
+                aria-hidden="true"
+                class="absolute inset-x-0 top-0 h-32 bg-gradient-to-b opacity-80 transition duration-500 group-hover:opacity-100"
+                :class="step.tone"
               />
               <div
-                class="relative grid h-28 w-28 place-items-center rounded-2xl border border-black/10 bg-white shadow-xl shadow-black/10 transition duration-500 group-hover:scale-105 group-hover:border-black/30"
-              >
-                <svg
-                  v-if="step.icon === 'radar'"
-                  class="h-16 w-16 text-black/80"
-                  viewBox="0 0 80 80"
-                  fill="none"
+                aria-hidden="true"
+                class="absolute -right-16 -top-16 h-36 w-36 rounded-full border border-black/10 bg-black/[0.03] transition duration-500 group-hover:scale-125 group-hover:border-black/25"
+              />
+              <div
+                aria-hidden="true"
+                class="absolute bottom-0 left-0 h-28 w-full translate-y-10 bg-gradient-to-t from-black/10 to-transparent opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100"
+              />
+
+              <div class="relative flex items-start justify-between gap-4">
+                <span
+                  class="rounded-full border border-black/10 bg-black/[0.04] px-3 py-1 font-display text-xs font-bold tracking-[0.22em] text-black/70"
                 >
-                  <circle
-                    cx="40"
-                    cy="40"
-                    r="25"
-                    stroke="currentColor"
-                    stroke-width="3"
-                    opacity=".35"
-                  />
-                  <circle
-                    cx="40"
-                    cy="40"
-                    r="14"
-                    stroke="currentColor"
-                    stroke-width="3"
-                    opacity=".5"
-                  />
-                  <path
-                    class="svg-sweep"
-                    d="M40 40 60 24"
-                    stroke="currentColor"
-                    stroke-width="4"
-                    stroke-linecap="round"
-                  />
-                  <circle cx="53" cy="29" r="4" fill="currentColor" />
-                  <circle cx="40" cy="40" r="3" fill="currentColor" />
-                </svg>
-                <svg
-                  v-else-if="step.icon === 'prototype'"
-                  class="h-16 w-16 text-black/80"
-                  viewBox="0 0 80 80"
-                  fill="none"
+                  {{ step.step }}
+                </span>
+                <span
+                  class="process-pulse relative grid h-4 w-4 place-items-center rounded-full bg-black"
                 >
-                  <rect
-                    x="16"
-                    y="18"
-                    width="48"
-                    height="38"
-                    rx="8"
-                    stroke="currentColor"
-                    stroke-width="3"
-                  />
-                  <path
-                    d="M16 30h48"
-                    stroke="currentColor"
-                    stroke-width="3"
-                    opacity=".45"
-                  />
-                  <path
-                    class="svg-draw"
-                    d="M27 44h13M27 50h25"
-                    stroke="currentColor"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                  />
-                  <path
-                    d="M49 40l10 10-8 2 2 8-10-10 8-2-2-8Z"
-                    fill="currentColor"
-                  />
-                </svg>
-                <svg
-                  v-else-if="step.icon === 'terminal'"
-                  class="h-16 w-16 text-black/80"
-                  viewBox="0 0 80 80"
-                  fill="none"
-                >
-                  <rect
-                    x="14"
-                    y="18"
-                    width="52"
-                    height="44"
-                    rx="8"
-                    stroke="currentColor"
-                    stroke-width="3"
-                  />
-                  <path
-                    d="M25 37l8 7-8 7"
-                    stroke="currentColor"
-                    stroke-width="4"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                  <path
-                    class="svg-draw"
-                    d="M40 51h15"
-                    stroke="currentColor"
-                    stroke-width="4"
-                    stroke-linecap="round"
-                  />
-                  <circle
-                    cx="26"
-                    cy="28"
-                    r="2"
-                    fill="currentColor"
-                    opacity=".65"
-                  />
-                  <circle
-                    cx="34"
-                    cy="28"
-                    r="2"
-                    fill="currentColor"
-                    opacity=".65"
-                  />
-                </svg>
-                <svg
-                  v-else
-                  class="h-16 w-16 text-black/80"
-                  viewBox="0 0 80 80"
-                  fill="none"
-                >
-                  <path
-                    class="svg-float"
-                    d="M42 12c10 7 15 18 13 31l-9 9-18-18 9-9c2-5 3-9 5-13Z"
-                    stroke="currentColor"
-                    stroke-width="3"
-                    stroke-linejoin="round"
-                  />
-                  <path
-                    d="M28 34l-10 4 8 8M46 52l-4 10-8-8"
-                    stroke="currentColor"
-                    stroke-width="3"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    opacity=".65"
-                  />
-                  <circle
-                    cx="45"
-                    cy="31"
-                    r="5"
-                    stroke="currentColor"
-                    stroke-width="3"
-                  />
-                  <path
-                    class="svg-flame"
-                    d="M30 55c-4 2-7 5-9 10 5-1 9-3 12-7"
-                    stroke="currentColor"
-                    stroke-width="4"
-                    stroke-linecap="round"
-                  />
-                </svg>
+                  <span class="h-1.5 w-1.5 rounded-full bg-white" />
+                </span>
               </div>
-            </div>
 
-            <div class="relative mt-9">
-              <h3 class="font-display text-xl font-semibold text-black">
-                {{ step.title }}
-              </h3>
-              <p class="mt-3 text-sm leading-relaxed text-black/60">
-                {{ step.description }}
-              </p>
-            </div>
+              <div class="relative mt-8 grid place-items-center">
+                <div
+                  class="process-orbit absolute h-36 w-36 rounded-full border border-dashed border-black/25"
+                />
+                <div
+                  class="relative grid h-28 w-28 place-items-center rounded-2xl border border-black/10 bg-white shadow-xl shadow-black/10 transition duration-500 group-hover:scale-105 group-hover:border-black/30"
+                >
+                  <svg
+                    v-if="step.icon === 'radar'"
+                    class="h-16 w-16 text-black/80"
+                    viewBox="0 0 80 80"
+                    fill="none"
+                  >
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="25"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      opacity=".35"
+                    />
+                    <circle
+                      cx="40"
+                      cy="40"
+                      r="14"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      opacity=".5"
+                    />
+                    <path
+                      class="svg-sweep"
+                      d="M40 40 60 24"
+                      stroke="currentColor"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="53" cy="29" r="4" fill="currentColor" />
+                    <circle cx="40" cy="40" r="3" fill="currentColor" />
+                  </svg>
+                  <svg
+                    v-else-if="step.icon === 'prototype'"
+                    class="h-16 w-16 text-black/80"
+                    viewBox="0 0 80 80"
+                    fill="none"
+                  >
+                    <rect
+                      x="16"
+                      y="18"
+                      width="48"
+                      height="38"
+                      rx="8"
+                      stroke="currentColor"
+                      stroke-width="3"
+                    />
+                    <path
+                      d="M16 30h48"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      opacity=".45"
+                    />
+                    <path
+                      class="svg-draw"
+                      d="M27 44h13M27 50h25"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M49 40l10 10-8 2 2 8-10-10 8-2-2-8Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <svg
+                    v-else-if="step.icon === 'terminal'"
+                    class="h-16 w-16 text-black/80"
+                    viewBox="0 0 80 80"
+                    fill="none"
+                  >
+                    <rect
+                      x="14"
+                      y="18"
+                      width="52"
+                      height="44"
+                      rx="8"
+                      stroke="currentColor"
+                      stroke-width="3"
+                    />
+                    <path
+                      d="M25 37l8 7-8 7"
+                      stroke="currentColor"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      class="svg-draw"
+                      d="M40 51h15"
+                      stroke="currentColor"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                    />
+                    <circle
+                      cx="26"
+                      cy="28"
+                      r="2"
+                      fill="currentColor"
+                      opacity=".65"
+                    />
+                    <circle
+                      cx="34"
+                      cy="28"
+                      r="2"
+                      fill="currentColor"
+                      opacity=".65"
+                    />
+                  </svg>
+                  <svg
+                    v-else
+                    class="h-16 w-16 text-black/80"
+                    viewBox="0 0 80 80"
+                    fill="none"
+                  >
+                    <path
+                      class="svg-float"
+                      d="M42 12c10 7 15 18 13 31l-9 9-18-18 9-9c2-5 3-9 5-13Z"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M28 34l-10 4 8 8M46 52l-4 10-8-8"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      opacity=".65"
+                    />
+                    <circle
+                      cx="45"
+                      cy="31"
+                      r="5"
+                      stroke="currentColor"
+                      stroke-width="3"
+                    />
+                    <path
+                      class="svg-flame"
+                      d="M30 55c-4 2-7 5-9 10 5-1 9-3 12-7"
+                      stroke="currentColor"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+              </div>
 
-            <div
-              v-if="index < visualSteps.length - 1"
-              aria-hidden="true"
-              class="absolute -right-3 top-24 hidden h-6 w-6 rotate-45 border-r border-t border-black/25 bg-white lg:block"
-            />
-          </li>
-        </ol>
+              <div class="relative mt-9">
+                <h3 class="font-display text-xl font-semibold text-black">
+                  {{ step.title }}
+                </h3>
+                <p class="mt-3 text-sm leading-relaxed text-black/60">
+                  {{ step.description }}
+                </p>
+              </div>
+
+              <div
+                v-if="index < visualSteps.length - 1"
+                aria-hidden="true"
+                class="absolute -right-3 top-24 hidden h-6 w-6 rotate-45 border-r border-t border-black/25 bg-white lg:block"
+              />
+            </li>
+          </ol>
         </div>
       </div>
     </div>

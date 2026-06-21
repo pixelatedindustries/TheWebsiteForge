@@ -266,12 +266,12 @@ onMounted(load);
               min="0"
               max="100"
               class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-            >
+            />
             <input
               v-model="project.estimatedLaunchAt"
               type="date"
               class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-            >
+            />
           </div>
           <textarea
             v-model="project.latestUpdate"
@@ -308,7 +308,7 @@ onMounted(load);
           v-model="actionTitle"
           placeholder="Action title"
           class="mt-5 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-        >
+        />
         <textarea
           v-model="actionDetails"
           rows="4"
@@ -328,13 +328,13 @@ onMounted(load);
             v-model="deliverableName"
             placeholder="Final source repository"
             class="mt-3 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-          >
+          />
           <input
             v-model="deliverableUrl"
             type="url"
             placeholder="https://..."
             class="mt-3 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-          >
+          />
           <button
             :disabled="busy === selected.id"
             class="mt-3 w-full rounded-full border border-white/15 px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50"
