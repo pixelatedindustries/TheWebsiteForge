@@ -1,5 +1,13 @@
 import { eq } from "drizzle-orm";
 
+/** Internal sentinel: thrown to roll back a build transaction when the wallet
+ * debit comes up short, without surfacing as a generic 500. */
+class WalletInsufficientError extends Error {
+  constructor(readonly shortfallCents: number) {
+    super("wallet_insufficient");
+  }
+}
+
 /**
  * Shared payment fulfillment (WebForgePlan2 §4.3/§4.6).
  *
@@ -154,51 +162,66 @@ async function finalizeBuild(
   }
 
   const walletApplyCents = Math.max(0, Number(meta.walletApplyCents ?? 0));
-  if (walletApplyCents > 0) {
-    const walletResult = await debitWallet({
-      customerId: invoice.customerId,
-      type: "adjustment",
-      amountCents: walletApplyCents,
-      description: `Wallet applied to build payment (${reference})`,
-      reference,
-      siteId: invoice.siteId,
-      createdBy: "system",
-      allowNegative: false,
+
+  // Wallet debit + invoice→paid + project transition all commit together. If the
+  // debit comes up short, the sentinel rolls the whole thing back so we never
+  // leave money debited against an unpaid invoice (and a retry stays clean,
+  // since no wallet row was committed).
+  try {
+    await db.transaction(async (tx) => {
+      if (walletApplyCents > 0) {
+        const walletResult = await debitWallet({
+          customerId: invoice.customerId,
+          type: "adjustment",
+          amountCents: walletApplyCents,
+          description: `Wallet applied to build payment (${reference})`,
+          reference,
+          siteId: invoice.siteId,
+          createdBy: "system",
+          allowNegative: false,
+          tx,
+        });
+        if (!walletResult.ok) {
+          throw new WalletInsufficientError(walletResult.shortfallCents ?? 0);
+        }
+      }
+
+      await tx
+        .update(schema.invoices)
+        .set({ status: "paid", paidAt: new Date(), provider: "paystack" })
+        .where(eq(schema.invoices.id, invoice.id));
+
+      const [project] = await tx
+        .select()
+        .from(schema.projects)
+        .where(eq(schema.projects.invoiceId, invoice.id))
+        .limit(1);
+      if (project?.status === "awaiting_payment") {
+        await tx
+          .update(schema.projects)
+          .set({
+            status: "brief_received",
+            progress: 10,
+            latestUpdate: "Payment received. Your brief is ready for review.",
+            updatedAt: new Date(),
+          })
+          .where(eq(schema.projects.id, project.id));
+        await tx.insert(schema.projectActivity).values({
+          projectId: project.id,
+          type: "payment",
+          title: "Payment received",
+          details: "The project is ready for studio review.",
+        });
+      }
     });
-    if (!walletResult.ok) {
+  } catch (err) {
+    if (err instanceof WalletInsufficientError) {
       console.warn(
-        `[fulfillment] wallet debit failed for build ${reference}; shortfall=${walletResult.shortfallCents ?? 0}`,
+        `[fulfillment] wallet debit failed for build ${reference}; shortfall=${err.shortfallCents}`,
       );
       return { ok: false, status: "wallet_insufficient", kind: "build" };
     }
-  }
-
-  await db
-    .update(schema.invoices)
-    .set({ status: "paid", paidAt: new Date(), provider: "paystack" })
-    .where(eq(schema.invoices.id, invoice.id));
-
-  const [project] = await db
-    .select()
-    .from(schema.projects)
-    .where(eq(schema.projects.invoiceId, invoice.id))
-    .limit(1);
-  if (project?.status === "awaiting_payment") {
-    await db
-      .update(schema.projects)
-      .set({
-        status: "brief_received",
-        progress: 10,
-        latestUpdate: "Payment received. Your brief is ready for review.",
-        updatedAt: new Date(),
-      })
-      .where(eq(schema.projects.id, project.id));
-    await db.insert(schema.projectActivity).values({
-      projectId: project.id,
-      type: "payment",
-      title: "Payment received",
-      details: "The project is ready for studio review.",
-    });
+    throw err;
   }
 
   const [customer] = await db

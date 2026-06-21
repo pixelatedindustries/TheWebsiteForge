@@ -17,3 +17,17 @@ export function isValidEmail(value: string | null | undefined): boolean {
   if (email.length > 254) return false;
   return EMAIL_RE.test(email);
 }
+
+/** Upper bound for stored URLs — long enough for real links, short enough to
+ * reject abuse (multi-KB strings) before they reach the database. */
+export const MAX_URL_LENGTH = 2048;
+
+/**
+ * Accepts an http(s) URL within {@link MAX_URL_LENGTH}. Mirrors the server-side
+ * check used when persisting project file/deliverable links.
+ */
+export function isValidHttpUrl(value: string | null | undefined): boolean {
+  const url = (value ?? "").trim();
+  if (url.length === 0 || url.length > MAX_URL_LENGTH) return false;
+  return /^https?:\/\//.test(url);
+}

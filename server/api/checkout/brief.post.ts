@@ -8,46 +8,50 @@ interface BriefPayload {
 }
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<BriefPayload>(event);
-  const email = body?.email?.trim().toLowerCase() ?? "";
-  const planKey = body?.planKey?.trim() ?? "";
-  const answers = body?.answers;
+  try {
+    const body = await readBody<BriefPayload>(event);
+    const email = body?.email?.trim().toLowerCase() ?? "";
+    const planKey = body?.planKey?.trim() ?? "";
+    const answers = body?.answers;
 
-  if (!isValidEmail(email) || !getBuildPackage(planKey) || !answers) {
-    throw createError({
-      statusCode: 422,
-      statusMessage: "A valid email, plan, and project brief are required.",
-    });
+    if (!isValidEmail(email) || !getBuildPackage(planKey) || !answers) {
+      throw createError({
+        statusCode: 422,
+        statusMessage: "A valid email, plan, and project brief are required.",
+      });
+    }
+
+    const [brief] = await useDb()
+      .insert(schema.checkoutBriefs)
+      .values({ email, planKey, answers })
+      .returning({ id: schema.checkoutBriefs.id });
+
+    if (!brief) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Could not save project brief.",
+      });
+    }
+
+    // Alert the business so the team can start work immediately. Never block the
+    // response on mail delivery — the brief is already safely stored above.
+    const admin = getMailAdmin();
+    if (admin) {
+      const pkg = getBuildPackage(planKey);
+      const summary =
+        typeof answers.summary === "string" && answers.summary.trim()
+          ? answers.summary
+          : JSON.stringify(answers, null, 2);
+      const alert = briefAlertEmail({
+        email,
+        planLabel: pkg?.label ?? planKey,
+        message: summary,
+      });
+      void sendEmail({ to: admin, replyTo: email, ...alert });
+    }
+
+    return { id: brief.id };
+  } catch (err) {
+    toSafeError(err, "checkout/brief", "Could not save project brief.");
   }
-
-  const [brief] = await useDb()
-    .insert(schema.checkoutBriefs)
-    .values({ email, planKey, answers })
-    .returning({ id: schema.checkoutBriefs.id });
-
-  if (!brief) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Could not save project brief.",
-    });
-  }
-
-  // Alert the business so the team can start work immediately. Never block the
-  // response on mail delivery — the brief is already safely stored above.
-  const admin = getMailAdmin();
-  if (admin) {
-    const pkg = getBuildPackage(planKey);
-    const summary =
-      typeof answers.summary === "string" && answers.summary.trim()
-        ? answers.summary
-        : JSON.stringify(answers, null, 2);
-    const alert = briefAlertEmail({
-      email,
-      planLabel: pkg?.label ?? planKey,
-      message: summary,
-    });
-    void sendEmail({ to: admin, replyTo: email, ...alert });
-  }
-
-  return { id: brief.id };
 });

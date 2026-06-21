@@ -22,6 +22,15 @@ type NavigatorWithCapabilities = Navigator & {
 // with itself if `matchMedia` changes mid-session.
 let cachedTier: DeviceTier | null = null;
 
+// Capability thresholds — at or below any of these, a device reads as "low".
+const LOW_MEMORY_GB = 4;
+const LOW_CORE_COUNT = 4;
+const MOBILE_LOW_CORE_COUNT = 6;
+// Optimistic fallbacks for when the browser doesn't expose the capability, so
+// we don't wrongly downgrade a capable device that simply withholds the metric.
+const ASSUMED_CORES = 8;
+const ASSUMED_MEMORY_GB = 8;
+
 /**
  * Coarse device classification. A device is treated as **low** when any of the
  * following hold, since each is a strong signal of a constrained device:
@@ -40,8 +49,8 @@ export function getDeviceTier(): DeviceTier {
 
   const nav = navigator as NavigatorWithCapabilities;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const cores = nav.hardwareConcurrency ?? 8;
-  const memory = nav.deviceMemory ?? 8;
+  const cores = nav.hardwareConcurrency ?? ASSUMED_CORES;
+  const memory = nav.deviceMemory ?? ASSUMED_MEMORY_GB;
   const saveData = nav.connection?.saveData === true;
   const slowNetwork = /(^|-)(2g|slow-2g|3g)$/.test(
     nav.connection?.effectiveType ?? "",
@@ -50,11 +59,11 @@ export function getDeviceTier(): DeviceTier {
 
   const isLow =
     reduced ||
-    memory <= 4 ||
-    cores <= 4 ||
+    memory <= LOW_MEMORY_GB ||
+    cores <= LOW_CORE_COUNT ||
     saveData ||
     slowNetwork ||
-    (isMobile && cores <= 6);
+    (isMobile && cores <= MOBILE_LOW_CORE_COUNT);
 
   cachedTier = isLow ? "low" : "high";
   return cachedTier;
@@ -89,7 +98,10 @@ export function fbmOctaves(tier: DeviceTier = getDeviceTier()): number {
  * Cap the renderer pixel ratio. Low-tier devices render at 1x; high-tier caps
  * at `hi` (defaults to 1.5) to avoid paying for 3x retina on full-screen quads.
  */
-export function cappedPixelRatio(hi = 1.5, tier: DeviceTier = getDeviceTier()): number {
+export function cappedPixelRatio(
+  hi = 1.5,
+  tier: DeviceTier = getDeviceTier(),
+): number {
   const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
   return tier === "low" ? 1 : Math.min(dpr, hi);
 }

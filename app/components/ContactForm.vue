@@ -113,11 +113,17 @@ function isEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+// Minimum field lengths enforced per step.
+const MIN_NAME_LENGTH = 2;
+const MIN_GOALS_LENGTH = 10;
+const MIN_PAGES_LENGTH = 3;
+
 function validateStep(step = currentStep.value) {
   const errors: Record<string, string> = {};
 
   if (step === 0) {
-    if (form.name.trim().length < 2) errors.name = "Please enter your name.";
+    if (form.name.trim().length < MIN_NAME_LENGTH)
+      errors.name = "Please enter your name.";
     if (!isEmail(form.email.trim()))
       errors.email = "Please enter a valid email.";
   }
@@ -134,9 +140,9 @@ function validateStep(step = currentStep.value) {
   }
 
   if (step === 3) {
-    if (form.goals.trim().length < 10)
-      errors.goals = "Tell us the main goal in at least 10 characters.";
-    if (form.pages.trim().length < 3)
+    if (form.goals.trim().length < MIN_GOALS_LENGTH)
+      errors.goals = `Tell us the main goal in at least ${MIN_GOALS_LENGTH} characters.`;
+    if (form.pages.trim().length < MIN_PAGES_LENGTH)
       errors.pages = "List the pages or sections you expect.";
     if (!form.features.length) errors.features = "Choose at least one feature.";
   }

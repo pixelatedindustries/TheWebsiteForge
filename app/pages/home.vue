@@ -114,8 +114,8 @@ onBeforeUnmount(() => {
               </div>
               <div class="mt-4 flex gap-1.5 pl-11" aria-hidden="true">
                 <span
-                  v-for="(_, index) in services"
-                  :key="index"
+                  v-for="(service, index) in services"
+                  :key="service"
                   class="h-px transition-all duration-700"
                   :class="
                     index === activeService

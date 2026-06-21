@@ -85,7 +85,15 @@ export function useAmbientHum() {
   const enable = async () => {
     ensureGraph();
     if (!ctx || !master) return;
-    if (ctx.state === "suspended") await ctx.resume();
+    try {
+      // resume() can reject if not driven by a trusted user gesture (autoplay
+      // policy). Don't let that surface as an unhandled rejection.
+      if (ctx.state === "suspended") await ctx.resume();
+    } catch (err) {
+      console.warn("[ambientHum] could not start audio:", err);
+      enabled.value = false;
+      return;
+    }
     master.gain.cancelScheduledValues(ctx.currentTime);
     master.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 1.4);
     chime();
@@ -103,6 +111,10 @@ export function useAmbientHum() {
   };
 
   const toggle = () => (enabled.value ? disable() : enable());
+
+  // Stop the breathing RAF loop if the host component unmounts while the hum is
+  // still active, so the loop doesn't keep mutating shared state forever.
+  if (getCurrentInstance()) onUnmounted(stopPulse);
 
   return { enabled, toggle, disable };
 }

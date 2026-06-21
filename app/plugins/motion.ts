@@ -19,7 +19,7 @@
  * The plugin is universal so the directives resolve during SSR, but every hook
  * body runs client-only and bails out under `prefers-reduced-motion`.
  */
-import type { Directive, DirectiveBinding } from "vue";
+import type { Directive } from "vue";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { RevealOpts, SplitOpts } from "~/types/motion";
@@ -329,8 +329,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         // then release so they don't hold compositor memory (issues.md #9).
         onStart: () =>
           chars.forEach((c) => (c.style.willChange = "transform, opacity")),
-        onComplete: () =>
-          chars.forEach((c) => (c.style.willChange = "auto")),
+        onComplete: () => chars.forEach((c) => (c.style.willChange = "auto")),
         scrollTrigger:
           o.scroll === false || isInitiallyVisible
             ? undefined
@@ -523,30 +522,32 @@ export default defineNuxtPlugin((nuxtApp) => {
   // Incredibly subtle mood shift: scrubs the page background between two close
   // charcoals as this section nears centre, then back — you barely register the
   // colour change, you just feel the mood lift. expo.inOut shaping; reversible.
-  const bgmorph: Directive<HTMLElement, { from?: string; to?: string } | undefined> =
-    {
-      mounted(el, binding) {
-        if (reduced) return;
-        const from = binding.value?.from ?? "#0e0d0c";
-        const to = binding.value?.to ?? "#26231f";
-        const lerp = gsap.utils.interpolate(from, to);
-        const update = () => {
-          const r = el.getBoundingClientRect();
-          const vh = window.innerHeight || 1;
-          const center = r.top + r.height / 2;
-          const dist = Math.abs(center - vh / 2) / (vh * 0.9);
-          const p = stackEase(gsap.utils.clamp(0, 1, 1 - dist));
-          document.body.style.backgroundColor = lerp(p);
-        };
-        addFrameCallback(update);
-        update();
-        onCleanup(el, () => {
-          removeFrameCallback(update);
-          document.body.style.backgroundColor = "";
-        });
-      },
-      unmounted: runCleanup,
-    };
+  const bgmorph: Directive<
+    HTMLElement,
+    { from?: string; to?: string } | undefined
+  > = {
+    mounted(el, binding) {
+      if (reduced) return;
+      const from = binding.value?.from ?? "#0e0d0c";
+      const to = binding.value?.to ?? "#26231f";
+      const lerp = gsap.utils.interpolate(from, to);
+      const update = () => {
+        const r = el.getBoundingClientRect();
+        const vh = window.innerHeight || 1;
+        const center = r.top + r.height / 2;
+        const dist = Math.abs(center - vh / 2) / (vh * 0.9);
+        const p = stackEase(gsap.utils.clamp(0, 1, 1 - dist));
+        document.body.style.backgroundColor = lerp(p);
+      };
+      addFrameCallback(update);
+      update();
+      onCleanup(el, () => {
+        removeFrameCallback(update);
+        document.body.style.backgroundColor = "";
+      });
+    },
+    unmounted: runCleanup,
+  };
 
   const app = nuxtApp.vueApp;
   app.directive("reveal", reveal);
@@ -570,6 +571,13 @@ export default defineNuxtPlugin((nuxtApp) => {
     window.addEventListener("load", () => ScrollTrigger.refresh(), {
       once: true,
     });
+
+    // v-stack hands out an ever-incrementing z-index as sections mount. Reset
+    // the counter on each navigation so it can't grow unbounded across SPA
+    // route changes.
+    nuxtApp.hook("page:start", () => {
+      stackZ = 2;
+    });
   }
 
   // ── Lenis smooth scroll (client, motion-safe) ───────────────────────────────
@@ -584,9 +592,20 @@ export default defineNuxtPlugin((nuxtApp) => {
         ScrollTrigger.update();
         velocity.value = e.velocity;
       });
-      gsap.ticker.add((time) => lenis.raf(time * 1000));
+      const lenisRaf = (time: number) => lenis.raf(time * 1000);
+      gsap.ticker.add(lenisRaf);
       gsap.ticker.lagSmoothing(0);
       _lenis = lenis;
+
+      // On hot-module reload the plugin re-runs; without this teardown the old
+      // Lenis instance's ticker callback would accumulate on every update.
+      if (import.meta.hot) {
+        import.meta.hot.dispose(() => {
+          gsap.ticker.remove(lenisRaf);
+          (lenis as unknown as { destroy?: () => void }).destroy?.();
+          _lenis = null;
+        });
+      }
 
       // scroll reset + trigger refresh on route change. Refresh again after the
       // page-enter transition settles so above-the-fold reveals measure correctly
@@ -600,4 +619,3 @@ export default defineNuxtPlugin((nuxtApp) => {
     });
   }
 });
-

@@ -3,7 +3,6 @@ import {
   TOPUP_PRESETS_USD_CENTS,
   MIN_TOPUP_USD_CENTS,
   formatUsdCents,
-  estimateZar,
 } from "~~/shared/billing";
 import type {
   ChangeRequest,
@@ -28,9 +27,6 @@ const {
   error: topupError,
 } = useCheckout();
 const { balanceCents, refresh: refreshWalletBalance } = useWalletBalance();
-
-const config = useRuntimeConfig();
-const rate = Number(config.public.usdToZar) || 17;
 
 const wallet = ref<WalletData | null>(null);
 const txns = ref<Txn[]>([]);

@@ -37,23 +37,28 @@ export default defineEventHandler(async (event) => {
   }
 
   if (body.actionId) {
-    const [action] = await db
-      .update(schema.projectActions)
-      .set({ status: "completed", completedAt: new Date() })
-      .where(
-        and(
-          eq(schema.projectActions.id, body.actionId),
-          eq(schema.projectActions.projectId, project.id),
-        ),
-      )
-      .returning();
-    if (action) {
-      await db.insert(schema.projectActivity).values({
-        projectId: project.id,
-        type: "action",
-        title: `Completed: ${action.title}`,
-      });
-    }
+    const actionId = body.actionId;
+    // Mark the action complete and log the activity atomically so a completed
+    // action always has its matching timeline entry.
+    await db.transaction(async (tx) => {
+      const [action] = await tx
+        .update(schema.projectActions)
+        .set({ status: "completed", completedAt: new Date() })
+        .where(
+          and(
+            eq(schema.projectActions.id, actionId),
+            eq(schema.projectActions.projectId, project.id),
+          ),
+        )
+        .returning();
+      if (action) {
+        await tx.insert(schema.projectActivity).values({
+          projectId: project.id,
+          type: "action",
+          title: `Completed: ${action.title}`,
+        });
+      }
+    });
   }
 
   return { ok: true };

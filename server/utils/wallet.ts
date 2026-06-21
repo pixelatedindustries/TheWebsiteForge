@@ -127,7 +127,10 @@ export async function debitWallet(
 async function applyDelta(
   input: WalletMutationInput,
   delta: number,
-  allowNegative = true,
+  // Safe-by-default: never let a debit overdraw unless a caller explicitly opts
+  // in (debitWallet passes this through; credits use positive deltas so the
+  // negative-balance guard never applies to them).
+  allowNegative = false,
   existingTx?: WalletTx,
 ): Promise<WalletResult> {
   const db = useDb();

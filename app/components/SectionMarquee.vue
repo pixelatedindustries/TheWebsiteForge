@@ -81,7 +81,11 @@ const copies = computed(() => Array.from({ length: 4 }, () => props.text));
       ref="strip"
       class="marquee-strip flex w-max items-center gap-[6vw]"
     >
-      <span v-for="(copy, i) in copies" :key="i" class="marquee-word">
+      <span
+        v-for="(copy, i) in copies"
+        :key="`${copy}-${i}`"
+        class="marquee-word"
+      >
         {{ copy }}
       </span>
     </div>

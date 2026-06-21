@@ -1,4 +1,3 @@
-import { eq } from "drizzle-orm";
 import type { WalletAdjustPayload } from "../../models/admin";
 
 const CREDIT_TYPES = new Set(["topup", "refund", "adjustment"]);

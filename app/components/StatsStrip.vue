@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { stats as fallbackStats, type Stat } from "~~/shared/site";
 
 const { data } = await useFetch("/api/stats", {
@@ -280,7 +279,9 @@ const metricKind = (index: number) =>
           <div
             class="stat-sheen pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
           />
-          <div class="stat-scan pointer-events-none absolute inset-x-0 top-0 h-px" />
+          <div
+            class="stat-scan pointer-events-none absolute inset-x-0 top-0 h-px"
+          />
           <span
             class="stat-ghost pointer-events-none absolute -right-[0.04em] -bottom-[0.18em] select-none font-display text-[clamp(12rem,22vw,22rem)] font-medium leading-none tracking-[-0.12em]"
             aria-hidden="true"
@@ -316,7 +317,9 @@ const metricKind = (index: number) =>
               <div
                 class="stat-rule mt-9 h-px bg-gradient-to-r from-[#d4cfc4]/70 via-white/20 to-transparent"
               />
-              <div class="stat-caption mt-5 flex items-start justify-between gap-6">
+              <div
+                class="stat-caption mt-5 flex items-start justify-between gap-6"
+              >
                 <span
                   class="max-w-[15rem] font-mono text-[0.68rem] uppercase leading-relaxed tracking-[0.28em] text-slate-400"
                 >
@@ -426,7 +429,11 @@ const metricKind = (index: number) =>
 
 .stats-console-wave span {
   width: 2px;
-  background: linear-gradient(to top, rgba(236, 233, 226, 0.12), rgba(236, 233, 226, 0.72));
+  background: linear-gradient(
+    to top,
+    rgba(236, 233, 226, 0.12),
+    rgba(236, 233, 226, 0.72)
+  );
   transform-origin: center;
   animation: stats-wave 2.8s ease-in-out infinite alternate;
   animation-delay: calc(var(--bar) * -90ms);
@@ -496,7 +503,12 @@ const metricKind = (index: number) =>
 
 .stat-scan {
   z-index: 3;
-  background: linear-gradient(90deg, transparent, rgba(236, 233, 226, 0.38), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(236, 233, 226, 0.38),
+    transparent
+  );
   opacity: 0;
   transform: translateY(0);
 }

@@ -347,7 +347,7 @@ async function enter() {
           <span aria-hidden="true" class="block whitespace-nowrap">
             <span
               v-for="(ch, i) in line1"
-              :key="i"
+              :key="`${ch}-${i}`"
               data-letter
               class="inline-block will-change-transform"
               >{{ ch }}</span
@@ -437,12 +437,7 @@ async function enter() {
   font-style: italic;
   font-weight: 600;
   letter-spacing: -0.01em;
-  background-image: linear-gradient(
-    100deg,
-    #ffffff,
-    #c9c9c9 50%,
-    #ffffff
-  );
+  background-image: linear-gradient(100deg, #ffffff, #c9c9c9 50%, #ffffff);
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;

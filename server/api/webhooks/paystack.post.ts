@@ -166,7 +166,7 @@ async function handleSubscriptionCreate(data: PaystackData) {
     provider: "paystack",
     providerSubId: subCode,
     status: "active" as const,
-    amountCents: data.amount ?? data.plan?.amount ?? 0,
+    amountCents: safeAmountCents(data.amount ?? data.plan?.amount),
     currency: data.plan?.currency ?? "ZAR",
     interval: mapInterval(data.plan?.interval),
     currentPeriodEnd: parseDate(data.next_payment_date),
@@ -206,10 +206,14 @@ async function handleInvoiceUpsert(data: PaystackData) {
     .where(eq(schema.invoices.providerInvoiceId, invoiceCode))
     .limit(1);
 
+  // Don't downgrade an already-paid invoice back to open (and skip the
+  // subscription refresh too — matches prior behaviour).
+  if (existing && existing.status === "paid" && !paid) return;
+
   const values = {
     customerId: customer.id,
     type: "hosting" as const,
-    amountCents: data.amount ?? 0,
+    amountCents: safeAmountCents(data.amount),
     currency: data.currency ?? "ZAR",
     status: (paid ? "paid" : "open") as "paid" | "open",
     provider: "paystack",
@@ -217,28 +221,32 @@ async function handleInvoiceUpsert(data: PaystackData) {
     paidAt: paid ? (parseDate(data.paid_at) ?? new Date()) : null,
   };
 
-  if (existing) {
-    // Don't downgrade an already-paid invoice back to open.
-    if (existing.status === "paid" && !paid) return;
-    await db
-      .update(schema.invoices)
-      .set(values)
-      .where(eq(schema.invoices.id, existing.id));
-  } else {
-    await db.insert(schema.invoices).values(values);
-  }
-
-  // Keep the subscription's next renewal date fresh when Paystack tells us.
   const subCode = data.subscription?.subscription_code;
-  if (subCode && data.subscription?.next_payment_date) {
-    await db
-      .update(schema.subscriptions)
-      .set({
-        status: "active",
-        currentPeriodEnd: parseDate(data.subscription.next_payment_date),
-      })
-      .where(eq(schema.subscriptions.providerSubId, subCode));
-  }
+  const nextPaymentDate = data.subscription?.next_payment_date;
+
+  // Invoice upsert + subscription renewal refresh commit together: the webhook
+  // returns 200 (no Paystack retry), so a partial failure here would otherwise
+  // leave the invoice and its subscription permanently out of sync.
+  await db.transaction(async (tx) => {
+    if (existing) {
+      await tx
+        .update(schema.invoices)
+        .set(values)
+        .where(eq(schema.invoices.id, existing.id));
+    } else {
+      await tx.insert(schema.invoices).values(values);
+    }
+
+    if (subCode && nextPaymentDate) {
+      await tx
+        .update(schema.subscriptions)
+        .set({
+          status: "active",
+          currentPeriodEnd: parseDate(nextPaymentDate),
+        })
+        .where(eq(schema.subscriptions.providerSubId, subCode));
+    }
+  });
 }
 
 /**
@@ -248,28 +256,32 @@ async function handleInvoiceUpsert(data: PaystackData) {
 async function handleInvoicePaymentFailed(data: PaystackData) {
   const db = useDb();
   const subCode = data.subscription?.subscription_code;
-
-  if (subCode) {
-    await db
-      .update(schema.subscriptions)
-      .set({ status: "past_due" })
-      .where(eq(schema.subscriptions.providerSubId, subCode));
-  }
-
   const invoiceCode = data.invoice_code ?? data.reference;
-  if (invoiceCode) {
-    const [existing] = await db
-      .select()
-      .from(schema.invoices)
-      .where(eq(schema.invoices.providerInvoiceId, invoiceCode))
-      .limit(1);
-    if (existing && existing.status !== "paid") {
-      await db
-        .update(schema.invoices)
-        .set({ status: "failed" })
-        .where(eq(schema.invoices.id, existing.id));
+
+  // Flag subscription past_due and the invoice failed in one transaction so a
+  // partial write can't leave a "past_due sub with no failed invoice" state.
+  await db.transaction(async (tx) => {
+    if (subCode) {
+      await tx
+        .update(schema.subscriptions)
+        .set({ status: "past_due" })
+        .where(eq(schema.subscriptions.providerSubId, subCode));
     }
-  }
+
+    if (invoiceCode) {
+      const [existing] = await tx
+        .select()
+        .from(schema.invoices)
+        .where(eq(schema.invoices.providerInvoiceId, invoiceCode))
+        .limit(1);
+      if (existing && existing.status !== "paid") {
+        await tx
+          .update(schema.invoices)
+          .set({ status: "failed" })
+          .where(eq(schema.invoices.id, existing.id));
+      }
+    }
+  });
 
   // Send the dunning ("update your card") email (Phase 1).
   const email = data.customer?.email;
@@ -366,10 +378,20 @@ function mapInterval(interval?: string): "month" | "year" {
   return interval === "annually" || interval === "yearly" ? "year" : "month";
 }
 
+/**
+ * Coerce a Paystack amount (minor currency units) to a safe non-negative
+ * integer. Guards against missing/malformed payload fields (`undefined`,
+ * `"abc"`, negatives) becoming NaN or bad data in the DB.
+ */
+function safeAmountCents(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0
+    ? Math.round(value)
+    : 0;
+}
+
 /** Parse a Paystack date string into a Date, or null if absent/invalid. */
 function parseDate(value?: string | null): Date | null {
   if (!value) return null;
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? null : d;
 }
-

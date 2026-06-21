@@ -6,6 +6,10 @@ import { scrollVelocity } from "~/plugins/motion";
 
 const featured = projects.slice(0, 4);
 
+// Let the pinned horizontal track lay out before recalculating ScrollTrigger
+// positions, so the pin distance measures correctly on first paint.
+const SCROLL_REFRESH_DELAY_MS = 120;
+
 const section = ref<HTMLElement | null>(null);
 const track = ref<HTMLElement | null>(null);
 const progress = ref<HTMLElement | null>(null);
@@ -75,7 +79,7 @@ onMounted(() => {
 
   requestAnimationFrame(() => {
     setup();
-    setTimeout(() => ScrollTrigger.refresh(true), 120);
+    setTimeout(() => ScrollTrigger.refresh(true), SCROLL_REFRESH_DELAY_MS);
   });
 });
 </script>
@@ -130,7 +134,14 @@ onMounted(() => {
           <ProjectIdentityVisual :name="project.name" :index="i" />
           <div
             class="absolute inset-0 flex flex-col justify-between p-10"
-            style="background: linear-gradient(to top, rgba(14, 13, 12, 0.72), transparent 32%, rgba(14, 13, 12, 0.2));"
+            style="
+              background: linear-gradient(
+                to top,
+                rgba(14, 13, 12, 0.72),
+                transparent 32%,
+                rgba(14, 13, 12, 0.2)
+              );
+            "
           >
             <div
               class="flex items-center justify-between font-mono text-xs uppercase tracking-[0.3em] text-[#ece9e2]/70"
@@ -201,7 +212,14 @@ onMounted(() => {
         <ProjectIdentityVisual :name="project.name" :index="i" />
         <div
           class="absolute inset-0 flex flex-col justify-between p-7"
-          style="background: linear-gradient(to top, rgba(14, 13, 12, 0.72), transparent 38%, rgba(14, 13, 12, 0.2));"
+          style="
+            background: linear-gradient(
+              to top,
+              rgba(14, 13, 12, 0.72),
+              transparent 38%,
+              rgba(14, 13, 12, 0.2)
+            );
+          "
         >
           <div
             class="flex items-center justify-between font-mono text-[0.65rem] uppercase tracking-[0.3em] text-[#ece9e2]/70"

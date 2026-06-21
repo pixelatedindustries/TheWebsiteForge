@@ -7,12 +7,21 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   modules: [
+    "@nuxt/eslint",
     "@pinia/nuxt",
     "@vueuse/nuxt",
     "@vueuse/motion/nuxt",
     "@nuxt/fonts",
     "@nuxt/image",
   ],
+
+  // Use the project's Prettier for formatting; ESLint focuses on correctness so
+  // the two don't fight over style.
+  eslint: {
+    config: {
+      stylistic: false,
+    },
+  },
 
   css: ["~/assets/css/main.css"],
 
