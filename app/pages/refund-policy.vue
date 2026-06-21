@@ -6,7 +6,7 @@ useSeoMeta({
     "How refunds work at TheWebsiteForge across one-time builds, recurring hosting, domains, and feature work.",
 });
 
-defineOgImageComponent("Forge", {
+defineOgImage("Forge", {
   title: "Refund Policy",
   description:
     "How refunds work across builds, recurring hosting, domains, and feature work.",

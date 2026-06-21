@@ -6,7 +6,7 @@ useSeoMeta({
     "How TheWebsiteForge hosts, maintains, suspends, and offboards websites, plus domain management and included changes.",
 });
 
-defineOgImageComponent("Forge", {
+defineOgImage("Forge", {
   title: "Hosting Agreement",
   description:
     "How we host, maintain, and offboard websites, plus domain management.",

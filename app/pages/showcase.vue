@@ -11,7 +11,7 @@ useSeoMeta({
     "Explore websites and digital products built by TheWebsiteForge.",
 });
 
-defineOgImageComponent("Forge", {
+defineOgImage("Forge", {
   title: "Showcase",
   description: "Explore websites and digital products built by TheWebsiteForge.",
 });

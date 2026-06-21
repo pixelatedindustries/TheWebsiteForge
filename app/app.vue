@@ -17,8 +17,8 @@ useSchemaOrg([
 
 // Default branded OG card for every route. Each page's resolved title +
 // description are injected into the Forge template automatically; individual
-// pages can override with their own defineOgImageComponent() call.
-defineOgImageComponent("Forge");
+// pages can override with their own defineOgImage() call.
+defineOgImage("Forge");
 
 // Pages already self-brand their titles (e.g. "About — TheWebsiteForge"), so
 // use the page title verbatim instead of letting the SEO suite append the site

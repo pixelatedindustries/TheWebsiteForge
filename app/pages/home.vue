@@ -5,7 +5,7 @@ useSeoMeta({
     "Premium, fast, beautifully animated websites we build and sell. Browse the showcase, see the proof, and pick a plan.",
 });
 
-defineOgImageComponent("Forge", {
+defineOgImage("Forge", {
   title: "Websites We Build, Sell & Stand Behind",
   description:
     "Premium, fast, beautifully animated websites — browse the showcase and pick a plan.",

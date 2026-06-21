@@ -6,7 +6,7 @@ useSeoMeta({
     "The terms that govern your use of TheWebsiteForge's website design, build, and hosting services.",
 });
 
-defineOgImageComponent("Forge", {
+defineOgImage("Forge", {
   title: "Terms of Service",
   description:
     "The terms governing TheWebsiteForge's design, build, and hosting services.",

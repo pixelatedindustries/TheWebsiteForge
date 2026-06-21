@@ -15,7 +15,7 @@ useSeoMeta({
 
 // Per-page social card: the wordmark is already in the template, so the big
 // title is the page topic.
-defineOgImageComponent("Forge", {
+defineOgImage("Forge", {
   title: "Pricing",
   description:
     "Clear pricing for websites, hosting, databases, care plans, and domains.",
