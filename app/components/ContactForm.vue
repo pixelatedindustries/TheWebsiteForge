@@ -285,7 +285,7 @@ function reset() {
             v-model="form.website"
             tabindex="-1"
             autocomplete="off"
-        /></label>
+        ></label>
       </div>
 
       <div>
@@ -341,7 +341,7 @@ function reset() {
                   type="text"
                   placeholder="Jane Doe"
                   :class="inputClass"
-                />
+                >
                 <p v-if="fieldErrors.name" class="mt-1 text-xs text-white">
                   {{ fieldErrors.name }}
                 </p>
@@ -355,7 +355,7 @@ function reset() {
                   type="email"
                   placeholder="jane@company.com"
                   :class="inputClass"
-                />
+                >
                 <p v-if="fieldErrors.email" class="mt-1 text-xs text-white">
                   {{ fieldErrors.email }}
                 </p>
@@ -371,7 +371,7 @@ function reset() {
                   type="text"
                   placeholder="Acme Inc."
                   :class="inputClass"
-                />
+                >
               </div>
               <div>
                 <label class="mb-1.5 block text-xs font-medium text-slate-300">
@@ -382,7 +382,7 @@ function reset() {
                   type="tel"
                   placeholder="+1 555 000 0000"
                   :class="inputClass"
-                />
+                >
               </div>
             </div>
           </template>
@@ -450,7 +450,7 @@ function reset() {
                 type="url"
                 placeholder="https://example.com"
                 :class="inputClass"
-              />
+              >
             </div>
           </template>
 

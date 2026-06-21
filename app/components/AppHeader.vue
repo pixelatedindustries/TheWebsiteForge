@@ -182,7 +182,7 @@ watch(
                 decoding="async"
                 referrerpolicy="no-referrer"
                 class="h-full w-full object-cover"
-              />
+              >
               <span v-else>{{ avatarInitials }}</span>
             </button>
 

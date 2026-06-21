@@ -52,7 +52,7 @@ const comparison = [
             <h1
               class="font-display text-[clamp(4.5rem,13vw,13rem)] font-medium leading-[0.75] tracking-[-0.09em]"
             >
-              Pick your<br />
+              Pick your<br >
               <span class="font-serif font-light italic text-brand-300"
                 >starting point.</span
               >
@@ -163,7 +163,7 @@ const comparison = [
               <h2
                 class="mt-6 font-display text-[clamp(3rem,6vw,6rem)] font-medium leading-[0.88] tracking-[-0.075em]"
               >
-                The right<br />
+                The right<br >
                 <span class="font-serif font-light italic text-brand-300"
                   >fit, clearly.</span
                 >
@@ -211,7 +211,7 @@ const comparison = [
               <h2
                 class="mt-5 font-display text-[clamp(3.5rem,7vw,7rem)] font-medium leading-[0.86] tracking-[-0.08em]"
               >
-                We keep it<br />
+                We keep it<br >
                 <span class="font-serif font-light italic text-brand-300"
                   >online.</span
                 >
@@ -353,7 +353,7 @@ const comparison = [
               <h2
                 class="mt-5 font-display text-[clamp(3.5rem,6vw,6rem)] font-medium leading-[0.88] tracking-[-0.075em]"
               >
-                Stay sharp<br />
+                Stay sharp<br >
                 <span class="font-serif font-light italic text-brand-300"
                   >after launch.</span
                 >
@@ -411,7 +411,7 @@ const comparison = [
           <h2
             class="mt-5 font-display text-[clamp(3.5rem,6vw,6rem)] font-medium leading-[0.88] tracking-[-0.075em]"
           >
-            Fund once.<br />
+            Fund once.<br >
             <span class="font-serif font-light italic text-brand-300"
               >Move faster.</span
             >

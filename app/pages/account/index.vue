@@ -533,13 +533,13 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                     v-model="fileName"
                     placeholder="Logo files"
                     class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-xs text-white outline-none focus:border-white/30"
-                  />
+                  >
                   <input
                     v-model="fileUrl"
                     type="url"
                     placeholder="https://drive.google.com/..."
                     class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-xs text-white outline-none focus:border-white/30"
-                  />
+                  >
                   <button
                     type="button"
                     :disabled="projectBusy"
@@ -625,7 +625,7 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                         :min="minTopupUsd"
                         :placeholder="`Custom (min $${minTopupUsd})`"
                         class="w-full rounded-lg border border-white/10 bg-black/30 py-2.5 pl-7 pr-3 text-white outline-none transition focus:border-brand-400/60"
-                      />
+                      >
                     </div>
                     <button
                       type="button"
@@ -865,7 +865,7 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                     type="text"
                     placeholder="Short title"
                     class="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none transition focus:border-brand-400/60"
-                  />
+                  >
                   <select
                     v-if="sites.length"
                     v-model="crSiteId"

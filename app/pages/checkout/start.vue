@@ -324,7 +324,7 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
               v-model="useWalletFirst"
               type="checkbox"
               class="mt-0.5 h-4 w-4 rounded border-white/30 bg-black/40 text-brand-500 focus:ring-brand-500"
-            />
+            >
             <span>
               <span class="block text-sm font-semibold text-white"
                 >Use funds in my wallet first</span
@@ -367,7 +367,7 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
               type="text"
               placeholder="Jane Doe"
               class="checkout-input w-full rounded-xl border border-white/10 px-4 py-3.5 text-white outline-none transition"
-            />
+            >
           </div>
           <div>
             <label class="mb-1.5 block text-sm font-medium text-slate-300"
@@ -378,7 +378,7 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
               type="email"
               placeholder="jane@company.com"
               class="checkout-input w-full rounded-xl border border-white/10 px-4 py-3.5 text-white outline-none transition"
-            />
+            >
             <p class="mt-1 text-xs text-slate-500">
               Your receipt and project updates go here.
             </p>
@@ -550,7 +550,7 @@ useSeoMeta({ title: "Checkout — TheWebsiteForge", robots: "noindex" });
                   v-model="brief.references"
                   type="text"
                   placeholder="Sites, competitors, or inspiration you like"
-                />
+                >
               </label>
 
               <p

@@ -209,7 +209,7 @@ onMounted(loadCustomers);
               <th class="px-4 py-3 font-medium">Sites</th>
               <th class="px-4 py-3 font-medium">Wallet</th>
               <th class="px-4 py-3 font-medium">Since</th>
-              <th class="px-4 py-3 font-medium"></th>
+              <th class="px-4 py-3 font-medium"/>
             </tr>
           </thead>
           <tbody class="divide-y divide-white/5">
@@ -320,7 +320,7 @@ onMounted(loadCustomers);
                 step="0.01"
                 placeholder="Amount (USD)"
                 class="w-full rounded-lg border border-white/10 bg-black/30 py-2 pl-7 pr-3 text-sm text-white outline-none focus:border-brand-400/60"
-              />
+              >
             </div>
           </div>
           <input
@@ -328,7 +328,7 @@ onMounted(loadCustomers);
             type="text"
             placeholder="Description (e.g. Feature: booking calendar)"
             class="mt-2 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-brand-400/60"
-          />
+          >
           <button
             type="button"
             :disabled="adjBusy || !adjAmount"

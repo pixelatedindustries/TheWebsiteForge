@@ -77,8 +77,8 @@ const copies = computed(() => Array.from({ length: 4 }, () => props.text));
   >
     <span ref="ruleTop" class="rule" />
     <div
-      v-skew="0.12"
       ref="strip"
+      v-skew="0.12"
       class="marquee-strip flex w-max items-center gap-[6vw]"
     >
       <span

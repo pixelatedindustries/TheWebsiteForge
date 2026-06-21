@@ -10,7 +10,13 @@ withDefaults(
     /** small monospaced index, e.g. "03" */
     index?: string;
   }>(),
-  { align: "left", tone: "dark" },
+  {
+    align: "left",
+    tone: "dark",
+    eyebrow: undefined,
+    subtitle: undefined,
+    index: undefined,
+  },
 );
 </script>
 

@@ -44,7 +44,7 @@ const priceLabel = (price: number) =>
             <h1
               class="font-display text-[clamp(5rem,14vw,14rem)] font-medium leading-[0.72] tracking-[-0.09em]"
             >
-              The<br />
+              The<br >
               <span class="font-serif font-light italic text-brand-300"
                 >work.</span
               >

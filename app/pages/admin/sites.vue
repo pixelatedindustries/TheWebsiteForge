@@ -104,7 +104,7 @@ onMounted(load);
               <th class="px-4 py-3 font-medium">Type</th>
               <th class="px-4 py-3 font-medium">Database</th>
               <th class="px-4 py-3 font-medium">Status</th>
-              <th class="px-4 py-3 font-medium"></th>
+              <th class="px-4 py-3 font-medium"/>
             </tr>
           </thead>
           <tbody class="divide-y divide-white/5">

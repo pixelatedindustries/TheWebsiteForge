@@ -23,7 +23,7 @@ useSeoMeta({ title: "Payment — TheWebsiteForge", robots: "noindex" });
 
 <template>
   <div class="px-4 pt-36 pb-24 sm:px-6 lg:px-8">
-    <div class="mx-auto max-w-xl text-center" v-motion="reveal(0)">
+    <div v-motion="reveal(0)" class="mx-auto max-w-xl text-center">
       <div v-if="pending" class="glass rounded-2xl p-10">
         <p class="text-lg text-slate-300">Confirming your payment…</p>
       </div>

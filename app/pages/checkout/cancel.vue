@@ -12,7 +12,7 @@ useSeoMeta({
 
 <template>
   <div class="px-4 pt-36 pb-24 sm:px-6 lg:px-8">
-    <div class="mx-auto max-w-xl text-center" v-motion="reveal(0)">
+    <div v-motion="reveal(0)" class="mx-auto max-w-xl text-center">
       <div class="glass rounded-2xl p-10">
         <h1 class="font-display text-3xl font-bold text-white">
           Checkout cancelled
