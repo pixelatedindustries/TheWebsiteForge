@@ -60,6 +60,7 @@ function paymentTone(status: string | null): string {
 const { adminFetch } = useAuth();
 const projects = ref<Project[]>([]);
 const pending = ref(true);
+const error = ref<string | null>(null);
 const busy = ref("");
 const expandedBrief = ref<string | null>(null);
 const selected = ref<Project | null>(null);
@@ -80,11 +81,25 @@ const statuses = [
 ];
 
 async function load() {
-  const result = await adminFetch<{ projects: Project[] }>(
-    "/api/admin/projects",
-  );
-  projects.value = result.projects;
-  pending.value = false;
+  pending.value = true;
+  error.value = null;
+  try {
+    const result = await adminFetch<{ projects: Project[] }>(
+      "/api/admin/projects",
+    );
+    projects.value = result.projects;
+  } catch (e) {
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
+    error.value =
+      err?.data?.statusMessage ||
+      err?.statusMessage ||
+      "Failed to load projects.";
+  } finally {
+    pending.value = false;
+  }
 }
 
 async function save(project: Project) {
@@ -164,6 +179,7 @@ onMounted(load);
     </p>
 
     <p v-if="pending" class="mt-8 text-sm text-zinc-500">Loading projects...</p>
+    <p v-else-if="error" class="mt-8 text-sm text-rose-400">{{ error }}</p>
     <div v-else class="mt-8 grid gap-5 xl:grid-cols-[1fr_22rem]">
       <div class="space-y-4">
         <article
@@ -215,8 +231,7 @@ onMounted(load);
               type="button"
               class="flex w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wider text-zinc-400 hover:text-white"
               @click="
-                expandedBrief =
-                  expandedBrief === project.id ? null : project.id
+                expandedBrief = expandedBrief === project.id ? null : project.id
               "
             >
               <span>Project brief</span>

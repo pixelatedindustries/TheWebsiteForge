@@ -1,4 +1,3 @@
-import type { FetchOptions } from "ofetch";
 import { storeToRefs } from "pinia";
 import { useCheckoutStore } from "~/stores/checkout";
 import type {
@@ -24,22 +23,16 @@ export function useCheckout() {
     checkoutStore.setLoading(true);
     checkoutStore.setError(null);
     try {
-      const opts: FetchOptions = {
+      // Attach the bearer token when signed in (required for top-ups).
+      const token = user.value ? await getToken() : null;
+      const res = await $fetch<CheckoutResponse>("/api/checkout/create", {
         method: "POST",
         body,
         // Don't let a hung request strand the user on a loading screen.
         timeout: 30_000,
         retry: 0,
-      };
-      // Attach the bearer token when signed in (required for top-ups).
-      const token = user.value ? await getToken() : null;
-      if (token) {
-        opts.headers = { Authorization: `Bearer ${token}` };
-      }
-      const res = await $fetch<CheckoutResponse>(
-        "/api/checkout/create",
-        opts as never,
-      );
+        ...(token ? { headers: { Authorization: `Bearer ${token}` } } : {}),
+      });
       if (res?.authorizationUrl) {
         window.location.href = res.authorizationUrl;
       } else {

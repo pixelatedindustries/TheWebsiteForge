@@ -8,10 +8,12 @@
 const route = useRoute();
 const reference = computed(() => String(route.query.reference ?? ""));
 
+// Stable key so the verify result is deduped/cached predictably across SSR and
+// client hydration. Fetches immediately on load (the page is only reached via a
+// Paystack redirect that carries the reference).
 const { data, pending } = await useFetch("/api/checkout/verify", {
+  key: "checkout-verify",
   query: { reference },
-  // Only fetch when we actually have a reference.
-  immediate: true,
 });
 
 const paid = computed(() => data.value?.paid === true);

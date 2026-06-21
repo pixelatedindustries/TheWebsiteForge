@@ -78,7 +78,7 @@ export function getBuildPackage(key: string): BuildPackage | undefined {
  * Guards against an admin fat-finger (e.g. $999,999/mo) that the scheduled
  * debit job would otherwise keep applying every month.
  */
-export const MAX_RECURRING_MONTHLY_USD_CENTS = 100_000_00; // $100,000 / month
+export const MAX_RECURRING_MONTHLY_USD_CENTS = 10_000_000; // $100,000 / month (cents)
 
 export interface RecurringService {
   key: string;

@@ -16,6 +16,7 @@ const filters: Filter[] = ["All", ...projectCategories];
 const active = ref<Filter>("All");
 
 const { data, pending } = await useFetch("/api/projects", {
+  key: "showcase-projects",
   query: { category: active },
   default: () => ({ count: 0, projects: [] as Project[] }),
 });
