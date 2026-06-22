@@ -45,7 +45,7 @@ export interface Customer {
   createdAt: string;
 }
 
-/** A customer's recurring charge, shown in the admin customer drawer. */
+/** A customer's recurring charge, shown in the admin customer drawer + billing. */
 export interface Recurring {
   id: string;
   kind: string;
@@ -53,6 +53,9 @@ export interface Recurring {
   amountCents: number;
   status: string;
   nextChargeAt: string;
+  interval?: string;
+  customerId?: string;
+  customerName?: string;
 }
 
 /** A wallet ledger entry, shown in the admin customer drawer. */
@@ -68,13 +71,33 @@ export interface Txn {
 /** Row in the admin domains table. */
 export interface Domain {
   id: string;
+  customerId: string;
   customerName: string;
+  siteId: string | null;
   fqdn: string;
   registrar: string;
   autoRenew: boolean;
   annualCostCents: number | null;
+  registeredAt: string | null;
   expiresAt: string | null;
   daysToExpiry: number | null;
+}
+
+/** Row in the admin change-requests inbox. */
+export interface ChangeRequest {
+  id: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  siteId: string | null;
+  title: string;
+  details: string;
+  status: string;
+  quotedCents: number | null;
+  approvedAt: string | null;
+  approvedBy: string | null;
+  invoiceId: string | null;
+  createdAt: string;
 }
 
 /** Aggregate stats for the admin overview dashboard. */
@@ -113,13 +136,16 @@ export interface Lead {
 /** Row in the admin sites table. */
 export interface Site {
   id: string;
+  customerId: string;
   customerName: string;
   name: string;
   type: string;
   origin: string;
   status: string;
+  billingStatus: string;
   dbHosting: string;
   repoUrl: string | null;
   deployUrl: string | null;
+  vpsHost: string | null;
   createdAt: string;
 }

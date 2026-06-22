@@ -14,8 +14,10 @@ import { eq, sql } from "drizzle-orm";
 
 export type WalletTxnType =
   | "topup"
+  | "build"
   | "hosting"
   | "database"
+  | "domain"
   | "feature"
   | "change"
   | "refund"

@@ -8,6 +8,7 @@ export interface WalletData {
     kind: string;
     label: string;
     amountCents: number;
+    interval: string;
     nextChargeAt: string;
   }>;
 }
@@ -36,6 +37,8 @@ export interface Site {
   id: string;
   name: string;
   status: string;
+  type: string;
+  deployUrl: string | null;
 }
 
 export interface ProjectAction {

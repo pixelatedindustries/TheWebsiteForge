@@ -32,8 +32,14 @@ export const MAX_TOPUP_USD_CENTS = 1_000_000; // $10,000
 export const TOPUP_PRESETS_USD_CENTS = [5_000, 15_000, 30_000, 60_000]; // $50/$150/$300/$600
 
 export type BillingInterval = "month" | "year";
-export type InvoiceType = "build" | "hosting" | "domain" | "feature";
-export type RecurringKind = "hosting" | "database";
+export type InvoiceType =
+  | "build"
+  | "hosting"
+  | "database"
+  | "domain"
+  | "feature";
+/** Recurring charge kinds. Hosting/database bill monthly; domains bill yearly. */
+export type RecurringKind = "hosting" | "database" | "domain";
 
 /* ----------------------------- one-off builds ----------------------------- */
 

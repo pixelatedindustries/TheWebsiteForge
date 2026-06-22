@@ -35,6 +35,7 @@ const panelMsg = ref<string | null>(null);
 
 // wallet adjust form
 const adjDirection = ref<"credit" | "debit">("credit");
+const adjCreateInvoice = ref(false);
 const adjAmount = ref<number | null>(null);
 const adjType = ref("topup");
 const adjDescription = ref("");
@@ -106,6 +107,8 @@ async function submitAdjust() {
           amountUsdCents: Math.round(adjAmount.value * 100),
           type: adjType.value,
           description: adjDescription.value.trim() || undefined,
+          createInvoice:
+            adjDirection.value === "debit" && adjCreateInvoice.value,
         },
       },
     );
@@ -255,12 +258,16 @@ onMounted(loadCustomers);
       </div>
     </div>
 
-    <!-- manage billing panel -->
+    <!-- manage billing modal -->
     <div
       v-if="selected"
-      class="glass-strong gradient-border mt-6 rounded-2xl p-6"
+      class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm sm:p-8"
+      @click.self="closeManage"
     >
-      <div class="flex items-start justify-between gap-4">
+      <div
+        class="glass-strong gradient-border my-auto w-full max-w-2xl rounded-2xl p-6"
+      >
+        <div class="flex items-start justify-between gap-4">
         <div>
           <h2 class="font-display text-lg font-semibold text-white">
             {{ selected.name }} — billing
@@ -320,7 +327,7 @@ onMounted(loadCustomers);
                 step="0.01"
                 placeholder="Amount (USD)"
                 class="w-full rounded-lg border border-white/10 bg-black/30 py-2 pl-7 pr-3 text-sm text-white outline-none focus:border-brand-400/60"
-              />
+              >
             </div>
           </div>
           <input
@@ -328,7 +335,14 @@ onMounted(loadCustomers);
             type="text"
             placeholder="Description (e.g. Feature: booking calendar)"
             class="mt-2 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-brand-400/60"
-          />
+          >
+          <label
+            v-if="adjDirection === 'debit'"
+            class="mt-2 flex items-center gap-2 text-xs text-slate-400"
+          >
+            <input v-model="adjCreateInvoice" type="checkbox" class="rounded" >
+            Raise a paid invoice for this charge
+          </label>
           <button
             type="button"
             :disabled="adjBusy || !adjAmount"
@@ -438,7 +452,10 @@ onMounted(loadCustomers);
           </tbody>
         </table>
       </div>
-      <p v-if="detailPending" class="mt-4 text-sm text-slate-500">Loading…</p>
+        <p v-if="detailPending" class="mt-4 text-sm text-slate-500">
+          Loading…
+        </p>
+      </div>
     </div>
   </div>
 </template>

@@ -7,9 +7,9 @@ export default defineEventHandler(async (event) => {
   await requireAdmin(event);
   const db = useDb();
 
-  const [subs, invs, siteRows, leadRows, domainRows, customerRows] =
+  const [recurring, invs, siteRows, leadRows, domainRows, customerRows] =
     await Promise.all([
-      db.select().from(schema.subscriptions),
+      db.select().from(schema.recurringCharges),
       db.select().from(schema.invoices),
       db.select().from(schema.sites),
       db.select().from(schema.leads),
@@ -24,10 +24,10 @@ export default defineEventHandler(async (event) => {
   const monthlyCents = (amount: number, interval: string) =>
     interval === "year" ? Math.round(amount / 12) : amount;
 
-  // MRR from active subscriptions.
-  const mrrCents = subs
-    .filter((s) => s.status === "active")
-    .reduce((sum, s) => sum + monthlyCents(s.amountCents, s.interval), 0);
+  // MRR from active wallet recurring charges (yearly normalised to monthly).
+  const mrrCents = recurring
+    .filter((r) => r.status === "active")
+    .reduce((sum, r) => sum + monthlyCents(r.amountCents, r.interval), 0);
 
   const paid = invs.filter((i) => i.status === "paid" && i.paidAt);
   const revenueThisMonthCents = paid
@@ -71,8 +71,9 @@ export default defineEventHandler(async (event) => {
     revenueYtdCents,
     activeSites: siteRows.filter((s) => s.status === "live").length,
     suspendedSites: siteRows.filter((s) => s.status === "suspended").length,
-    activeSubscriptions: subs.filter((s) => s.status === "active").length,
-    canceledSubscriptions: subs.filter((s) => s.status === "canceled").length,
+    activeSubscriptions: recurring.filter((r) => r.status === "active").length,
+    canceledSubscriptions: recurring.filter((r) => r.status === "canceled")
+      .length,
     newBuildsThisMonth: invs.filter(
       (i) => i.type === "build" && new Date(i.issuedAt) >= startOfMonth,
     ).length,

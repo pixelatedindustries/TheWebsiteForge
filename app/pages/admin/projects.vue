@@ -66,18 +66,22 @@ const expandedBrief = ref<string | null>(null);
 const selected = ref<Project | null>(null);
 const actionTitle = ref("");
 const actionDetails = ref("");
+const actionMsg = ref<string | null>(null);
 const deliverableName = ref("");
 const deliverableUrl = ref("");
-const statuses = [
-  "awaiting_payment",
-  "brief_received",
-  "design",
-  "build",
-  "review",
-  "launch",
-  "live",
-  "paused",
-  "canceled",
+
+// Project lifecycle stages with human-friendly labels for the dropdown.
+const statusOptions: Array<{ value: string; label: string }> = [
+  { value: "awaiting_payment", label: "Awaiting payment" },
+  { value: "payment_received", label: "Payment received" },
+  { value: "brief_received", label: "Brief received" },
+  { value: "design", label: "Design" },
+  { value: "build", label: "Build" },
+  { value: "review", label: "Review" },
+  { value: "launch", label: "Launch" },
+  { value: "live", label: "Live" },
+  { value: "paused", label: "Paused" },
+  { value: "canceled", label: "Canceled" },
 ];
 
 async function load() {
@@ -122,23 +126,36 @@ async function save(project: Project) {
 }
 
 async function addAction() {
-  if (!selected.value || actionTitle.value.trim().length < 3) return;
+  if (!selected.value) return;
+  actionMsg.value = null;
+  if (actionTitle.value.trim().length < 3) {
+    actionMsg.value = "Give the action a title (at least 3 characters).";
+    return;
+  }
   busy.value = selected.value.id;
   try {
     await adminFetch("/api/admin/project-actions", {
       method: "POST",
       body: {
         projectId: selected.value.id,
-        title: actionTitle.value,
-        details: actionDetails.value,
+        title: actionTitle.value.trim(),
+        details: actionDetails.value.trim() || undefined,
       },
     });
     actionTitle.value = "";
     actionDetails.value = "";
+    actionMsg.value = "Action added — the customer will see it in their portal.";
     await load();
     selected.value =
       projects.value.find((project) => project.id === selected.value?.id) ??
       null;
+  } catch (e) {
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
+    actionMsg.value =
+      err?.data?.statusMessage || err?.statusMessage || "Could not add action.";
   } finally {
     busy.value = "";
   }
@@ -252,27 +269,44 @@ onMounted(load);
             </dl>
           </div>
           <div class="mt-5 grid gap-3 md:grid-cols-[1fr_7rem_10rem]">
-            <select
-              v-model="project.status"
-              class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-            >
-              <option v-for="status in statuses" :key="status" :value="status">
-                {{ status.replaceAll("_", " ") }}
-              </option>
-            </select>
-            <input
-              v-model.number="project.progress"
-              type="number"
-              min="0"
-              max="100"
-              class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-            />
-            <input
-              v-model="project.estimatedLaunchAt"
-              type="date"
-              class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-            />
+            <label class="text-[11px] font-medium text-zinc-500">
+              Stage
+              <select
+                v-model="project.status"
+                class="mt-1 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
+              >
+                <option
+                  v-for="status in statusOptions"
+                  :key="status.value"
+                  :value="status.value"
+                >
+                  {{ status.label }}
+                </option>
+              </select>
+            </label>
+            <label class="text-[11px] font-medium text-zinc-500">
+              Progress %
+              <input
+                v-model.number="project.progress"
+                type="number"
+                min="0"
+                max="100"
+                class="mt-1 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
+              >
+            </label>
+            <label class="text-[11px] font-medium text-zinc-500">
+              Est. launch date
+              <input
+                v-model="project.estimatedLaunchAt"
+                type="date"
+                class="mt-1 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
+              >
+            </label>
           </div>
+          <p class="mt-2 text-[11px] text-zinc-600">
+            Progress drives the customer's progress bar; the launch date shows as
+            their estimated launch. Both are saved with "Save update".
+          </p>
           <textarea
             v-model="project.latestUpdate"
             rows="2"
@@ -304,37 +338,52 @@ onMounted(load);
       >
         <p class="text-xs text-zinc-600">Customer action</p>
         <h2 class="mt-1 font-semibold text-white">{{ selected.name }}</h2>
+        <p class="mt-2 text-[11px] leading-relaxed text-zinc-600">
+          Add a to-do the customer must complete (e.g. "Send your logo"). It
+          appears in their account's action centre, where they can mark it done.
+        </p>
         <input
           v-model="actionTitle"
-          placeholder="Action title"
-          class="mt-5 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-        />
+          placeholder="Action title (e.g. Send your logo files)"
+          class="mt-4 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
+        >
         <textarea
           v-model="actionDetails"
           rows="4"
-          placeholder="What does the customer need to do?"
+          placeholder="What does the customer need to do? (optional)"
           class="mt-3 w-full rounded-xl border border-white/10 bg-black/25 p-3 text-sm text-white"
         />
         <button
-          :disabled="busy === selected.id"
+          :disabled="busy === selected.id || actionTitle.trim().length < 3"
           class="mt-3 w-full rounded-full bg-white px-4 py-2.5 text-xs font-semibold text-black disabled:opacity-50"
           @click="addAction"
         >
           Add customer action
         </button>
+        <p
+          v-if="actionMsg"
+          class="mt-2 text-[11px]"
+          :class="
+            actionMsg.startsWith('Action added')
+              ? 'text-emerald-400'
+              : 'text-rose-400'
+          "
+        >
+          {{ actionMsg }}
+        </p>
         <div class="mt-6 border-t border-white/[0.08] pt-5">
           <p class="text-xs text-zinc-600">Add deliverable link</p>
           <input
             v-model="deliverableName"
             placeholder="Final source repository"
             class="mt-3 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-          />
+          >
           <input
             v-model="deliverableUrl"
             type="url"
             placeholder="https://..."
             class="mt-3 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-          />
+          >
           <button
             :disabled="busy === selected.id"
             class="mt-3 w-full rounded-full border border-white/15 px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50"

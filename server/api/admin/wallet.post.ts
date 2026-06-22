@@ -47,23 +47,55 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const result =
-    direction === "credit"
-      ? await creditWallet({
-          customerId,
-          type: type as never,
-          amountCents: amount,
-          description,
-          createdBy: admin.email,
-        })
-      : await debitWallet({
-          customerId,
-          type: type as never,
-          amountCents: amount,
-          description,
-          createdBy: admin.email,
-          allowNegative: body?.force === true,
-        });
+  // Map a debit type to the closest invoice type when raising an invoice.
+  const invoiceTypeFor = (
+    t: string,
+  ): "hosting" | "database" | "feature" =>
+    t === "hosting" ? "hosting" : t === "database" ? "database" : "feature";
+
+  let result;
+  if (direction === "credit") {
+    result = await creditWallet({
+      customerId,
+      type: type as never,
+      amountCents: amount,
+      description,
+      createdBy: admin.email,
+    });
+  } else if (body?.createInvoice) {
+    // Debit + paid invoice atomically so we never bill without a record.
+    result = await useDb().transaction(async (tx) => {
+      const r = await debitWallet({
+        customerId,
+        type: type as never,
+        amountCents: amount,
+        description,
+        createdBy: admin.email,
+        allowNegative: body?.force === true,
+        tx,
+      });
+      if (!r.ok) return r;
+      await tx.insert(schema.invoices).values({
+        customerId,
+        type: invoiceTypeFor(type),
+        amountCents: amount,
+        currency: "USD",
+        status: "paid",
+        provider: "wallet",
+        paidAt: new Date(),
+      });
+      return r;
+    });
+  } else {
+    result = await debitWallet({
+      customerId,
+      type: type as never,
+      amountCents: amount,
+      description,
+      createdBy: admin.email,
+      allowNegative: body?.force === true,
+    });
+  }
 
   if (!result.ok) {
     throw createError({

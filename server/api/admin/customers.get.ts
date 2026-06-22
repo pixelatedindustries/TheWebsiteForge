@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   const db = useDb();
   const { limit, offset } = getPagination(event);
 
-  const [customerRows, siteRows, subs] = await Promise.all([
+  const [customerRows, siteRows, recurring] = await Promise.all([
     db
       .select()
       .from(schema.customers)
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
       .limit(limit)
       .offset(offset),
     db.select().from(schema.sites),
-    db.select().from(schema.subscriptions),
+    db.select().from(schema.recurringCharges),
   ]);
 
   const monthlyCents = (amount: number, interval: string) =>
@@ -24,9 +24,9 @@ export default defineEventHandler(async (event) => {
 
   const customers = customerRows.map((c) => {
     const siteCount = siteRows.filter((s) => s.customerId === c.id).length;
-    const mrrCents = subs
-      .filter((s) => s.customerId === c.id && s.status === "active")
-      .reduce((sum, s) => sum + monthlyCents(s.amountCents, s.interval), 0);
+    const mrrCents = recurring
+      .filter((r) => r.customerId === c.id && r.status === "active")
+      .reduce((sum, r) => sum + monthlyCents(r.amountCents, r.interval), 0);
     return { ...c, siteCount, mrrCents };
   });
 

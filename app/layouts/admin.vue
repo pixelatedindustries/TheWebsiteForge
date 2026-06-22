@@ -14,6 +14,7 @@ const nav = [
   { label: "Customers", to: "/admin/customers" },
   { label: "Sites", to: "/admin/sites" },
   { label: "Domains", to: "/admin/domains" },
+  { label: "Requests", to: "/admin/change-requests" },
   { label: "Billing", to: "/admin/billing" },
   { label: "Settings", to: "/admin/settings" },
 ];
@@ -263,12 +264,16 @@ const currentSection = computed(
   content: "Infrastructure / 05";
 }
 
+:deep(.admin-page--change-requests::before) {
+  content: "Requests / 06";
+}
+
 :deep(.admin-page--billing::before) {
-  content: "Finance / 06";
+  content: "Finance / 07";
 }
 
 :deep(.admin-page--settings::before) {
-  content: "Access / 07";
+  content: "Access / 08";
 }
 
 :deep(.admin-page > h1) {

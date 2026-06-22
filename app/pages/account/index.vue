@@ -191,9 +191,55 @@ function topupCustom() {
   void startCheckout({ purpose: "topup", amountUsdCents: cents });
 }
 
+const resumeBusy = ref(false);
+const resumeError = ref<string | null>(null);
+
+/** Complete payment for an awaiting-payment build by resuming the existing
+ * invoice (no duplicate order is created), then redirect to Paystack. */
+async function resumePayment(projectId: string) {
+  resumeBusy.value = true;
+  resumeError.value = null;
+  try {
+    const res = await authFetch<{ authorizationUrl?: string }>(
+      "/api/account/resume-payment",
+      { method: "POST", body: { projectId } },
+    );
+    if (res?.authorizationUrl) {
+      window.location.href = res.authorizationUrl;
+    } else {
+      throw new Error("No checkout URL returned.");
+    }
+  } catch (e) {
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
+    resumeError.value =
+      err?.data?.statusMessage ||
+      err?.statusMessage ||
+      "Could not start payment. Please try again.";
+    resumeBusy.value = false;
+  }
+}
+
 async function submitChangeRequest() {
-  if (crTitle.value.trim().length < 3 || crDetails.value.trim().length < 10)
+  // Client-side validation with clear feedback.
+  if (!sites.value.length) {
+    crMessage.value = "You need a live site with us before requesting changes.";
     return;
+  }
+  if (!crSiteId.value) {
+    crMessage.value = "Please choose which site this change is for.";
+    return;
+  }
+  if (crTitle.value.trim().length < 3) {
+    crMessage.value = "Give the request a short title (at least 3 characters).";
+    return;
+  }
+  if (crDetails.value.trim().length < 10) {
+    crMessage.value = "Please describe the change in a sentence or two.";
+    return;
+  }
   crBusy.value = true;
   crMessage.value = null;
   try {
@@ -220,6 +266,57 @@ async function submitChangeRequest() {
       err?.data?.statusMessage || err?.statusMessage || "Could not submit.";
   } finally {
     crBusy.value = false;
+  }
+}
+
+const approveBusy = ref<string | null>(null);
+const approveError = ref<string | null>(null);
+
+/** Approve a quoted change request and pay it from the wallet balance. */
+async function approveRequest(id: string) {
+  approveBusy.value = id;
+  approveError.value = null;
+  try {
+    await authFetch("/api/account/change-request", {
+      method: "PATCH",
+      body: { id },
+    });
+    await Promise.all([load(), refreshWalletBalance()]);
+  } catch (e) {
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
+    approveError.value =
+      err?.data?.statusMessage ||
+      err?.statusMessage ||
+      "Could not approve. Please try again.";
+  } finally {
+    approveBusy.value = null;
+  }
+}
+
+/** Cancel an open/quoted change request the customer raised by mistake. */
+async function cancelRequest(id: string) {
+  approveBusy.value = id;
+  approveError.value = null;
+  try {
+    await authFetch("/api/account/change-request", {
+      method: "PATCH",
+      body: { id, action: "cancel" },
+    });
+    await load();
+  } catch (e) {
+    const err = e as {
+      data?: { statusMessage?: string };
+      statusMessage?: string;
+    };
+    approveError.value =
+      err?.data?.statusMessage ||
+      err?.statusMessage ||
+      "Could not cancel the request.";
+  } finally {
+    approveBusy.value = null;
   }
 }
 
@@ -342,6 +439,22 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                     "Your project has been added to the studio queue."
                   }}
                 </p>
+                <div
+                  v-if="activeProject.status === 'awaiting_payment'"
+                  class="mt-5"
+                >
+                  <button
+                    type="button"
+                    :disabled="resumeBusy"
+                    class="btn-gradient inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+                    @click="resumePayment(activeProject.id)"
+                  >
+                    {{ resumeBusy ? "Starting…" : "Complete payment" }}
+                  </button>
+                  <p v-if="resumeError" class="mt-2 text-xs text-white">
+                    {{ resumeError }}
+                  </p>
+                </div>
               </div>
               <select
                 v-if="projects.length > 1"
@@ -533,13 +646,13 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                     v-model="fileName"
                     placeholder="Logo files"
                     class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-xs text-white outline-none focus:border-white/30"
-                  />
+                  >
                   <input
                     v-model="fileUrl"
                     type="url"
                     placeholder="https://drive.google.com/..."
                     class="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-xs text-white outline-none focus:border-white/30"
-                  />
+                  >
                   <button
                     type="button"
                     :disabled="projectBusy"
@@ -625,7 +738,7 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                         :min="minTopupUsd"
                         :placeholder="`Custom (min $${minTopupUsd})`"
                         class="w-full rounded-lg border border-white/10 bg-black/30 py-2.5 pl-7 pr-3 text-white outline-none transition focus:border-brand-400/60"
-                      />
+                      >
                     </div>
                     <button
                       type="button"
@@ -706,6 +819,7 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                       <th class="py-2 font-medium">Type</th>
                       <th class="py-2 text-right font-medium">Amount</th>
                       <th class="py-2 text-right font-medium">Status</th>
+                      <th class="py-2 text-right font-medium" />
                     </tr>
                   </thead>
                   <tbody>
@@ -728,6 +842,14 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                         >
                           {{ i.status }}
                         </span>
+                      </td>
+                      <td class="py-2.5 text-right whitespace-nowrap">
+                        <NuxtLink
+                          :to="`/account/invoices/${i.id}`"
+                          class="text-xs text-brand-300 hover:underline"
+                        >
+                          View
+                        </NuxtLink>
                       </td>
                     </tr>
                   </tbody>
@@ -762,7 +884,8 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                     <span
                       class="whitespace-nowrap font-semibold text-brand-300"
                     >
-                      {{ formatUsdCents(r.amountCents) }}/mo
+                      {{ formatUsdCents(r.amountCents)
+                      }}{{ r.interval === "year" ? "/yr" : "/mo" }}
                     </span>
                   </li>
                 </ul>
@@ -779,7 +902,18 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                     :key="s.id"
                     class="flex items-center justify-between gap-3 text-sm"
                   >
-                    <span class="text-slate-200">{{ s.name }}</span>
+                    <div class="min-w-0">
+                      <p class="truncate text-slate-200">{{ s.name }}</p>
+                      <a
+                        v-if="s.deployUrl"
+                        :href="s.deployUrl"
+                        target="_blank"
+                        rel="noopener"
+                        class="text-xs text-brand-300 hover:underline"
+                      >
+                        Visit site ↗
+                      </a>
+                    </div>
                     <span
                       class="rounded-full px-2 py-0.5 text-xs font-semibold"
                       :class="statusClass(s.status)"
@@ -847,8 +981,42 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                     >
                       Quote: {{ formatUsdCents(request.quotedCents) }}
                     </p>
+                    <div
+                      v-if="
+                        request.status === 'quoted' ||
+                        request.status === 'open'
+                      "
+                      class="mt-3 flex flex-wrap items-center gap-2"
+                    >
+                      <button
+                        v-if="
+                          request.status === 'quoted' && request.quotedCents
+                        "
+                        type="button"
+                        :disabled="approveBusy === request.id"
+                        class="btn-gradient inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                        @click="approveRequest(request.id)"
+                      >
+                        {{
+                          approveBusy === request.id
+                            ? "Processing…"
+                            : `Approve & pay ${formatUsdCents(request.quotedCents)} from wallet`
+                        }}
+                      </button>
+                      <button
+                        type="button"
+                        :disabled="approveBusy === request.id"
+                        class="inline-flex items-center justify-center rounded-lg border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/70 hover:bg-white/5 disabled:opacity-50"
+                        @click="cancelRequest(request.id)"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </li>
                 </ul>
+                <p v-if="approveError" class="mt-3 text-xs text-white">
+                  {{ approveError }}
+                </p>
               </div>
 
               <div class="glass rounded-2xl p-6">
@@ -859,23 +1027,30 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                   Need an update or new feature? Tell us and we'll quote it from
                   your wallet.
                 </p>
-                <div class="mt-4 space-y-3">
+                <p
+                  v-if="!sites.length"
+                  class="mt-4 rounded-lg border border-white/10 bg-black/20 p-3 text-xs text-slate-400"
+                >
+                  Change requests are for sites we build or host for you. Once
+                  your first site is live, you'll be able to request changes
+                  here.
+                </p>
+                <div v-else class="mt-4 space-y-3">
+                  <select
+                    v-model="crSiteId"
+                    class="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none transition focus:border-brand-400/60"
+                  >
+                    <option value="">Which site?</option>
+                    <option v-for="s in sites" :key="s.id" :value="s.id">
+                      {{ s.name }}
+                    </option>
+                  </select>
                   <input
                     v-model="crTitle"
                     type="text"
                     placeholder="Short title"
                     class="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none transition focus:border-brand-400/60"
-                  />
-                  <select
-                    v-if="sites.length"
-                    v-model="crSiteId"
-                    class="w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none transition focus:border-brand-400/60"
                   >
-                    <option value="">Which site? (optional)</option>
-                    <option v-for="s in sites" :key="s.id" :value="s.id">
-                      {{ s.name }}
-                    </option>
-                  </select>
                   <textarea
                     v-model="crDetails"
                     rows="3"
@@ -884,7 +1059,7 @@ useSeoMeta({ title: "My account — TheWebsiteForge", robots: "noindex" });
                   />
                   <button
                     type="button"
-                    :disabled="crBusy"
+                    :disabled="crBusy || !crSiteId"
                     class="btn-gradient inline-flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
                     @click="submitChangeRequest"
                   >

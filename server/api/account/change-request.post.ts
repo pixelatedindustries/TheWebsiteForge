@@ -29,31 +29,37 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // A change request must target one of the customer's sites — there's nothing
+  // to change without a site we built/host for them.
+  if (!body?.siteId) {
+    throw createError({
+      statusCode: 422,
+      statusMessage: "Please choose which site this change is for.",
+    });
+  }
+
   const db = useDb();
 
   // Validate site ownership: a customer may only attach a request to their own
   // site. Without this, a signed-in user could reference another customer's
   // siteId (horizontal privilege escalation / data-integrity corruption).
-  let siteId: string | null = null;
-  if (body?.siteId) {
-    const [site] = await db
-      .select({ id: schema.sites.id })
-      .from(schema.sites)
-      .where(
-        and(
-          eq(schema.sites.id, body.siteId),
-          eq(schema.sites.customerId, customer.id),
-        ),
-      )
-      .limit(1);
-    if (!site) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: "That site doesn't belong to your account.",
-      });
-    }
-    siteId = site.id;
+  const [site] = await db
+    .select({ id: schema.sites.id })
+    .from(schema.sites)
+    .where(
+      and(
+        eq(schema.sites.id, body.siteId),
+        eq(schema.sites.customerId, customer.id),
+      ),
+    )
+    .limit(1);
+  if (!site) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "That site doesn't belong to your account.",
+    });
   }
+  const siteId = site.id;
 
   const [row] = await db
     .insert(schema.changeRequests)

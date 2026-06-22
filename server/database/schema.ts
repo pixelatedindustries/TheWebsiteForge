@@ -16,6 +16,7 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -36,6 +37,14 @@ export const siteStatus = pgEnum("site_status", [
   "suspended",
   "offboarded",
 ]);
+/** Billing health of a site, distinct from its lifecycle `status`. Lets the
+ * recurring-billing task flag non-payment ("grace"/"suspended") without
+ * conflating it with a manual offboarding. */
+export const siteBillingStatus = pgEnum("site_billing_status", [
+  "current",
+  "grace",
+  "suspended",
+]);
 
 export const dbHosting = pgEnum("db_hosting", [
   "none",
@@ -53,6 +62,7 @@ export const billingInterval = pgEnum("billing_interval", ["month", "year"]);
 export const invoiceType = pgEnum("invoice_type", [
   "build",
   "hosting",
+  "database",
   "domain",
   "care",
   "feature",
@@ -69,16 +79,22 @@ export const adminRole = pgEnum("admin_role", ["owner", "admin", "support"]);
 /** Wallet ledger entry kinds (WebForgePlan2 §4.2). Signed amount decides credit/debit. */
 export const walletTxnType = pgEnum("wallet_txn_type", [
   "topup",
+  "build",
   "hosting",
   "database",
+  "domain",
   "feature",
   "change",
   "refund",
   "adjustment",
 ]);
 
-/** What a recurring monthly charge is for. */
-export const recurringKind = pgEnum("recurring_kind", ["hosting", "database"]);
+/** What a recurring charge is for. Hosting/database bill monthly; domains yearly. */
+export const recurringKind = pgEnum("recurring_kind", [
+  "hosting",
+  "database",
+  "domain",
+]);
 export const recurringStatus = pgEnum("recurring_status", [
   "active",
   "paused",
@@ -91,9 +107,11 @@ export const changeRequestStatus = pgEnum("change_request_status", [
   "approved",
   "done",
   "declined",
+  "canceled",
 ]);
 export const projectStatus = pgEnum("project_status", [
   "awaiting_payment",
+  "payment_received",
   "brief_received",
   "design",
   "build",
@@ -180,6 +198,10 @@ export const sites = pgTable(
     type: siteType("type").notNull(),
     origin: siteOrigin("origin").notNull(),
     status: siteStatus("status").default("draft").notNull(),
+    /** Billing health, driven by the recurring-billing task (current/grace/suspended). */
+    billingStatus: siteBillingStatus("billing_status")
+      .default("current")
+      .notNull(),
     /** Which database option the customer chose for this site (plan §3.2.1). */
     dbHosting: dbHosting("db_hosting").default("none").notNull(),
     repoUrl: text("repo_url"),
@@ -220,6 +242,12 @@ export const domains = pgTable(
   ],
 );
 
+/**
+ * @deprecated Legacy Paystack-native card subscriptions. The app standardised on
+ * the wallet model (`recurring_charges`); nothing writes this table anymore (the
+ * webhook subscription/invoice handlers were removed). Kept for historical data;
+ * drop in a future dedicated migration once confirmed unused.
+ */
 export const subscriptions = pgTable(
   "subscriptions",
   {
@@ -269,6 +297,20 @@ export const invoices = pgTable(
     status: invoiceStatus("status").default("open").notNull(),
     provider: text("provider"),
     providerInvoiceId: text("provider_invoice_id"),
+    /** Set when this invoice was emitted by a recurring (hosting/db/domain) charge. */
+    recurringChargeId: uuid("recurring_charge_id").references(
+      (): AnyPgColumn => recurringCharges.id,
+      { onDelete: "set null" },
+    ),
+    /** Set for domain-renewal invoices. */
+    domainId: uuid("domain_id").references(() => domains.id, {
+      onDelete: "set null",
+    }),
+    /** Set when this invoice settles an approved change request (ad-hoc feature). */
+    changeRequestId: uuid("change_request_id").references(
+      (): AnyPgColumn => changeRequests.id,
+      { onDelete: "set null" },
+    ),
     issuedAt: timestamp("issued_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -280,6 +322,7 @@ export const invoices = pgTable(
   (t) => [
     index("invoices_customer_id_idx").on(t.customerId),
     index("invoices_provider_invoice_id_idx").on(t.providerInvoiceId),
+    index("invoices_recurring_charge_id_idx").on(t.recurringChargeId),
   ],
 );
 
@@ -459,11 +502,15 @@ export const recurringCharges = pgTable(
     siteId: uuid("site_id").references(() => sites.id, {
       onDelete: "set null",
     }),
+    /** Set for domain-renewal charges so the task can advance the right domain. */
+    domainId: uuid("domain_id").references(() => domains.id, {
+      onDelete: "cascade",
+    }),
     kind: recurringKind("kind").notNull(),
     /** Catalogue key from shared/billing.ts (e.g. "hosting_dynamic"), optional. */
     planKey: text("plan_key"),
     label: text("label").notNull(),
-    /** Monthly amount in USD cents. */
+    /** Charge amount in USD cents, per `interval`. */
     amountCents: integer("amount_cents").notNull(),
     interval: billingInterval("interval").default("month").notNull(),
     status: recurringStatus("status").default("active").notNull(),
@@ -471,6 +518,10 @@ export const recurringCharges = pgTable(
     lowBalanceNotifiedAt: timestamp("low_balance_notified_at", {
       withTimezone: true,
     }),
+    /** When this charge last successfully debited the wallet. */
+    lastChargedAt: timestamp("last_charged_at", { withTimezone: true }),
+    /** Consecutive failed debit attempts (reset to 0 on success). */
+    failureCount: integer("failure_count").default(0).notNull(),
     nextChargeAt: timestamp("next_charge_at", { withTimezone: true }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
@@ -505,6 +556,13 @@ export const changeRequests = pgTable(
     status: changeRequestStatus("status").default("open").notNull(),
     /** Optional quoted amount in USD cents once an admin scopes it. */
     quotedCents: integer("quoted_cents"),
+    /** Consent trail: when the customer approved the quote and from what email. */
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    approvedBy: text("approved_by"),
+    /** The feature invoice raised when the customer approved + paid the quote. */
+    invoiceId: uuid("invoice_id").references((): AnyPgColumn => invoices.id, {
+      onDelete: "set null",
+    }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),

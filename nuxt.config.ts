@@ -152,7 +152,15 @@ export default defineNuxtConfig({
       tasks: true,
     },
     scheduledTasks: {
-      // Daily at 06:00 — debit due recurring charges from customer wallets.
+      // Daily at 06:00 — debit due recurring charges from customer wallets
+      // (monthly hosting/database, yearly domain renewals). The daily cadence
+      // catches yearly charges on the day their next_charge_at falls due.
+      //
+      // DEPLOYMENT NOTE: Nitro scheduledTasks only fire on a long-running Node
+      // server (e.g. node-server preset / a VPS). On serverless/static hosting
+      // there is no scheduler — wire an external cron (or platform scheduler) to
+      // invoke the "billing:charge-recurring" task, or recurring billing and the
+      // auto-suspend grace flow will never run.
       "0 6 * * *": ["billing:charge-recurring"],
     },
   },

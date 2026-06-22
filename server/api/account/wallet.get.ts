@@ -29,7 +29,14 @@ export default defineEventHandler(async (event) => {
     )
     .orderBy(desc(schema.recurringCharges.createdAt));
 
-  const monthlyBurnCents = recurring.reduce((sum, r) => sum + r.amountCents, 0);
+  // Normalise to a monthly figure so a yearly domain renewal doesn't overstate
+  // the burn rate (and runway).
+  const monthlyCents = (amount: number, interval: string) =>
+    interval === "year" ? Math.round(amount / 12) : amount;
+  const monthlyBurnCents = recurring.reduce(
+    (sum, r) => sum + monthlyCents(r.amountCents, r.interval),
+    0,
+  );
   const balanceCents = customer.walletBalanceCents ?? 0;
   const runwayMonths =
     monthlyBurnCents > 0 ? balanceCents / monthlyBurnCents : null;

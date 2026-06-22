@@ -8,9 +8,10 @@ import { lowBalanceEmail, suspensionEmail } from "../../utils/email-templates";
  * Scheduled task: debit due recurring charges from customer wallets
  * (WebForgePlan2 §4.4). Configured in nuxt.config.ts to run daily at 06:00.
  *
+ * Charges bill on their `interval`: hosting/database monthly, domains yearly.
  * For each active charge whose `next_charge_at` is due:
- *  - If the wallet covers it → debit, advance the date one month, clear any
- *    low-balance flag.
+ *  - If the wallet covers it → debit, raise a paid invoice, advance the date one
+ *    interval, and (for domains) advance the domain expiry. All in one tx.
  *  - If not → start (or continue) a grace window. On first miss, email a
  *    low-balance warning. After GRACE_DAYS still unpaid, suspend the site and
  *    pause the charge.
@@ -22,15 +23,35 @@ import { lowBalanceEmail, suspensionEmail } from "../../utils/email-templates";
 
 const GRACE_DAYS = 7;
 
+/** Thrown inside the charge transaction to roll back when the wallet is short. */
+class InsufficientFundsError extends Error {
+  constructor(readonly balanceAfterCents: number) {
+    super("insufficient_funds");
+  }
+}
+
 function addMonths(date: Date, months: number): Date {
   const d = new Date(date);
   d.setMonth(d.getMonth() + months);
   return d;
 }
 
+function addYears(date: Date, years: number): Date {
+  const d = new Date(date);
+  d.setFullYear(d.getFullYear() + years);
+  return d;
+}
+
 function topupUrl(): string | null {
   const base = process.env.NUXT_PUBLIC_SITE_URL;
   return base ? `${base.replace(/\/$/, "")}/account` : null;
+}
+
+/** Invoice type for a recurring charge kind. */
+function invoiceTypeFor(kind: string): "hosting" | "database" | "domain" {
+  if (kind === "domain") return "domain";
+  if (kind === "database") return "database";
+  return "hosting";
 }
 
 export default defineTask({
@@ -69,40 +90,90 @@ export default defineTask({
           .limit(1);
         if (!customer) continue;
 
-        const result = await debitWallet({
-          customerId: rc.customerId,
-          type: rc.kind, // "hosting" | "database"
-          amountCents: rc.amountCents,
-          description: rc.label,
-          siteId: rc.siteId,
-          createdBy: "system",
-        });
+        const advanced =
+          rc.interval === "year"
+            ? addYears(rc.nextChargeAt, 1)
+            : addMonths(rc.nextChargeAt, 1);
 
-        if (result.ok) {
-          // Charged successfully — schedule next month, clear any grace flag.
-          await db
-            .update(schema.recurringCharges)
-            .set({
-              nextChargeAt: addMonths(rc.nextChargeAt, 1),
-              lowBalanceNotifiedAt: null,
-            })
-            .where(eq(schema.recurringCharges.id, rc.id));
+        // Debit + paid invoice + date advance (+ domain expiry) commit together.
+        // An insufficient balance throws the sentinel to roll the whole thing
+        // back, so we never raise an invoice without a matching wallet debit.
+        let balanceAfterCents = 0;
+        try {
+          await db.transaction(async (tx) => {
+            const result = await debitWallet({
+              customerId: rc.customerId,
+              type: rc.kind,
+              amountCents: rc.amountCents,
+              description: rc.label,
+              siteId: rc.siteId,
+              createdBy: "system",
+              tx,
+            });
+            if (!result.ok) {
+              throw new InsufficientFundsError(result.balanceAfterCents);
+            }
+            balanceAfterCents = result.balanceAfterCents;
+
+            await tx.insert(schema.invoices).values({
+              customerId: rc.customerId,
+              siteId: rc.siteId,
+              recurringChargeId: rc.id,
+              domainId: rc.domainId ?? null,
+              type: invoiceTypeFor(rc.kind),
+              amountCents: rc.amountCents,
+              currency: "USD",
+              status: "paid",
+              provider: "wallet",
+              paidAt: now,
+            });
+
+            // Domain renewal: push the registration expiry out one year too.
+            if (rc.kind === "domain" && rc.domainId) {
+              await tx
+                .update(schema.domains)
+                .set({ expiresAt: advanced.toISOString().slice(0, 10) })
+                .where(eq(schema.domains.id, rc.domainId));
+            }
+
+            // A successful charge clears any prior billing-grace flag on the site.
+            if (rc.siteId) {
+              await tx
+                .update(schema.sites)
+                .set({ billingStatus: "current" })
+                .where(eq(schema.sites.id, rc.siteId));
+            }
+
+            await tx
+              .update(schema.recurringCharges)
+              .set({
+                nextChargeAt: advanced,
+                lowBalanceNotifiedAt: null,
+                lastChargedAt: now,
+                failureCount: 0,
+              })
+              .where(eq(schema.recurringCharges.id, rc.id));
+          });
           charged++;
           continue;
+        } catch (txErr) {
+          if (!(txErr instanceof InsufficientFundsError)) throw txErr;
+          balanceAfterCents = txErr.balanceAfterCents;
+          // fall through to grace handling below
         }
 
-        // Insufficient balance.
+        // ---- Insufficient balance ----
         if (!rc.lowBalanceNotifiedAt) {
           // First miss → open the grace window and warn.
           await db
             .update(schema.recurringCharges)
-            .set({ lowBalanceNotifiedAt: now })
+            .set({ lowBalanceNotifiedAt: now, failureCount: rc.failureCount + 1 })
             .where(eq(schema.recurringCharges.id, rc.id));
           lowBalance++;
           if (customer.email) {
             const mail = lowBalanceEmail({
               name: customer.name,
-              balanceCents: result.balanceAfterCents,
+              balanceCents: balanceAfterCents,
               serviceLabel: rc.label,
               chargeCents: rc.amountCents,
               graceDays: GRACE_DAYS,
@@ -135,12 +206,12 @@ export default defineTask({
             siteName = site?.name ?? null;
             await db
               .update(schema.sites)
-              .set({ status: "suspended" })
+              .set({ status: "suspended", billingStatus: "suspended" })
               .where(eq(schema.sites.id, rc.siteId));
           }
           await db
             .update(schema.recurringCharges)
-            .set({ status: "paused" })
+            .set({ status: "paused", failureCount: rc.failureCount + 1 })
             .where(eq(schema.recurringCharges.id, rc.id));
           suspended++;
           if (customer.email) {
@@ -155,8 +226,20 @@ export default defineTask({
               ...mail,
             });
           }
+        } else {
+          // Still within grace — flag the continued shortfall as a billing
+          // grace state on the site so the admin/customer can see it.
+          await db
+            .update(schema.recurringCharges)
+            .set({ failureCount: rc.failureCount + 1 })
+            .where(eq(schema.recurringCharges.id, rc.id));
+          if (rc.siteId) {
+            await db
+              .update(schema.sites)
+              .set({ billingStatus: "grace" })
+              .where(eq(schema.sites.id, rc.siteId));
+          }
         }
-        // else: still within grace — wait for a future run.
       } catch (err) {
         failed++;
         console.error(

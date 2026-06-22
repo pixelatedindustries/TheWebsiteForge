@@ -206,7 +206,7 @@ export default defineEventHandler(async (event) => {
         await db.transaction(async (tx) => {
           const debit = await debitWallet({
             customerId: customer.id,
-            type: "adjustment",
+            type: "build",
             amountCents: walletApplyCents,
             description: `${label} (wallet payment)`,
             reference,

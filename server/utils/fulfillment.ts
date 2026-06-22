@@ -172,7 +172,7 @@ async function finalizeBuild(
       if (walletApplyCents > 0) {
         const walletResult = await debitWallet({
           customerId: invoice.customerId,
-          type: "adjustment",
+          type: "build",
           amountCents: walletApplyCents,
           description: `Wallet applied to build payment (${reference})`,
           reference,
@@ -197,11 +197,38 @@ async function finalizeBuild(
         .where(eq(schema.projects.invoiceId, invoice.id))
         .limit(1);
       if (project?.status === "awaiting_payment") {
+        // Provision a draft site for the new build so recurring charges,
+        // suspension, and "Your sites" have something to attach to. Guarded by
+        // `!project.siteId` (and the paid-early-return above) so re-runs of the
+        // idempotent fulfillment never create a second site.
+        let siteId = project.siteId;
+        if (!siteId) {
+          const [site] = await tx
+            .insert(schema.sites)
+            .values({
+              customerId: invoice.customerId,
+              name: project.name,
+              type: "dynamic",
+              origin: "built",
+              status: "draft",
+              dbHosting: "none",
+            })
+            .returning({ id: schema.sites.id });
+          siteId = site?.id ?? null;
+          if (siteId) {
+            await tx
+              .update(schema.invoices)
+              .set({ siteId })
+              .where(eq(schema.invoices.id, invoice.id));
+          }
+        }
+
         await tx
           .update(schema.projects)
           .set({
             status: "brief_received",
             progress: 10,
+            siteId,
             latestUpdate: "Payment received. Your brief is ready for review.",
             updatedAt: new Date(),
           })
