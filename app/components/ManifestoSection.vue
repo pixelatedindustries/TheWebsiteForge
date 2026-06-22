@@ -68,15 +68,7 @@ onMounted(() => {
     removePointerMove = () =>
       window.removeEventListener("pointermove", onPointerMove);
 
-    const entrance = gsap.timeline({
-      scrollTrigger: {
-        trigger: root.value,
-        start: "top bottom",
-        end: "top top",
-        scrub: 1,
-        invalidateOnRefresh: true,
-      },
-    });
+    const entrance = gsap.timeline({ paused: true });
 
     entrance
       .fromTo(
@@ -117,14 +109,7 @@ onMounted(() => {
         0.38,
       );
 
-    const content = gsap.timeline({
-      scrollTrigger: {
-        trigger: root.value,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 1,
-      },
-    });
+    const content = gsap.timeline({ paused: true });
 
     content
       .fromTo(
@@ -158,11 +143,34 @@ onMounted(() => {
         0,
       );
 
+    // Drive both timelines forward only — once a beat has played it locks at
+    // that progress, so scrolling back up is static (no reverse/replay).
+    let entranceMax = 0;
+    ScrollTrigger.create({
+      trigger: root.value,
+      start: "top bottom",
+      end: "top top",
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        if (self.progress > entranceMax) {
+          entranceMax = self.progress;
+          entrance.progress(entranceMax);
+        }
+      },
+    });
+
+    let contentMax = 0;
     ScrollTrigger.create({
       trigger: root.value,
       start: "top top",
       end: "bottom bottom",
-      onUpdate: (self) => gsap.set(progress.value, { scaleY: self.progress }),
+      onUpdate: (self) => {
+        if (self.progress > contentMax) {
+          contentMax = self.progress;
+          content.progress(contentMax);
+          gsap.set(progress.value, { scaleY: contentMax });
+        }
+      },
     });
   }, root.value);
 });
@@ -301,7 +309,7 @@ onMounted(() => {
 
 <style scoped>
 .manifesto-shell {
-  min-height: 210vh;
+  min-height: 140vh;
   margin-top: -8vh;
   padding-top: 8vh;
 }

@@ -67,6 +67,17 @@ const journey = [
   },
 ];
 
+// The journey cards run on their own as a seamless horizontal ribbon (desktop):
+// render the set twice and translate by exactly one set width. The duplicate
+// set is hidden from assistive tech and from the mobile (stacked) layout.
+const journeyRibbon = computed(() =>
+  [...journey, ...journey].map((item, i) => ({
+    ...item,
+    clone: i >= journey.length,
+    key: `${item.step}-${i}`,
+  })),
+);
+
 const teamRoles = [
   "Strategy",
   "Design",
@@ -143,35 +154,6 @@ onMounted(() => {
         scrub: 1,
       },
     });
-
-    const journeyTrack =
-      root.value!.querySelector<HTMLElement>(".journey-track");
-    const journeyViewport =
-      root.value!.querySelector<HTMLElement>(".journey-viewport");
-    if (journeyTrack && journeyViewport && window.innerWidth >= 900) {
-      gsap.to(journeyTrack, {
-        x: () => -(journeyTrack.scrollWidth - journeyViewport.clientWidth),
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".journey-pin",
-          start: "top top",
-          end: () => `+=${journeyTrack.scrollWidth}`,
-          pin: true,
-          scrub: 1,
-          invalidateOnRefresh: true,
-        },
-      });
-      gsap.to(".journey-meter-fill", {
-        scaleX: 1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".journey-pin",
-          start: "top top",
-          end: () => `+=${journeyTrack.scrollWidth}`,
-          scrub: 1,
-        },
-      });
-    }
 
     gsap.to(".journey-marquee", {
       xPercent: -32,
@@ -443,13 +425,16 @@ onBeforeUnmount(() => context?.revert());
             </p>
           </div>
 
+          <!-- self-running ribbon (desktop) / stacked list (mobile) -->
           <div class="journey-viewport mt-14 overflow-hidden">
-            <div class="journey-track flex gap-5">
+            <div class="journey-track flex">
               <article
-                v-for="item in journey"
-                :key="item.step"
+                v-for="item in journeyRibbon"
+                :key="item.key"
                 :data-step="item.step"
-                class="journey-card relative flex min-h-[22rem] w-[min(78vw,34rem)] shrink-0 flex-col justify-between rounded-[1.75rem] border border-white/10 bg-white/[0.025] p-7 backdrop-blur-md md:min-h-[28rem] md:p-10"
+                :aria-hidden="item.clone ? 'true' : undefined"
+                class="journey-card relative mr-5 flex min-h-[22rem] w-[min(78vw,34rem)] shrink-0 flex-col justify-between rounded-[1.75rem] border border-white/10 bg-white/[0.025] p-7 backdrop-blur-md md:min-h-[28rem] md:p-10"
+                :class="item.clone ? 'max-[899px]:hidden' : ''"
               >
                 <span
                   class="relative z-10 grid h-11 w-11 place-items-center rounded-full border border-white/20 bg-[#151412] font-mono text-[0.65rem] text-white/62"
@@ -473,11 +458,6 @@ onBeforeUnmount(() => context?.revert());
                 </p>
               </article>
             </div>
-          </div>
-          <div class="mt-8 h-px overflow-hidden bg-white/10">
-            <div
-              class="journey-meter-fill h-full origin-left scale-x-0 bg-[#ece9e2]"
-            />
           </div>
         </div>
       </div>
@@ -770,6 +750,26 @@ onBeforeUnmount(() => context?.revert());
   pointer-events: none;
 }
 
+/* desktop: the cards run on their own as a seamless looping ribbon */
+@media (min-width: 900px) {
+  .journey-track {
+    width: max-content;
+    animation: journey-ribbon 46s linear infinite;
+  }
+}
+
+@keyframes journey-ribbon {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-track {
+    animation: none;
+  }
+}
+
 .principle-row {
   background: #ece9e2;
 }
@@ -846,10 +846,13 @@ onBeforeUnmount(() => context?.revert());
 
   .journey-track {
     flex-direction: column;
+    width: auto;
   }
 
   .journey-card {
     width: 100%;
+    margin-right: 0;
+    margin-bottom: 1.25rem;
   }
 }
 </style>

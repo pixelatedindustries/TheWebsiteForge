@@ -1,21 +1,7 @@
 <script setup lang="ts">
 import { projects } from "~~/shared/site";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { scrollVelocity } from "~/plugins/motion";
 
 const featured = projects.slice(0, 4);
-
-// Let the pinned horizontal track lay out before recalculating ScrollTrigger
-// positions, so the pin distance measures correctly on first paint.
-const SCROLL_REFRESH_DELAY_MS = 120;
-
-const section = ref<HTMLElement | null>(null);
-const track = ref<HTMLElement | null>(null);
-const progress = ref<HTMLElement | null>(null);
-
-let mounted = false;
-let mm: gsap.MatchMedia | null = null;
 
 const isExternal = (url?: string) => !!url && /^https?:\/\//.test(url);
 const linkAttrs = (url?: string) =>
@@ -23,115 +9,67 @@ const linkAttrs = (url?: string) =>
     ? { href: url, target: "_blank", rel: "noopener noreferrer" }
     : { href: url || "/showcase" };
 
-onBeforeUnmount(() => {
-  mounted = false;
-  mm?.revert();
-});
-
-onMounted(() => {
-  mounted = true;
-
-  const setup = () => {
-    if (!mounted || mm) return;
-    mm = gsap.matchMedia();
-    mm.add(
-      "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
-      () => {
-        const sec = section.value;
-        const tr = track.value;
-        if (!sec || !tr) return;
-
-        const distance = () => Math.max(0, tr.scrollWidth - window.innerWidth);
-        gsap.set(tr, { willChange: "transform" });
-        const tween = gsap.to(tr, {
-          x: () => -distance(),
-          ease: "none",
-          scrollTrigger: {
-            trigger: sec,
-            start: "center center",
-            end: () => "+=" + distance(),
-            pin: true,
-            scrub: 1,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            onUpdate: (self) =>
-              progress.value &&
-              gsap.set(progress.value, { scaleX: self.progress }),
-          },
-        });
-
-        const skewTo = gsap.quickTo(tr, "skewX", {
-          duration: 1.1,
-          ease: "power3.out",
-        });
-        const skewTick = () =>
-          skewTo(gsap.utils.clamp(-5, 5, scrollVelocity() * 0.12));
-        gsap.ticker.add(skewTick);
-
-        return () => {
-          gsap.ticker.remove(skewTick);
-          tween.kill();
-          gsap.set(tr, { willChange: "auto", skewX: 0 });
-        };
-      },
-    );
-  };
-
-  requestAnimationFrame(() => {
-    setup();
-    setTimeout(() => ScrollTrigger.refresh(true), SCROLL_REFRESH_DELAY_MS);
-  });
-});
+// The cards move on their own as a seamless horizontal ribbon (no scroll-jacking
+// pin). We render the set twice and translate the track by exactly one set width,
+// so the loop is continuous. The duplicate set is hidden from assistive tech.
+const ribbon = computed(() =>
+  [...featured, ...featured].map((project, i) => ({
+    project,
+    n: i % featured.length,
+    clone: i >= featured.length,
+    key: `${project.id}-${i}`,
+  })),
+);
 </script>
 
 <template>
-  <section
-    ref="section"
-    class="relative hidden h-screen overflow-hidden lg:block"
-  >
-    <div class="flex h-full items-center">
-      <div ref="track" class="flex h-full items-center gap-8 pr-[12vw]">
-        <div
-          class="flex h-full w-[40vw] shrink-0 flex-col justify-center pr-[5vw] pl-[8vw]"
+  <section class="relative hidden overflow-hidden py-24 lg:block">
+    <div class="mx-auto flex max-w-[1500px] items-end justify-between px-[8vw]">
+      <div>
+        <p
+          class="mb-8 flex items-center gap-4 font-mono text-xs uppercase tracking-[0.4em] text-slate-500"
         >
-          <p
-            class="mb-8 flex items-center gap-4 font-mono text-xs uppercase tracking-[0.4em] text-slate-500"
-          >
-            <span class="h-px w-12 bg-slate-700" />
-            Selected work
-          </p>
-          <h2
-            class="font-serif text-[clamp(2.5rem,5.5vw,5rem)] font-light leading-[1.04] tracking-[-0.01em] text-[#ece9e2]"
-          >
-            The <span class="italic text-brand-300">work</span>
-          </h2>
-          <NuxtLink
-            to="/showcase"
-            class="btn-line mt-12 inline-flex w-fit items-center gap-3 px-7 py-3.5 text-xs font-medium uppercase tracking-[0.2em]"
-          >
-            View all
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </NuxtLink>
-        </div>
+          <span class="h-px w-12 bg-slate-700" />
+          Selected work
+        </p>
+        <h2
+          class="font-serif text-[clamp(2.5rem,5.5vw,5rem)] font-light leading-[1.04] tracking-[-0.01em] text-[#ece9e2]"
+        >
+          The <span class="italic text-brand-300">work</span>
+        </h2>
+      </div>
+      <NuxtLink
+        to="/showcase"
+        class="btn-line mb-2 inline-flex w-fit items-center gap-3 px-7 py-3.5 text-xs font-medium uppercase tracking-[0.2em]"
+      >
+        View all
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </NuxtLink>
+    </div>
 
+    <!-- self-running ribbon — keeps moving even under the cursor -->
+    <div class="work-ribbon mt-16 overflow-hidden">
+      <div class="work-ribbon-track flex w-max">
         <a
-          v-for="(project, i) in featured"
-          :key="project.id"
-          v-bind="linkAttrs(project.url)"
-          class="work-frame group relative block h-[68vh] w-[44vw] shrink-0 overflow-hidden rounded-[1.75rem] border border-white/10"
+          v-for="item in ribbon"
+          :key="item.key"
+          v-bind="linkAttrs(item.project.url)"
+          :aria-hidden="item.clone ? 'true' : undefined"
+          :tabindex="item.clone ? -1 : undefined"
+          class="work-frame group relative mr-8 block h-[62vh] w-[42vw] shrink-0 overflow-hidden rounded-[1.75rem] border border-white/10"
         >
-          <ProjectIdentityVisual :name="project.name" :index="i" />
+          <ProjectIdentityVisual :name="item.project.name" :index="item.n" />
           <div
             class="absolute inset-0 flex flex-col justify-between p-10"
             style="
@@ -146,9 +84,9 @@ onMounted(() => {
             <div
               class="flex items-center justify-between font-mono text-xs uppercase tracking-[0.3em] text-[#ece9e2]/70"
             >
-              <span>0{{ i + 1 }}</span>
+              <span>0{{ item.n + 1 }}</span>
               <span class="flex items-center gap-2">
-                {{ project.category }}
+                {{ item.project.category }}
                 <svg
                   class="opacity-50 transition duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
                   width="13"
@@ -168,7 +106,7 @@ onMounted(() => {
               <p
                 class="font-mono text-xs uppercase tracking-[0.25em] text-slate-400"
               >
-                {{ project.metric }} — {{ project.metricLabel }}
+                {{ item.project.metric }} — {{ item.project.metricLabel }}
               </p>
               <span
                 class="work-open-label font-mono text-[0.55rem] uppercase tracking-[0.28em] text-white/35"
@@ -179,10 +117,6 @@ onMounted(() => {
           </div>
         </a>
       </div>
-    </div>
-
-    <div class="absolute inset-x-[8vw] bottom-8 h-px bg-white/10">
-      <div ref="progress" class="h-full origin-left scale-x-0 bg-brand-300" />
     </div>
   </section>
 
@@ -253,6 +187,17 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* self-running ribbon: render the set twice, translate by one set width */
+.work-ribbon-track {
+  animation: work-ribbon 44s linear infinite;
+}
+
+@keyframes work-ribbon {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 .work-frame,
 .m-frame {
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0);
@@ -288,6 +233,13 @@ onMounted(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .work-ribbon-track {
+    animation: none;
+  }
+  .work-ribbon {
+    overflow-x: auto;
+  }
+
   .work-frame,
   .m-frame,
   .work-open-label {

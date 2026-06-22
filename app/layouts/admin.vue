@@ -152,7 +152,7 @@ const currentSection = computed(
 
         <div class="border-t border-white/[0.06] pt-4">
           <NuxtLink
-            to="/home"
+            to="/"
             class="flex items-center justify-between rounded-xl px-3 py-2 text-xs text-zinc-600 transition hover:bg-white/[0.04] hover:text-zinc-300"
           >
             View live site

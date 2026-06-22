@@ -74,7 +74,7 @@ async function handleSignIn() {
       <p v-if="error" class="mt-4 text-xs text-rose-400">{{ error }}</p>
 
       <NuxtLink
-        to="/home"
+        to="/"
         class="mt-6 inline-block text-xs text-slate-500 transition hover:text-slate-300"
       >
         ← Back to site

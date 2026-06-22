@@ -85,6 +85,6 @@ export default defineEventHandler(async (event) => {
   return {
     ok: true,
     id: leadId,
-    message: `Thanks ${name.split(" ")[0]}! We'll be in touch within one business day.`,
+    message: `Thanks ${name.split(" ")[0]}! We'll be in touch with you shortly.`,
   };
 });

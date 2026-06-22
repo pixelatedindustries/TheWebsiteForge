@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { testimonials } from "~~/shared/site";
 
 const outcomes = [
@@ -14,92 +12,87 @@ const outcomes = [
   ["2×", "demo requests"],
 ];
 
+// The section auto-advances through the client outcomes on a timer instead of
+// being scroll-scrubbed, so the page scrolls straight past to the next section.
+const ROTATE_MS = 5000;
+
 const root = ref<HTMLElement | null>(null);
-const progress = ref<HTMLElement | null>(null);
 const activeIndex = ref(0);
+const cycle = ref(0); // bumps on every (re)start/advance to restart the fill bar
+const revealed = ref(false);
 const activeTestimonial = computed(() => testimonials[activeIndex.value]!);
 const activeOutcome = computed(() => outcomes[activeIndex.value]!);
-let context: gsap.Context | null = null;
-let tick: gsap.TickerCallback | null = null;
 
-const selectTestimonial = (index: number) => {
-  activeIndex.value = index;
-  const element = root.value;
-  if (!element) return;
-  const maxTravel = Math.max(1, element.offsetHeight - window.innerHeight);
-  const sectionTop = window.scrollY + element.getBoundingClientRect().top;
-  window.scrollTo({
-    top: sectionTop + (index / testimonials.length) * maxTravel,
-    behavior: "smooth",
-  });
-};
-
-onBeforeUnmount(() => {
-  if (tick) gsap.ticker.remove(tick);
-  context?.revert();
+// the orbit tilts gradually across the set as the outcomes advance
+const orbitAngle = computed(() => {
+  const p = activeIndex.value / Math.max(1, testimonials.length - 1);
+  return `${(-20 + p * 55).toFixed(2)}deg`;
 });
 
+let reduced = false;
+let timer: ReturnType<typeof setInterval> | null = null;
+let io: IntersectionObserver | null = null;
+
+const stopTimer = () => {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
+};
+const startTimer = () => {
+  if (reduced) return;
+  stopTimer();
+  cycle.value++;
+  timer = setInterval(() => {
+    activeIndex.value = (activeIndex.value + 1) % testimonials.length;
+    cycle.value++;
+  }, ROTATE_MS);
+};
+
+// clicking a client jumps to it and restarts the rotation from there
+const selectTestimonial = (index: number) => {
+  activeIndex.value = index;
+  startTimer();
+};
+
 onMounted(() => {
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced) {
+    revealed.value = true;
+    return;
+  }
   if (!root.value) return;
-
-  gsap.registerPlugin(ScrollTrigger);
-  context = gsap.context(() => {
-    gsap.fromTo(
-      ".proof-stage",
-      { clipPath: "inset(6% 3% 6% 3% round 2rem)", scale: 0.97 },
-      {
-        clipPath: "inset(0% 0% 0% 0% round 0rem)",
-        scale: 1,
-        ease: "power3.inOut",
-        scrollTrigger: {
-          trigger: root.value,
-          start: "top bottom",
-          end: "top top",
-          scrub: 1,
-        },
-      },
-    );
-
-    const orbit = root.value?.querySelector<HTMLElement>(".proof-orbit");
-    tick = () => {
-      const element = root.value;
-      if (!element) return;
-      const viewportHeight = window.innerHeight || 1;
-      const maxTravel = Math.max(1, element.offsetHeight - viewportHeight);
-      const travel = gsap.utils.clamp(
-        0,
-        maxTravel,
-        -element.getBoundingClientRect().top,
-      );
-      const sectionProgress = travel / maxTravel;
-      const index = Math.min(
-        testimonials.length - 1,
-        Math.floor(sectionProgress * (testimonials.length - 0.001)),
-      );
-
-      if (activeIndex.value !== index) activeIndex.value = index;
-      if (progress.value) {
-        progress.value.style.transform = `scaleX(${sectionProgress.toFixed(4)})`;
+  // reveal once on entry, and only rotate while the section is on screen
+  io = new IntersectionObserver(
+    ([entry]) => {
+      if (entry?.isIntersecting) {
+        revealed.value = true;
+        startTimer();
+      } else {
+        stopTimer();
       }
-      if (orbit) {
-        orbit.style.rotate = `${gsap.utils.interpolate(-20, 35, sectionProgress).toFixed(2)}deg`;
-      }
-    };
-    gsap.ticker.add(tick);
-    tick();
-  }, root.value);
+    },
+    { threshold: 0.25 },
+  );
+  io.observe(root.value);
+});
+
+onBeforeUnmount(() => {
+  stopTimer();
+  io?.disconnect();
 });
 </script>
 
 <template>
   <section ref="root" class="proof-shell relative">
     <div
-      class="proof-stage sticky top-0 min-h-screen overflow-hidden bg-[#e9e4da] text-[#151412]"
+      class="proof-stage relative min-h-screen overflow-hidden bg-[#e9e4da] text-[#151412]"
+      :class="{ 'is-revealed': revealed }"
     >
       <div class="proof-grid pointer-events-none absolute inset-0" />
       <div
         class="proof-orbit pointer-events-none absolute top-1/2 right-[-20vw] hidden aspect-square w-[min(75vw,1050px)] -translate-y-1/2 rounded-full border border-black/10 lg:block"
+        :style="{ rotate: orbitAngle }"
         aria-hidden="true"
       >
         <div class="absolute inset-[14%] rounded-full border border-black/10" />
@@ -173,7 +166,11 @@ onMounted(() => {
               </div>
             </Transition>
             <div class="mt-14 h-px w-full bg-black/15">
-              <div ref="progress" class="h-px origin-left scale-x-0 bg-black" />
+              <div
+                :key="cycle"
+                class="proof-progress h-px origin-left bg-black"
+                :style="{ animationDuration: `${ROTATE_MS}ms` }"
+              />
             </div>
             <p class="mt-5 max-w-52 text-sm leading-relaxed text-black/65">
               Outcomes measured after launch. Built beautifully, judged by what
@@ -215,12 +212,19 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.proof-shell {
-  min-height: 520vh;
-}
-
 .proof-stage {
   transform-origin: center center;
+  /* one-time entrance: an inset rounded card opens to full-bleed on scroll-in */
+  clip-path: inset(6% 3% 6% 3% round 2rem);
+  transform: scale(0.97);
+  transition:
+    clip-path 1.1s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.proof-stage.is-revealed {
+  clip-path: inset(0% 0% 0% 0% round 0rem);
+  transform: scale(1);
 }
 
 .proof-grid {
@@ -230,6 +234,10 @@ onMounted(() => {
     linear-gradient(90deg, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
   background-size: 7vw 7vw;
   mask-image: radial-gradient(circle at 70% 50%, black, transparent 70%);
+}
+
+.proof-orbit {
+  transition: rotate 1.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .proof-orbit::before {
@@ -248,6 +256,21 @@ onMounted(() => {
   height: 1px;
   transform-origin: left center;
   background: linear-gradient(90deg, rgba(0, 0, 0, 0.28), transparent);
+}
+
+/* auto-resetting fill bar — counts down to the next outcome each cycle */
+.proof-progress {
+  transform: scaleX(0);
+  animation: proof-fill linear forwards;
+}
+
+@keyframes proof-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
 .proof-client {
@@ -318,8 +341,17 @@ onMounted(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .proof-shell {
-    min-height: 100vh;
+  .proof-stage {
+    clip-path: none;
+    transform: none;
+    transition: none;
+  }
+  .proof-orbit {
+    transition: none;
+  }
+  .proof-progress {
+    animation: none;
+    transform: scaleX(1);
   }
 }
 </style>

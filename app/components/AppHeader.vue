@@ -2,7 +2,7 @@
 import { formatUsdCents } from "~~/shared/billing";
 
 const links = [
-  { label: "Home", to: "/home" },
+  { label: "Home", to: "/" },
   { label: "Showcase", to: "/showcase" },
   { label: "Pricing", to: "/pricing" },
   { label: "About", to: "/about" },
@@ -96,7 +96,7 @@ watch(
             : 'border border-transparent'
         "
       >
-        <NuxtLink to="/home" class="group flex items-center gap-2.5">
+        <NuxtLink to="/" class="group flex items-center gap-2.5">
           <span
             data-brand-mark-target
             class="brand-mark-target inline-flex text-white"

@@ -462,10 +462,13 @@ export default defineNuxtPlugin((nuxtApp) => {
   // ── v-stack (parallax stacking between sections) ────────────────────────────
   // As a section scrolls up and out the top it recedes: drifts slower than the
   // scroll (parallax), scales toward 0.95 and dims — while the next section
-  // (higher z-index, solid bg, soft top shadow) glides up over it. Driven from
-  // the section's LIVE position every frame, so it's perfectly reversible and
-  // immune to the stale start/end ScrollTrigger caches under pinned siblings.
+  // (higher z-index, solid bg, soft top shadow) glides up over it.
   // expo.inOut shapes the recede so the weight builds like a soft luxury glide.
+  //
+  // One-way lock on POSITION: the recede transform is monotonic — it only ever
+  // advances as you scroll DOWN and holds at the furthest point reached, so a
+  // section that has receded stays put on scroll-up (until a full reload). The
+  // DIM, however, tracks the live position so it lifts back as you scroll up.
   let stackZ = 2;
   const stackEase = gsap.parseEase("expo.inOut");
   const stack: Directive<
@@ -485,17 +488,21 @@ export default defineNuxtPlugin((nuxtApp) => {
       // whisper-soft top shadow → the incoming section just barely casts over
       el.style.boxShadow = "0 -40px 120px -60px rgba(0, 0, 0, 0.55)";
 
+      let maxP = 0;
       const update = () => {
         const r = el.getBoundingClientRect();
         const vh = window.innerHeight || 1;
         // 0 while the section's top is at/below the viewport top; ramps to 1 as
         // it scrolls up by ~75% of a viewport
         const p = gsap.utils.clamp(0, 1, -r.top / (vh * 0.75));
-        const e = stackEase(p);
-        const ty = (e * parallax).toFixed(1);
-        const scale = (1 - e * 0.05).toFixed(3);
+        // position locks at the furthest recede; dim tracks live so it reverses
+        if (p > maxP) maxP = p;
+        const eLock = stackEase(maxP);
+        const eLive = stackEase(p);
+        const ty = (eLock * parallax).toFixed(1);
+        const scale = (1 - eLock * 0.05).toFixed(3);
         el.style.transform = `translate3d(0, ${ty}px, 0) scale(${scale})`;
-        el.style.filter = `brightness(${(1 - e * dim).toFixed(3)})`;
+        el.style.filter = `brightness(${(1 - eLive * dim).toFixed(3)})`;
       };
       addFrameCallback(update);
       update();
@@ -518,10 +525,14 @@ export default defineNuxtPlugin((nuxtApp) => {
     unmounted: runCleanup,
   };
 
-  // ── v-bgmorph (smooth dark↔light page-colour scrub) ─────────────────────────
+  // ── v-bgmorph (smooth dark→light page-colour scrub) ─────────────────────────
   // Incredibly subtle mood shift: scrubs the page background between two close
-  // charcoals as this section nears centre, then back — you barely register the
-  // colour change, you just feel the mood lift. expo.inOut shaping; reversible.
+  // charcoals as this section nears centre — you barely register the colour
+  // change, you just feel the mood lift. expo.inOut shaping.
+  //
+  // One-way lock: the morph is monotonic — it advances toward `to` as you reach
+  // the section and holds there; scrolling back up keeps the lifted tint rather
+  // than reversing it, so the upward experience is static.
   const bgmorph: Directive<
     HTMLElement,
     { from?: string; to?: string } | undefined
@@ -531,13 +542,16 @@ export default defineNuxtPlugin((nuxtApp) => {
       const from = binding.value?.from ?? "#0e0d0c";
       const to = binding.value?.to ?? "#26231f";
       const lerp = gsap.utils.interpolate(from, to);
+      let maxP = 0;
       const update = () => {
         const r = el.getBoundingClientRect();
         const vh = window.innerHeight || 1;
         const center = r.top + r.height / 2;
         const dist = Math.abs(center - vh / 2) / (vh * 0.9);
         const p = stackEase(gsap.utils.clamp(0, 1, 1 - dist));
-        document.body.style.backgroundColor = lerp(p);
+        // monotonic — hold the lifted tint once reached (static on scroll-up)
+        if (p > maxP) maxP = p;
+        document.body.style.backgroundColor = lerp(maxP);
       };
       addFrameCallback(update);
       update();

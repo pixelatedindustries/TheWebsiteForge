@@ -147,7 +147,7 @@ export const projects: Project[] = [
     year: 2024,
     tags: ["CMS", "Forms", "SEO", "Blog"],
     gradient: ["#bdbdbd", "#6b6b6b"],
-    url: "/home",
+    url: "/",
     image: "/work/thewebsiteforge.jpg",
   },
   {

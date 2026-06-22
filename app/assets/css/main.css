@@ -118,11 +118,6 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  /* the intro page (/) is a fixed, scroll-locked splash */
-  html.intro-locked,
-  html.intro-locked body {
-    overflow: hidden;
-  }
   html.site-loading,
   html.site-loading body {
     overflow: hidden;

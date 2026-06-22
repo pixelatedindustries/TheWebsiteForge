@@ -183,6 +183,10 @@ export default defineNuxtConfig({
         "Content-Security-Policy": buildContentSecurityPolicy(),
       },
     },
+    // The home page now lives at the root. `/home` was the old URL (back when `/`
+    // was the black-hole intro); keep it as a permanent redirect so existing
+    // links and bookmarks still resolve.
+    "/home": { redirect: { to: "/", statusCode: 301 } },
     // Static marketing/legal routes are content-only (data comes from the
     // compiled-in shared/site.ts), so prerender them for instant TTFB. Auth-gated
     // header bits are <ClientOnly>, so the static HTML hydrates correctly.

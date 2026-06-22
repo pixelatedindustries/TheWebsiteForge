@@ -55,6 +55,7 @@ interface Shard {
   flingRotation: THREE.Vector3;
   angularVelocity: THREE.Vector3;
   mass: number;
+  persist: boolean;
 }
 
 const defaults = {
@@ -347,7 +348,28 @@ export class GlassShardScene {
           0.38,
           2.8,
         ),
+        persist: false,
       });
+    }
+
+    // Keep only a few rocks alive through the end of the scroll. Every other
+    // shard shrinks away as the scene assembles (see applyScrollState), so the
+    // footer area stays calm — a handful of shards drifting past instead of a
+    // dense pile. The survivors are spread across the view and drift sideways.
+    const persistCount = Math.min(3, this.shards.length);
+    for (let order = 0; order < persistCount; order++) {
+      const shardIndex = Math.floor(
+        ((order + 0.5) / persistCount) * this.shards.length,
+      );
+      const shard = this.shards[shardIndex]!;
+      shard.persist = true;
+      shard.assembledPosition.set(
+        (order - (persistCount - 1) / 2) * 3.4,
+        -0.6 + (random() - 0.5) * 0.9,
+        -0.4 + (random() - 0.5) * 1.6,
+      );
+      shard.floatAmplitude.set(0.62, 0.3, 0.26);
+      shard.floatSpeed *= 0.7;
     }
   }
 
@@ -472,6 +494,9 @@ export class GlassShardScene {
 
   private applyScrollState(elapsed: number) {
     const progress = this.scrollState.assembly;
+    // As the scene assembles toward the footer, fade out every non-persistent
+    // shard so the bottom of the page isn't a dense pile of rocks.
+    const endVanish = THREE.MathUtils.smoothstep(progress, 0.6, 0.94);
     const introExpansion = THREE.MathUtils.smoothstep(
       this.introState.expansion,
       0,
@@ -715,13 +740,17 @@ export class GlassShardScene {
       shard.mesh.rotation.z += shard.flingRotation.z;
       const hoverScale = Math.min(0.035, shard.hoverOffset.length() * 0.018);
       const introScale = THREE.MathUtils.lerp(0.34, 0.76, introExpansion);
+      const persistScale = shard.persist ? 1 : 1 - endVanish;
       shard.mesh.scale.set(
-        THREE.MathUtils.lerp(introScale, shard.roughScale.x, roughProgress) +
-          hoverScale,
-        THREE.MathUtils.lerp(introScale, shard.roughScale.y, roughProgress) +
-          hoverScale,
-        THREE.MathUtils.lerp(introScale, shard.roughScale.z, roughProgress) +
-          hoverScale,
+        (THREE.MathUtils.lerp(introScale, shard.roughScale.x, roughProgress) +
+          hoverScale) *
+          persistScale,
+        (THREE.MathUtils.lerp(introScale, shard.roughScale.y, roughProgress) +
+          hoverScale) *
+          persistScale,
+        (THREE.MathUtils.lerp(introScale, shard.roughScale.z, roughProgress) +
+          hoverScale) *
+          persistScale,
       );
     }
 

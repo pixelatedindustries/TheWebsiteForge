@@ -31,7 +31,7 @@ const columns = [
         class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(32rem,1fr)] lg:gap-[clamp(8rem,18vw,22rem)]"
       >
         <div class="max-w-xs">
-          <NuxtLink to="/home" class="flex items-center gap-2.5">
+          <NuxtLink to="/" class="flex items-center gap-2.5">
             <LogoMark :size="30" />
             <span class="text-lg font-semibold tracking-tight text-white">
               TheWebsite<span class="text-gradient">Forge</span>

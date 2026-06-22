@@ -41,26 +41,37 @@ onMounted(async () => {
   document.documentElement.classList.add("site-loading");
   const started = performance.now();
 
+  // Real load gates — no artificial minimum; we reveal the page as soon as
+  // these are actually ready (rock scene is itself capped at 8s as a safety).
+  const gates = [
+    waitForWindowLoad(),
+    document.fonts?.ready ?? Promise.resolve(),
+    waitForRockScene(),
+  ];
+  let done = 0;
+  for (const gate of gates) void Promise.resolve(gate).then(() => (done += 1));
+
   const animateProgress = () => {
     const elapsed = performance.now() - started;
-    const target = Math.min(92, 12 + elapsed * 0.025);
-    progress.value += (target - progress.value) * 0.08;
+    // The bar is driven by how many load gates have actually cleared, so it
+    // moves fast on a quick load and slow on a heavy one. A decelerating time
+    // creep (asymptotes toward 90) fills the gaps so it never stalls or jumps
+    // from a standstill while a gate is still pending.
+    const real = (done / gates.length) * 100;
+    const creep = 90 * (1 - Math.exp(-elapsed / 1400));
+    const target = Math.min(97, Math.max(real, creep));
+    progress.value += (target - progress.value) * 0.07;
     if (!disposed && !leaving.value)
       raf = requestAnimationFrame(animateProgress);
   };
   raf = requestAnimationFrame(animateProgress);
 
-  await Promise.all([
-    new Promise((resolve) => window.setTimeout(resolve, 3000)),
-    waitForWindowLoad(),
-    document.fonts?.ready ?? Promise.resolve(),
-    waitForRockScene(),
-  ]);
+  await Promise.all(gates);
 
   if (disposed) return;
   cancelAnimationFrame(raf);
   progress.value = 100;
-  await new Promise((resolve) => window.setTimeout(resolve, 320));
+  await new Promise((resolve) => window.setTimeout(resolve, 220));
   leaving.value = true;
   document.documentElement.classList.remove("site-loading");
   await new Promise((resolve) => window.setTimeout(resolve, 950));

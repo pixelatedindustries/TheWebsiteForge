@@ -259,7 +259,7 @@ const visualSteps = computed(() =>
 /* the white chapter slab — clip-path is scrub-animated from an inset rounded
    card to full-bleed as the section scrolls in (see script) */
 .light-panel {
-  background: #f5f5f5;
+  background: #e9e4da;
 }
 
 .process-grid {

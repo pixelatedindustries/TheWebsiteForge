@@ -59,25 +59,30 @@ onMounted(() => {
       const easeOut = gsap.parseEase("expo.out");
       const easeIO = gsap.parseEase("expo.inOut");
       const lerp = gsap.utils.interpolate;
+      // The faux-pin position stays live, but the reveal itself is one-way:
+      // once a beat has played it locks, so scrolling back up is static.
+      let maxP = 0;
       tick = () => {
         const vh = window.innerHeight || 1;
         const max = Math.max(1, shell.offsetHeight - vh);
         const ty = gsap.utils.clamp(0, max, -shell.getBoundingClientRect().top);
         pin.style.transform = `translateY(${ty.toFixed(1)}px)`;
-        const p = ty / max;
+        if (ty / max > maxP) maxP = ty / max;
+        const p = maxP;
 
         // bars part outward (0.12 → 0.55)
         const open = easeOut(gsap.utils.clamp(0, 1, (p - 0.12) / 0.43));
         if (barTop) barTop.style.transform = `translateY(${-open * 101}%)`;
         if (barBot) barBot.style.transform = `translateY(${open * 101}%)`;
 
-        // title zooms out of the black + fades in, then eases away at the end
+        // title zooms out of the black + fades in, then holds. We deliberately
+        // don't ease it away at the end: the reveal is locked one-way, so the
+        // hold keeps the title rendered when scrolling back up (no blank stage).
         if (reveal) {
           const zoom = easeIO(gsap.utils.clamp(0, 1, p / 0.55));
           const appear = gsap.utils.clamp(0, 1, (p - 0.1) / 0.28);
-          const leave = gsap.utils.clamp(0, 1, (p - 0.82) / 0.18);
-          reveal.style.transform = `scale(${lerp(1.28, 1, zoom).toFixed(3)}) translateY(${(-leave * 45).toFixed(1)}px)`;
-          reveal.style.opacity = (appear * (1 - leave)).toFixed(3);
+          reveal.style.transform = `scale(${lerp(1.28, 1, zoom).toFixed(3)})`;
+          reveal.style.opacity = appear.toFixed(3);
         }
       };
       gsap.ticker.add(tick);

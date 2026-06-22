@@ -1,3 +1,6 @@
+overrides:
+  h3: 1.15.11
+
 allowBuilds:
   "@firebase/util": true
   "@parcel/watcher": false
