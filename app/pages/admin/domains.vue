@@ -36,7 +36,10 @@ function expiryClass(days: number | null): string {
 }
 
 function errMsg(e: unknown, fallback: string) {
-  const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
+  const err = e as {
+    data?: { statusMessage?: string };
+    statusMessage?: string;
+  };
   return err?.data?.statusMessage || err?.statusMessage || fallback;
 }
 
@@ -174,14 +177,14 @@ onMounted(load);
           v-model="form.fqdn"
           class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
           placeholder="example.com"
-        >
+        />
       </label>
       <label class="text-xs text-slate-400">
         Registrar
         <input
           v-model="form.registrar"
           class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
-        >
+        />
       </label>
       <label class="text-xs text-slate-400">
         Annual cost (USD)
@@ -192,7 +195,7 @@ onMounted(load);
           step="0.01"
           class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
           placeholder="15.00"
-        >
+        />
       </label>
       <label class="text-xs text-slate-400">
         Registered on
@@ -200,7 +203,7 @@ onMounted(load);
           v-model="form.registeredAt"
           type="date"
           class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
-        >
+        />
       </label>
       <label class="text-xs text-slate-400">
         Expires on
@@ -208,10 +211,10 @@ onMounted(load);
           v-model="form.expiresAt"
           type="date"
           class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
-        >
+        />
       </label>
       <label class="flex items-center gap-2 text-xs text-slate-400">
-        <input v-model="form.autoRenew" type="checkbox" class="rounded" >
+        <input v-model="form.autoRenew" type="checkbox" class="rounded" />
         Auto-renew (bills annual cost to wallet on expiry)
       </label>
       <div class="flex items-center gap-3 sm:col-span-2">

@@ -33,7 +33,10 @@ export default defineEventHandler(async (event) => {
     .where(eq(schema.customers.id, customerId))
     .limit(1);
   if (!customer) {
-    throw createError({ statusCode: 404, statusMessage: "Customer not found." });
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Customer not found.",
+    });
   }
 
   // A supplied siteId must belong to this customer.
@@ -77,7 +80,10 @@ export default defineEventHandler(async (event) => {
   const autoRenew = body.autoRenew ?? true;
   const expiresAt = body.expiresAt ? new Date(body.expiresAt) : null;
   if (expiresAt && Number.isNaN(expiresAt.getTime())) {
-    throw createError({ statusCode: 422, statusMessage: "Invalid expiry date." });
+    throw createError({
+      statusCode: 422,
+      statusMessage: "Invalid expiry date.",
+    });
   }
   const registeredAt = body.registeredAt ? new Date(body.registeredAt) : null;
   if (registeredAt && Number.isNaN(registeredAt.getTime())) {
@@ -107,7 +113,13 @@ export default defineEventHandler(async (event) => {
         .returning();
 
       // Wire the yearly renewal charge when we have everything needed.
-      if (domain && autoRenew && annualCostCents && annualCostCents > 0 && expiresAt) {
+      if (
+        domain &&
+        autoRenew &&
+        annualCostCents &&
+        annualCostCents > 0 &&
+        expiresAt
+      ) {
         await tx.insert(schema.recurringCharges).values({
           customerId,
           siteId: null,

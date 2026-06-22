@@ -20,7 +20,10 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<SitePatchPayload>(event);
 
   if (!body?.id) {
-    throw createError({ statusCode: 422, statusMessage: "An `id` is required." });
+    throw createError({
+      statusCode: 422,
+      statusMessage: "An `id` is required.",
+    });
   }
 
   const updates: Partial<typeof schema.sites.$inferInsert> = {};
@@ -62,10 +65,12 @@ export default defineEventHandler(async (event) => {
     }
     updates.name = name;
   }
-  if (body.repoUrl !== undefined) updates.repoUrl = body.repoUrl?.trim() || null;
+  if (body.repoUrl !== undefined)
+    updates.repoUrl = body.repoUrl?.trim() || null;
   if (body.deployUrl !== undefined)
     updates.deployUrl = body.deployUrl?.trim() || null;
-  if (body.vpsHost !== undefined) updates.vpsHost = body.vpsHost?.trim() || null;
+  if (body.vpsHost !== undefined)
+    updates.vpsHost = body.vpsHost?.trim() || null;
 
   if (Object.keys(updates).length === 0) {
     throw createError({

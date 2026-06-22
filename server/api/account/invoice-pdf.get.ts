@@ -15,7 +15,10 @@ export default defineEventHandler(async (event) => {
 
   const id = getQuery(event).id as string | undefined;
   if (!id) {
-    throw createError({ statusCode: 422, statusMessage: "An `id` is required." });
+    throw createError({
+      statusCode: 422,
+      statusMessage: "An `id` is required.",
+    });
   }
 
   const db = useDb();

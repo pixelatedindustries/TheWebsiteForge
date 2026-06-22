@@ -21,7 +21,10 @@ export default defineEventHandler(async (event) => {
   const id = body?.id?.trim();
   const action = body?.action ?? "approve";
   if (!id) {
-    throw createError({ statusCode: 422, statusMessage: "An `id` is required." });
+    throw createError({
+      statusCode: 422,
+      statusMessage: "An `id` is required.",
+    });
   }
 
   const db = useDb();
@@ -40,7 +43,10 @@ export default defineEventHandler(async (event) => {
       )
       .limit(1);
     if (!cr) {
-      throw createError({ statusCode: 404, statusMessage: "Request not found." });
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Request not found.",
+      });
     }
     if (cr.status !== "open" && cr.status !== "quoted") {
       throw createError({
@@ -71,7 +77,10 @@ export default defineEventHandler(async (event) => {
       .limit(1);
 
     if (!cr) {
-      throw createError({ statusCode: 404, statusMessage: "Request not found." });
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Request not found.",
+      });
     }
     if (cr.status !== "quoted" || !cr.quotedCents || cr.quotedCents <= 0) {
       throw createError({

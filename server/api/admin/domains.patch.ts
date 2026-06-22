@@ -12,7 +12,10 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<DomainPatchPayload>(event);
 
   if (!body?.id) {
-    throw createError({ statusCode: 422, statusMessage: "An `id` is required." });
+    throw createError({
+      statusCode: 422,
+      statusMessage: "An `id` is required.",
+    });
   }
 
   const db = useDb();

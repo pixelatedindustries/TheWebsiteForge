@@ -167,7 +167,10 @@ export default defineTask({
           // First miss → open the grace window and warn.
           await db
             .update(schema.recurringCharges)
-            .set({ lowBalanceNotifiedAt: now, failureCount: rc.failureCount + 1 })
+            .set({
+              lowBalanceNotifiedAt: now,
+              failureCount: rc.failureCount + 1,
+            })
             .where(eq(schema.recurringCharges.id, rc.id));
           lowBalance++;
           if (customer.email) {

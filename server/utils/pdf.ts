@@ -89,11 +89,7 @@ export function renderInvoicePdf(input: InvoicePdfInput): Promise<Buffer> {
         });
 
       // Bill-to
-      doc
-        .moveTo(50, 130)
-        .lineTo(545, 130)
-        .strokeColor("#dddddd")
-        .stroke();
+      doc.moveTo(50, 130).lineTo(545, 130).strokeColor("#dddddd").stroke();
       doc
         .fontSize(9)
         .font("Helvetica-Bold")

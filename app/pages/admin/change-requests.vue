@@ -30,7 +30,10 @@ const quotedCount = computed(
 );
 
 function errMsg(e: unknown, fallback: string) {
-  const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
+  const err = e as {
+    data?: { statusMessage?: string };
+    statusMessage?: string;
+  };
   return err?.data?.statusMessage || err?.statusMessage || fallback;
 }
 
@@ -167,9 +170,11 @@ onMounted(load);
               step="0.01"
               class="w-28 rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-sm text-white"
               :placeholder="
-                r.quotedCents != null ? (r.quotedCents / 100).toFixed(2) : '0.00'
+                r.quotedCents != null
+                  ? (r.quotedCents / 100).toFixed(2)
+                  : '0.00'
               "
-            >
+            />
           </div>
           <button
             type="button"

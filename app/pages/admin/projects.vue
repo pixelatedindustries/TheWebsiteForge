@@ -144,7 +144,8 @@ async function addAction() {
     });
     actionTitle.value = "";
     actionDetails.value = "";
-    actionMsg.value = "Action added — the customer will see it in their portal.";
+    actionMsg.value =
+      "Action added — the customer will see it in their portal.";
     await load();
     selected.value =
       projects.value.find((project) => project.id === selected.value?.id) ??
@@ -292,7 +293,7 @@ onMounted(load);
                 min="0"
                 max="100"
                 class="mt-1 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-              >
+              />
             </label>
             <label class="text-[11px] font-medium text-zinc-500">
               Est. launch date
@@ -300,12 +301,12 @@ onMounted(load);
                 v-model="project.estimatedLaunchAt"
                 type="date"
                 class="mt-1 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-              >
+              />
             </label>
           </div>
           <p class="mt-2 text-[11px] text-zinc-600">
-            Progress drives the customer's progress bar; the launch date shows as
-            their estimated launch. Both are saved with "Save update".
+            Progress drives the customer's progress bar; the launch date shows
+            as their estimated launch. Both are saved with "Save update".
           </p>
           <textarea
             v-model="project.latestUpdate"
@@ -346,7 +347,7 @@ onMounted(load);
           v-model="actionTitle"
           placeholder="Action title (e.g. Send your logo files)"
           class="mt-4 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-        >
+        />
         <textarea
           v-model="actionDetails"
           rows="4"
@@ -377,13 +378,13 @@ onMounted(load);
             v-model="deliverableName"
             placeholder="Final source repository"
             class="mt-3 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-          >
+          />
           <input
             v-model="deliverableUrl"
             type="url"
             placeholder="https://..."
             class="mt-3 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-sm text-white"
-          >
+          />
           <button
             :disabled="busy === selected.id"
             class="mt-3 w-full rounded-full border border-white/15 px-4 py-2.5 text-xs font-semibold text-white disabled:opacity-50"

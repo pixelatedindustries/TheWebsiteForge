@@ -109,7 +109,9 @@ async function payNow() {
       statusMessage?: string;
     };
     actionError.value =
-      err?.data?.statusMessage || err?.statusMessage || "Could not start payment.";
+      err?.data?.statusMessage ||
+      err?.statusMessage ||
+      "Could not start payment.";
     resumeBusy.value = false;
   }
 }
@@ -130,20 +132,26 @@ useSeoMeta({ title: "Invoice — TheWebsiteForge", robots: "noindex" });
 <template>
   <div class="px-4 pt-36 pb-24 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-2xl">
-      <NuxtLink
-        to="/account"
-        class="text-sm text-slate-400 hover:text-white"
-      >
+      <NuxtLink to="/account" class="text-sm text-slate-400 hover:text-white">
         ← Back to account
       </NuxtLink>
 
-      <div v-if="!ready || pending" class="glass mt-6 rounded-2xl p-10 text-center text-slate-400">
+      <div
+        v-if="!ready || pending"
+        class="glass mt-6 rounded-2xl p-10 text-center text-slate-400"
+      >
         Loading…
       </div>
-      <div v-else-if="!user" class="glass mt-6 rounded-2xl p-10 text-center text-slate-400">
+      <div
+        v-else-if="!user"
+        class="glass mt-6 rounded-2xl p-10 text-center text-slate-400"
+      >
         Please sign in to view this invoice.
       </div>
-      <div v-else-if="error" class="glass mt-6 rounded-2xl p-10 text-center text-white">
+      <div
+        v-else-if="error"
+        class="glass mt-6 rounded-2xl p-10 text-center text-white"
+      >
         {{ error }}
       </div>
 
@@ -226,7 +234,9 @@ useSeoMeta({ title: "Invoice — TheWebsiteForge", robots: "noindex" });
             {{ downloading ? "Preparing…" : "Download PDF" }}
           </button>
           <button
-            v-if="data.invoice.status === 'open' && data.invoice.type === 'build'"
+            v-if="
+              data.invoice.status === 'open' && data.invoice.type === 'build'
+            "
             type="button"
             :disabled="resumeBusy"
             class="btn-gradient rounded-lg px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"

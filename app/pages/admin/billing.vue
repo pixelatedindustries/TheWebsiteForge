@@ -43,7 +43,10 @@ const recurringMrr = computed(() =>
 const maxPage = computed(() => Math.max(0, Math.ceil(total.value / PAGE) - 1));
 
 function errMsg(e: unknown, fallback: string) {
-  const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
+  const err = e as {
+    data?: { statusMessage?: string };
+    statusMessage?: string;
+  };
   return err?.data?.statusMessage || err?.statusMessage || fallback;
 }
 
@@ -254,7 +257,7 @@ onMounted(load);
             placeholder="Search customer…"
             class="w-48 rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
             @keyup.enter="applyFilters"
-          >
+          />
           <select
             v-model="filters.status"
             class="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
@@ -280,12 +283,12 @@ onMounted(load);
             v-model="filters.from"
             type="date"
             class="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
-          >
+          />
           <input
             v-model="filters.to"
             type="date"
             class="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
-          >
+          />
           <button
             type="button"
             class="rounded-lg bg-brand-500 px-3 py-2 text-sm font-semibold text-white"

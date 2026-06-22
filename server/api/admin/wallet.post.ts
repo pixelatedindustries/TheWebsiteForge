@@ -48,9 +48,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Map a debit type to the closest invoice type when raising an invoice.
-  const invoiceTypeFor = (
-    t: string,
-  ): "hosting" | "database" | "feature" =>
+  const invoiceTypeFor = (t: string): "hosting" | "database" | "feature" =>
     t === "hosting" ? "hosting" : t === "database" ? "database" : "feature";
 
   let result;

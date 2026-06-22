@@ -13,7 +13,8 @@ useSeoMeta({
 
 defineOgImage("Forge", {
   title: "Showcase",
-  description: "Explore websites and digital products built by TheWebsiteForge.",
+  description:
+    "Explore websites and digital products built by TheWebsiteForge.",
 });
 
 type Filter = "All" | ProjectCategory;

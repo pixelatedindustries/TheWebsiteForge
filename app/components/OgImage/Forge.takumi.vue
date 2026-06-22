@@ -27,18 +27,19 @@ withDefaults(
       flex-direction: column;
       justify-content: space-between;
       padding: 80px;
-      background-image: radial-gradient(
+      background-image:
+        radial-gradient(
           circle at 78% 28%,
           rgba(120, 110, 255, 0.18),
           transparent 55%
         ),
         linear-gradient(135deg, #0e0d0c 0%, #16140f 100%);
       color: #ece9e2;
-      font-family: 'Geist', sans-serif;
+      font-family: &quot;Geist&quot;, sans-serif;
     "
   >
     <!-- Brand lockup: logo mark + wordmark -->
-    <div style="display: flex; align-items: center;">
+    <div style="display: flex; align-items: center">
       <svg
         width="58"
         height="80"
@@ -63,7 +64,7 @@ withDefaults(
     </div>
 
     <!-- Page title + description -->
-    <div style="display: flex; flex-direction: column;">
+    <div style="display: flex; flex-direction: column">
       <div
         style="
           font-size: 68px;
@@ -90,7 +91,7 @@ withDefaults(
     </div>
 
     <!-- Footer accent + domain -->
-    <div style="display: flex; align-items: center;">
+    <div style="display: flex; align-items: center">
       <div
         style="
           width: 64px;
@@ -99,7 +100,7 @@ withDefaults(
           background-image: linear-gradient(90deg, #8b85ff, #d97757);
         "
       />
-      <span style="margin-left: 20px; font-size: 24px; color: #78716c;"
+      <span style="margin-left: 20px; font-size: 24px; color: #78716c"
         >websiteforge.pixelatedindustries.com</span
       >
     </div>

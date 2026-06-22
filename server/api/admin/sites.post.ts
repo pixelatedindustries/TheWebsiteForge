@@ -59,7 +59,10 @@ export default defineEventHandler(async (event) => {
     .where(eq(schema.customers.id, customerId))
     .limit(1);
   if (!customer) {
-    throw createError({ statusCode: 404, statusMessage: "Customer not found." });
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Customer not found.",
+    });
   }
 
   const [row] = await db

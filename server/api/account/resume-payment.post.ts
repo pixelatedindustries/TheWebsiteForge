@@ -21,7 +21,9 @@ export default defineEventHandler(async (event): Promise<CheckoutResponse> => {
     throw createError({ statusCode: 404, statusMessage: "Account not found." });
   }
 
-  const body = await readBody<{ projectId?: string; invoiceId?: string }>(event);
+  const body = await readBody<{ projectId?: string; invoiceId?: string }>(
+    event,
+  );
   const projectId = body?.projectId?.trim();
   const invoiceId = body?.invoiceId?.trim();
   if (!projectId && !invoiceId) {
@@ -50,7 +52,10 @@ export default defineEventHandler(async (event): Promise<CheckoutResponse> => {
       )
       .limit(1);
     if (!project) {
-      throw createError({ statusCode: 404, statusMessage: "Project not found." });
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Project not found.",
+      });
     }
     if (!project.invoiceId) {
       throw createError({
@@ -78,7 +83,8 @@ export default defineEventHandler(async (event): Promise<CheckoutResponse> => {
   if (invoice.status === "paid") {
     throw createError({
       statusCode: 409,
-      statusMessage: "This invoice is already paid. Refresh to see your project.",
+      statusMessage:
+        "This invoice is already paid. Refresh to see your project.",
     });
   }
   if (invoice.type !== "build" || invoice.status !== "open") {

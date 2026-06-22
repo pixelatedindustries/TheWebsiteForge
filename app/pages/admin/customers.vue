@@ -268,193 +268,204 @@ onMounted(loadCustomers);
         class="glass-strong gradient-border my-auto w-full max-w-2xl rounded-2xl p-6"
       >
         <div class="flex items-start justify-between gap-4">
-        <div>
-          <h2 class="font-display text-lg font-semibold text-white">
-            {{ selected.name }} — billing
-          </h2>
-          <p class="text-sm text-slate-400">
-            Balance:
-            <span class="font-semibold text-white">{{
-              formatUsdCents(selected.walletBalanceCents)
-            }}</span>
-          </p>
+          <div>
+            <h2 class="font-display text-lg font-semibold text-white">
+              {{ selected.name }} — billing
+            </h2>
+            <p class="text-sm text-slate-400">
+              Balance:
+              <span class="font-semibold text-white">{{
+                formatUsdCents(selected.walletBalanceCents)
+              }}</span>
+            </p>
+          </div>
+          <button
+            type="button"
+            class="text-sm text-slate-400 hover:text-white"
+            @click="closeManage"
+          >
+            Close
+          </button>
         </div>
-        <button
-          type="button"
-          class="text-sm text-slate-400 hover:text-white"
-          @click="closeManage"
-        >
-          Close
-        </button>
-      </div>
 
-      <p v-if="panelError" class="mt-3 text-sm text-rose-400">
-        {{ panelError }}
-      </p>
-      <p v-if="panelMsg" class="mt-3 text-sm text-brand-300">{{ panelMsg }}</p>
+        <p v-if="panelError" class="mt-3 text-sm text-rose-400">
+          {{ panelError }}
+        </p>
+        <p v-if="panelMsg" class="mt-3 text-sm text-brand-300">
+          {{ panelMsg }}
+        </p>
 
-      <div class="mt-5 grid gap-6 lg:grid-cols-2">
-        <!-- adjust wallet -->
-        <div class="rounded-xl border border-white/10 bg-black/20 p-4">
-          <h3 class="text-sm font-semibold text-white">Adjust wallet</h3>
-          <div class="mt-3 flex gap-2">
-            <select
-              v-model="adjDirection"
-              class="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
+        <div class="mt-5 grid gap-6 lg:grid-cols-2">
+          <!-- adjust wallet -->
+          <div class="rounded-xl border border-white/10 bg-black/20 p-4">
+            <h3 class="text-sm font-semibold text-white">Adjust wallet</h3>
+            <div class="mt-3 flex gap-2">
+              <select
+                v-model="adjDirection"
+                class="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
+              >
+                <option value="credit">Credit (+)</option>
+                <option value="debit">Debit (−)</option>
+              </select>
+              <select
+                v-model="adjType"
+                class="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white capitalize"
+              >
+                <option v-for="t in typeOptions" :key="t" :value="t">
+                  {{ t }}
+                </option>
+              </select>
+            </div>
+            <div class="mt-2 flex items-center gap-2">
+              <div class="relative flex-1">
+                <span
+                  class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+                  >$</span
+                >
+                <input
+                  v-model.number="adjAmount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Amount (USD)"
+                  class="w-full rounded-lg border border-white/10 bg-black/30 py-2 pl-7 pr-3 text-sm text-white outline-none focus:border-brand-400/60"
+                />
+              </div>
+            </div>
+            <input
+              v-model="adjDescription"
+              type="text"
+              placeholder="Description (e.g. Feature: booking calendar)"
+              class="mt-2 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-brand-400/60"
+            />
+            <label
+              v-if="adjDirection === 'debit'"
+              class="mt-2 flex items-center gap-2 text-xs text-slate-400"
             >
-              <option value="credit">Credit (+)</option>
-              <option value="debit">Debit (−)</option>
-            </select>
-            <select
-              v-model="adjType"
-              class="rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white capitalize"
+              <input
+                v-model="adjCreateInvoice"
+                type="checkbox"
+                class="rounded"
+              />
+              Raise a paid invoice for this charge
+            </label>
+            <button
+              type="button"
+              :disabled="adjBusy || !adjAmount"
+              class="btn-gradient mt-3 inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              @click="submitAdjust"
             >
-              <option v-for="t in typeOptions" :key="t" :value="t">
-                {{ t }}
+              {{ adjBusy ? "Saving…" : "Apply" }}
+            </button>
+          </div>
+
+          <!-- add recurring -->
+          <div class="rounded-xl border border-white/10 bg-black/20 p-4">
+            <h3 class="text-sm font-semibold text-white">
+              Add recurring charge
+            </h3>
+            <select
+              v-model="recPlanKey"
+              class="mt-3 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
+            >
+              <option value="">Choose a service…</option>
+              <option v-for="s in serviceOptions" :key="s.key" :value="s.key">
+                {{ s.label }} — {{ formatUsdCents(s.amountUsdCents) }}/mo
               </option>
             </select>
+            <button
+              type="button"
+              :disabled="recBusy || !recPlanKey"
+              class="btn-gradient mt-3 inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              @click="addRecurring"
+            >
+              {{ recBusy ? "Adding…" : "Add service" }}
+            </button>
           </div>
-          <div class="mt-2 flex items-center gap-2">
-            <div class="relative flex-1">
-              <span
-                class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-                >$</span
-              >
-              <input
-                v-model.number="adjAmount"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="Amount (USD)"
-                class="w-full rounded-lg border border-white/10 bg-black/30 py-2 pl-7 pr-3 text-sm text-white outline-none focus:border-brand-400/60"
-              >
-            </div>
-          </div>
-          <input
-            v-model="adjDescription"
-            type="text"
-            placeholder="Description (e.g. Feature: booking calendar)"
-            class="mt-2 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-brand-400/60"
-          >
-          <label
-            v-if="adjDirection === 'debit'"
-            class="mt-2 flex items-center gap-2 text-xs text-slate-400"
-          >
-            <input v-model="adjCreateInvoice" type="checkbox" class="rounded" >
-            Raise a paid invoice for this charge
-          </label>
-          <button
-            type="button"
-            :disabled="adjBusy || !adjAmount"
-            class="btn-gradient mt-3 inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-            @click="submitAdjust"
-          >
-            {{ adjBusy ? "Saving…" : "Apply" }}
-          </button>
         </div>
 
-        <!-- add recurring -->
-        <div class="rounded-xl border border-white/10 bg-black/20 p-4">
-          <h3 class="text-sm font-semibold text-white">Add recurring charge</h3>
-          <select
-            v-model="recPlanKey"
-            class="mt-3 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
+        <!-- recurring list -->
+        <div v-if="detail" class="mt-6">
+          <h3 class="text-sm font-semibold text-white">Recurring services</h3>
+          <p
+            v-if="!detail.recurring.length"
+            class="mt-2 text-sm text-slate-500"
           >
-            <option value="">Choose a service…</option>
-            <option v-for="s in serviceOptions" :key="s.key" :value="s.key">
-              {{ s.label }} — {{ formatUsdCents(s.amountUsdCents) }}/mo
-            </option>
-          </select>
-          <button
-            type="button"
-            :disabled="recBusy || !recPlanKey"
-            class="btn-gradient mt-3 inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-            @click="addRecurring"
-          >
-            {{ recBusy ? "Adding…" : "Add service" }}
-          </button>
+            None yet.
+          </p>
+          <table v-else class="mt-3 w-full text-left text-sm">
+            <tbody class="divide-y divide-white/5">
+              <tr v-for="r in detail.recurring" :key="r.id">
+                <td class="py-2 text-slate-200">{{ r.label }}</td>
+                <td class="py-2 text-slate-300">
+                  {{ formatUsdCents(r.amountCents) }}/mo
+                </td>
+                <td class="py-2">
+                  <span
+                    class="rounded-full px-2 py-0.5 text-xs font-semibold"
+                    :class="
+                      r.status === 'active'
+                        ? 'bg-emerald-500/15 text-emerald-300'
+                        : 'bg-slate-500/15 text-slate-400'
+                    "
+                  >
+                    {{ r.status }}
+                  </span>
+                </td>
+                <td class="py-2 text-right">
+                  <button
+                    v-if="r.status === 'active'"
+                    type="button"
+                    class="text-xs text-amber-300 hover:underline"
+                    @click="setRecurringStatus(r.id, 'paused')"
+                  >
+                    Pause
+                  </button>
+                  <button
+                    v-else-if="r.status === 'paused'"
+                    type="button"
+                    class="text-xs text-emerald-300 hover:underline"
+                    @click="setRecurringStatus(r.id, 'active')"
+                  >
+                    Resume
+                  </button>
+                  <button
+                    type="button"
+                    class="ml-3 text-xs text-rose-300 hover:underline"
+                    @click="setRecurringStatus(r.id, 'canceled')"
+                  >
+                    Cancel
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
 
-      <!-- recurring list -->
-      <div v-if="detail" class="mt-6">
-        <h3 class="text-sm font-semibold text-white">Recurring services</h3>
-        <p v-if="!detail.recurring.length" class="mt-2 text-sm text-slate-500">
-          None yet.
-        </p>
-        <table v-else class="mt-3 w-full text-left text-sm">
-          <tbody class="divide-y divide-white/5">
-            <tr v-for="r in detail.recurring" :key="r.id">
-              <td class="py-2 text-slate-200">{{ r.label }}</td>
-              <td class="py-2 text-slate-300">
-                {{ formatUsdCents(r.amountCents) }}/mo
-              </td>
-              <td class="py-2">
-                <span
-                  class="rounded-full px-2 py-0.5 text-xs font-semibold"
+        <!-- recent ledger -->
+        <div v-if="detail && detail.transactions.length" class="mt-6">
+          <h3 class="text-sm font-semibold text-white">Recent transactions</h3>
+          <table class="mt-3 w-full text-left text-sm">
+            <tbody class="divide-y divide-white/5">
+              <tr v-for="t in detail.transactions" :key="t.id">
+                <td class="py-2 text-slate-400">
+                  {{ formatDate(t.createdAt) }}
+                </td>
+                <td class="py-2 text-slate-200">{{ t.description }}</td>
+                <td
+                  class="py-2 text-right"
                   :class="
-                    r.status === 'active'
-                      ? 'bg-emerald-500/15 text-emerald-300'
-                      : 'bg-slate-500/15 text-slate-400'
+                    t.amountCents >= 0 ? 'text-emerald-300' : 'text-slate-200'
                   "
                 >
-                  {{ r.status }}
-                </span>
-              </td>
-              <td class="py-2 text-right">
-                <button
-                  v-if="r.status === 'active'"
-                  type="button"
-                  class="text-xs text-amber-300 hover:underline"
-                  @click="setRecurringStatus(r.id, 'paused')"
-                >
-                  Pause
-                </button>
-                <button
-                  v-else-if="r.status === 'paused'"
-                  type="button"
-                  class="text-xs text-emerald-300 hover:underline"
-                  @click="setRecurringStatus(r.id, 'active')"
-                >
-                  Resume
-                </button>
-                <button
-                  type="button"
-                  class="ml-3 text-xs text-rose-300 hover:underline"
-                  @click="setRecurringStatus(r.id, 'canceled')"
-                >
-                  Cancel
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- recent ledger -->
-      <div v-if="detail && detail.transactions.length" class="mt-6">
-        <h3 class="text-sm font-semibold text-white">Recent transactions</h3>
-        <table class="mt-3 w-full text-left text-sm">
-          <tbody class="divide-y divide-white/5">
-            <tr v-for="t in detail.transactions" :key="t.id">
-              <td class="py-2 text-slate-400">{{ formatDate(t.createdAt) }}</td>
-              <td class="py-2 text-slate-200">{{ t.description }}</td>
-              <td
-                class="py-2 text-right"
-                :class="
-                  t.amountCents >= 0 ? 'text-emerald-300' : 'text-slate-200'
-                "
-              >
-                {{ t.amountCents >= 0 ? "+" : "−"
-                }}{{ formatUsdCents(Math.abs(t.amountCents)) }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-        <p v-if="detailPending" class="mt-4 text-sm text-slate-500">
-          Loading…
-        </p>
+                  {{ t.amountCents >= 0 ? "+" : "−"
+                  }}{{ formatUsdCents(Math.abs(t.amountCents)) }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p v-if="detailPending" class="mt-4 text-sm text-slate-500">Loading…</p>
       </div>
     </div>
   </div>

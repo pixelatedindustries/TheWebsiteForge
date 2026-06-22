@@ -119,7 +119,10 @@ async function setStatus(site: Site, status: string) {
 }
 
 function errMsg(e: unknown, fallback: string) {
-  const err = e as { data?: { statusMessage?: string }; statusMessage?: string };
+  const err = e as {
+    data?: { statusMessage?: string };
+    statusMessage?: string;
+  };
   return err?.data?.statusMessage || err?.statusMessage || fallback;
 }
 
@@ -167,7 +170,7 @@ onMounted(load);
           v-model="form.name"
           class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
           placeholder="Acme Co. website"
-        >
+        />
       </label>
       <label class="text-xs text-slate-400">
         Type
@@ -207,7 +210,7 @@ onMounted(load);
           v-model="form.deployUrl"
           class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
           placeholder="https://…"
-        >
+        />
       </label>
       <label class="text-xs text-slate-400">
         Repo URL
@@ -215,7 +218,7 @@ onMounted(load);
           v-model="form.repoUrl"
           class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
           placeholder="https://github.com/…"
-        >
+        />
       </label>
       <label class="text-xs text-slate-400">
         VPS host
@@ -223,7 +226,7 @@ onMounted(load);
           v-model="form.vpsHost"
           class="mt-1 w-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-sm text-white"
           placeholder="vps-1"
-        >
+        />
       </label>
       <div class="flex items-center gap-3 sm:col-span-2">
         <button
