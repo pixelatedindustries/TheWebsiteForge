@@ -1,0 +1,21 @@
+# Keep the build context small and reproducible — deps and build outputs are
+# generated inside the image, secrets and local state never enter it.
+.git
+node_modules
+.output
+.nuxt
+.nitro
+.cache
+.data
+dist
+coverage
+playwright-report
+test-results
+tests
+.env
+.env.*
+!.env.example
+.agents
+.claude
+.video-review
+*.log

@@ -1,0 +1,70 @@
+# Production stack for TheWebsiteForge (websiteforge.pixelatedindustries.com).
+# Run from /data/production/thewebsiteforge:
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# All application secrets are read from ./.env (see .env.example). The app talks
+# to Postgres over the internal `twf-network`, so DATABASE_URL below points at
+# the `postgres` service — you only need to set POSTGRES_USER/PASSWORD/DB in .env.
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: twf-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-twf}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-thewebsiteforge}
+    ports:
+      # Published on host 5434 (5432/5433 are already in use) for admin access.
+      # The app itself connects internally via `postgres:5432`.
+      - "${POSTGRES_PORT:-5434}:5432"
+    volumes:
+      - twf_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-twf} -d ${POSTGRES_DB:-thewebsiteforge}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - twf-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: twf-app
+    restart: unless-stopped
+    # Load every value from .env (Firebase, Paystack, Resend, admin emails, …).
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NITRO_HOST: 0.0.0.0
+      # Override DATABASE_URL so it targets the compose service regardless of
+      # what's in .env — the container can't reach the host's localhost.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-twf}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-thewebsiteforge}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      # host:container — nginx reverse-proxies websiteforge.* to 127.0.0.1:4006.
+      - "4006:3000"
+    volumes:
+      # Persist Nitro file-backed lead storage (nuxt.config.ts: storage.leads).
+      - twf_data:/app/.data
+    networks:
+      - twf-network
+
+volumes:
+  twf_pgdata:
+    name: twf_pgdata
+  twf_data:
+    name: twf_data
+
+networks:
+  twf-network:
+    driver: bridge
